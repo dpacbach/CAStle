@@ -1,0 +1,15 @@
+#!/bin/bash
+export LD_LIBRARY_PATH=/usr/local/lib64:/home/dsicilia/lib:$LD_LIBRARY_PATH
+export PATH=.:$PATH
+
+COUNT=$1
+
+if [ "$COUNT" != "" ]; then
+    perftest $COUNT
+else
+    perftest 1000
+    perftest 10000
+    perftest 100000
+    perftest 1000000
+    perftest 10000000
+fi

@@ -10,7 +10,7 @@
 
 #include <iostream>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 using namespace std;
 
@@ -75,7 +75,7 @@ public:
 protected:
     bool finalized;
 
-    boost::shared_ptr<vector<unit_t> > digits;
+    std::shared_ptr<vector<unit_t> > digits;
     int startPadding;
     int startNumbers;
     int end;

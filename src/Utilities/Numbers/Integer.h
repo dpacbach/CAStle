@@ -61,7 +61,7 @@ public:
     bool isLessThan(const Integer&) const;
     bool isEqualTo(const Integer&) const;
     bool isNegative(void) const;
-    operator bool() const;
+    explicit operator bool() const;
 
     int numberOfDigits(void) const;
     int numberOfTrailingZeros(void) const;
@@ -116,13 +116,13 @@ inline Integer abs(const Integer& number)
     return result;
 }
 
-/*
+
 inline std::ostream& operator<< (std::ostream& out, const Integer& number)
 {
     number.output(out);
     return out;
 }
-*/
+
 
 inline Integer operator+ (const Integer& lhs, const Integer& rhs)
 {

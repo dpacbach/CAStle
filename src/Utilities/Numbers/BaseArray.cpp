@@ -20,8 +20,9 @@ BaseArray::BaseArray(unsigned int size) : digits(new vector<BaseArray::unit_t>(s
 }
 BaseArray::BaseArray(const BaseArray& src)
 {
-    if (!src.isFinalized())
-        throw logic_error("src not finalized in DigitArray::DigitArray(const DigitArray&)");
+    // commented out for testing
+    //if (!src.isFinalized())
+    //    throw logic_error("src not finalized in DigitArray::DigitArray(const DigitArray&)");
     digits = src.digits;
 
     startPadding = src.startPadding;
@@ -77,10 +78,11 @@ void BaseArray::set(BaseArray::unit_t c, unsigned int index)
 
 BaseArray& BaseArray::operator= (const BaseArray& src)
 {
-    if (!isFinalized())
-        throw logic_error("*this not finalized in DigitArray::operator=(const DigitArray&)");
-    if (!src.isFinalized())
-        throw logic_error("src not finalized in DigitArray::operator=(const DigitArray&)");
+    // commented out for testing
+    //if (!isFinalized())
+    //    throw logic_error("*this not finalized in DigitArray::operator=(const DigitArray&)");
+    //if (!src.isFinalized())
+    //    throw logic_error("src not finalized in DigitArray::operator=(const DigitArray&)");
     digits = src.digits;
     startPadding = src.startPadding;
     startNumbers = src.startNumbers;

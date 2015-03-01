@@ -23,7 +23,7 @@ public:
     typedef unsigned int unit_t;
     typedef unsigned long int unit_t_long;
 
-    BaseArray(unsigned int size); // does not initialize
+    BaseArray(unsigned int size = 0); // does not initialize
     BaseArray(const BaseArray&);
     ~BaseArray();
 

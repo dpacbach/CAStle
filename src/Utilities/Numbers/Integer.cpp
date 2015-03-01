@@ -445,7 +445,8 @@ bool Integer::shiftRightOneBit(void)
     BaseArray::unit_t lsb = 0;
     for (int i = digits.size()-1; i >=0; i--)
     {
-         result.set((digits[i] >> 1) | (lsb << sizeof(BaseArray::unit_t)*8-1), i);
+         // TODO: Examine parenthesis here
+         result.set((digits[i] >> 1) | (lsb << (sizeof(BaseArray::unit_t)*8 - 1)), i);
          lsb = digits[i] & 1;
     }
     result.finalize();

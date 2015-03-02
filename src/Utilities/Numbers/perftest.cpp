@@ -4,6 +4,8 @@
 #include <chrono>
 #include <functional>
 #include <array>
+#include <memory>
+#include <vector>
 
 #include "BaseArray.h"
 #include "Integer.h"
@@ -340,11 +342,21 @@ auto output_test(double res, double base, const char* name)
 
 int main(int argc, char* argv[])
 {
+    //printf("sizeof(Integer):       %lu\n", sizeof(DS::Numbers::Integer));
+    //printf("sizeof(BaseArray):     %lu\n", sizeof(DS::Numbers::BaseArray));
+    //printf("sizeof(SP):            %lu\n", sizeof(std::shared_ptr<std::vector<int>>));
+    //printf("sizeof(vector):        %lu\n", sizeof(std::vector<int>));
+    //printf("sizeof(std::array[8]): %lu\n", sizeof(std::array<char, 8>));
+    //printf("sizeof(Float):     %lu\n", sizeof(DS::Numbers::Float));
+    //printf("sizeof(bool):      %lu\n", sizeof(bool));
+    //printf("sizeof(int):       %lu\n", sizeof(int));
+    fflush(stdout);
+
     auto count = (unsigned long)(100000);
     if (argc > 1)
         count = atol(argv[1]);
 
-    printf("Running with count: %lu\n", count);
+    //printf("Running with count: %lu\n", count);
 
     output_test(time_fn(count, test_basearray_creation), 20.90, "test_creation");
     output_test(time_fn(count, test_basearray_copying),  20.05, "test_copying");

@@ -23,17 +23,18 @@
 ////
 //// This class is only needed in cases when optimization is critical.
 //// Otherwise, a shared_ptr<vector<>> is fine, or if the size is known
-//// at compile time then shared_ptr<array<>>.
-////
+//// at compile time then shared_ptr<array<>>.  NOTE: This class will
+//// not call the constructors or destructors for the elements in the
+//// array.  For this reason we only allow instantiation with scalar
+//// types.
 
 #include <cstddef>
-#include <iostream>
-#include <type_traits>
-
-using std::cout;
-using std::endl;
 
 namespace DS {
+
+///////////////////////////////////////////////////////////////////////////////
+//// shared_array
+///////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
 class shared_array
@@ -41,24 +42,26 @@ class shared_array
     // This is because we do not call constructors or destructors
     // on the array elements.
     static_assert(std::is_scalar<T>::value == true,
-                  "shared_array can only be parametrized with a scalar type!");
+                  "shared_array can only be instantiated with a scalar template parameter");
 
 public:
 
-    // constructor needs to default initialize elements... or does it?
-    shared_array() = delete;
-
+    // Default constructor will not allocate control block.
+    explicit shared_array();
+    // Will always allocate control block
     explicit shared_array(size_t size);
+
     ~shared_array();
 
     shared_array(const shared_array&);
     shared_array(shared_array&&);
 
     const shared_array& operator= (const shared_array&);
-    const shared_array& operator= (shared_array&&);
+    shared_array& operator= (shared_array&&);
 
-    // Get/Set: No range checking
+    // Get/Set: No range checking, No null checking!
     // Hopefully this is not dereferencing the ptr
+    const T& operator[] (size_t idx) const { return m_ctl->elem[idx]; }
     T& operator[] (size_t idx) { return m_ctl->elem[idx]; }
 
 private:
@@ -68,7 +71,7 @@ private:
 
     struct control
     {
-        using ref_count_t = unsigned int;
+        using ref_count_t = unsigned long;
 
         control()                                  = delete;
         ~control()                                 = delete;
@@ -83,22 +86,32 @@ private:
         T elem[1];
     };
 
-    // This is non const to allow for moves
     control* m_ctl;
 };
 
 // Probably not necessary to check this, but it should be true
+// given the design goals of this class.
 static_assert(sizeof(shared_array<int>) == sizeof(void*),
-              "sizeof(shared_array) should be that of a single pointer!");
+              "The memory footprint of this class is intended to occupy "
+              "no more than the size of a raw pointer");
+
+///////////////////////////////////////////////////////////////////////////////
+//// Standard Constructors / Destructor
+///////////////////////////////////////////////////////////////////////////////
+
+template<typename T> shared_array<T>::shared_array() : m_ctl(nullptr) { }
 
 template<typename T>
 shared_array<T>::shared_array(size_t size)
+    : m_ctl(reinterpret_cast<control*>(new char[offsetof(control, elem) + sizeof(T)*size]))
 {
-    // Consider putting this in the initializer list
-    size_t target = offsetof(control, elem) + sizeof(T)*size;
-    cout << "constructor (#bytes == " << target << ")" << endl;
-    m_ctl = (control*)(new char[target]);
-    m_ctl->ref_count = 0;
+    m_ctl->ref_count = 1;
+}
+
+template<typename T>
+inline shared_array<T>::~shared_array()
+{
+    release();
 }
 
 template<typename T>
@@ -111,56 +124,55 @@ void shared_array<T>::release()
     }
 }
 
-template<typename T>
-inline shared_array<T>::~shared_array()
-{
-    cout << "destructor" << endl;
-    release();
-}
+///////////////////////////////////////////////////////////////////////////////
+//// Copying
+///////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
 inline shared_array<T>::shared_array(const shared_array<T>& sa)
     : m_ctl(sa.m_ctl)
 {
-    cout << "copy constructor" << endl;
-    ++(m_ctl->ref_count);
-}
-
-template<typename T>
-inline shared_array<T>::shared_array(shared_array<T>&& sa)
-    : m_ctl(std::move(sa.m_ctl))
-{
-    cout << "move constructor.  sa.m_ctl == " << sa.m_ctl << " ==? nullptr" << endl;
-    // Verify this
-    //sa.m_ctl = nullptr;
+    if (m_ctl)
+        ++(m_ctl->ref_count);
 }
 
 template<typename T>
 const shared_array<T>& shared_array<T>::operator= (const shared_array<T>& rhs)
 {
-    cout << "copy assignment" << endl;
+    // If the objects are referring to the same control block
+    // then just return
     if (this == &rhs || m_ctl == rhs.m_ctl)
-        return;
+        return *this;
     release();
     m_ctl = rhs.m_ctl;
     if (m_ctl)
-        ++m_ctl->ref_count;
+        ++(m_ctl->ref_count);
+    return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//// Moving
+///////////////////////////////////////////////////////////////////////////////
+
+template<typename T>
+inline shared_array<T>::shared_array(shared_array<T>&& rvalue)
+    : m_ctl(rvalue.m_ctl)
+{
+    rvalue.m_ctl = nullptr;
 }
 
 template<typename T>
-const shared_array<T>& shared_array<T>::operator= (shared_array<T>&& rhs)
+shared_array<T>& shared_array<T>::operator= (shared_array<T>&& rhs)
 {
-    cout << "move assignment" << endl;
     if (m_ctl == rhs.m_ctl) {
         if (this != &rhs)
             rhs.release();
-        return;
+        return *this;
     }
     release();
-    m_ctl = std::move(rhs.m_ctl);
-    // Verify this
-    //rhs.m_ctl = nullptr;
+    m_ctl = rhs.m_ctl;
+    rhs.m_ctl = nullptr;
+    return *this;
 }
-
 
 } // namespace DS

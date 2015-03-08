@@ -102,13 +102,11 @@ protected:
     int exponent;
 };
 
-/*
 inline std::ostream& operator<< (std::ostream& out, const Float& number)
 {
     number.output(out);
     return out;
 }
-*/
 
 inline Float floor(const Float& number)
 {

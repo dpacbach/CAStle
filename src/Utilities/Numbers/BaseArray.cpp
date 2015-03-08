@@ -11,8 +11,22 @@
 namespace DS {
 namespace Numbers {
 
-BaseArray::BaseArray(unsigned int size) : digits(new vector<BaseArray::unit_t>(size)) // does not initialize
+#ifdef USE_SHARED_PTR
+#    define DIGITS_REF (*digits)
+#else
+#    define DIGITS_REF digits
+#endif
+
+BaseArray::BaseArray(size_t size)
+#ifdef USE_SHARED_PTR
+    : digits(new vector<unit_t>(size)) // does not initialize
+#else
+    : digits(size) // does not initialize
+#endif
 {
+#ifndef USE_SHARED_PTR
+    m_digits_size = size;
+#endif
     finalized = false;
     startPadding = 0;
     startNumbers = 0;
@@ -29,9 +43,6 @@ BaseArray::BaseArray(const BaseArray& src)
     startNumbers = src.startNumbers;
     end = src.end;
     finalized = true;
-}
-BaseArray::~BaseArray()
-{
 }
 
 void BaseArray::finalize(void)
@@ -58,7 +69,7 @@ const BaseArray::unit_t& BaseArray::operator[] (unsigned int index) const
         return _dummyZero;
     if (temp >= end)
         throw out_of_range("index out of range in DigitArray::operator[] const");
-    return digits->operator[](temp);
+    return DIGITS_REF[temp];
 }
 
 // **********************************************************
@@ -70,7 +81,7 @@ void BaseArray::set(BaseArray::unit_t c, unsigned int index)
         throw logic_error("*this is finalized in DigitArray::operator[]");
     if (static_cast<int>(index) >= end)
         throw out_of_range("index out of range in DigitArray::operator[]");
-    digits->operator[](index) = c;
+    DIGITS_REF[(size_t)index] = c;
 }
 
 // **********************************************************
@@ -118,7 +129,7 @@ unsigned int BaseArray::removeTrailingZeros(void)
     }
     while (startPadding < end)
     {
-        if (digits->operator[](startPadding) != 0)
+        if (DIGITS_REF[startPadding] != 0)
             break;
         count++;
         startPadding++;
@@ -133,7 +144,7 @@ unsigned int BaseArray::removeLeadingZeros(void)
     unsigned int count = 0;
     while (end > startNumbers)
     {
-        if (digits->operator[](end-1) != 0)
+        if (DIGITS_REF[end-1] != 0)
             break;
         count++;
         end--;

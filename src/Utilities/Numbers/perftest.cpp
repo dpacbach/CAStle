@@ -283,10 +283,17 @@ auto test_integer(unsigned long count)
     cout << ((m == Integer(2)) ? "" : "               <red><b>**** Integer Result Incorrect! ****</b></red>\n");
 }
 
-auto test_float(unsigned long count)
+void verify_float_result(const DS::Numbers::Float& f, const char* target)
+{
+    std::stringstream s;
+    f.output(s);
+    cout << ((s.str() == target) ? "" : "               <red><b>**** Float Result Incorrect! ****</b></red>\n");
+}
+
+auto test_float_1(unsigned long count)
 {
     using DS::Numbers::Float;
-    Float c;
+    Float res;
     for (auto index = 0ul; index < count/1000; ++index) {
 #ifdef ENABLE_TESTS
         Float f(12345.45678);
@@ -295,15 +302,60 @@ auto test_float(unsigned long count)
         Float h(3456.0033);
         h.ln();
         h = h / g;
-        c = h;
+        res = h;
         h.sin();
         h.sqrt();
 #endif
     }
-    auto target = "(314956277*2^(384)+1538707376*2^(352)+989686057*2^(320)+3741943418*2^(288)+2329427682*2^(256)+2326218685*2^(224)+3335557927*2^(192)+1133823119*2^(160)+3715106361*2^(128)+2575701856*2^(96)+2251213430*2^(64)+2617781194*2^(32)+2682567656*2^(0)+0)*2^(-416)";
-    std::stringstream s;
-    c.output(s);
-    cout << ((s.str() == target) ? "" : "               <red><b>**** Float Result Incorrect! ****</b></red>\n");
+    verify_float_result(res, "(314956277*2^(384)+1538707376*2^(352)+989686057*2^(320)+3741943418*2^(288)+2329427682*2^(256)+2326218685*2^(224)+3335557927*2^(192)+1133823119*2^(160)+3715106361*2^(128)+2575701856*2^(96)+2251213430*2^(64)+2617781194*2^(32)+2682567656*2^(0)+0)*2^(-416)");
+}
+
+auto test_float_pisqrt(unsigned long count)
+{
+    using DS::Numbers::Float;
+    Float two(2.0), one(1.0), zero(0.0), res;
+    for (auto index = 0ul; index < count/7500; ++index) {
+#ifdef ENABLE_TESTS
+        Float prev = zero;
+        Float total = one;
+        for (auto term = 0ul; term < 200; ++term) {
+            Float tmp = sqrt(prev + two);
+            prev = tmp;
+            total *= tmp / two;
+        }
+        res = total;
+#endif
+    }
+    res = (one / res) * two - Float::pi();
+    verify_float_result(res, "-(156*2^(0)+0)*2^(-384)");
+}
+
+auto test_float_atan(unsigned long count)
+{
+    using DS::Numbers::Float;
+    Float one(1.0), res;
+    for (auto index = 0ul; index < count/800; ++index) {
+#ifdef ENABLE_TESTS
+        Float tmp = one;
+        tmp.atan();
+        res = tmp;
+#endif
+    }
+    verify_float_result(res, "(3373259426*2^(384)+560513588*2^(352)+3301335691*2^(320)+2161908945*2^(288)+688016904*2^(256)+2322058356*2^(224)+34324134*2^(192)+991140642*2^(160)+1363806329*2^(128)+2385773789*2^(96)+4019526067*2^(64)+3443147548*2^(32)+1990164480*2^(0)+0)*2^(-416)");
+}
+
+auto test_float_exppi(unsigned long count)
+{
+    using DS::Numbers::Float;
+    Float one(1.0), res;
+    for (auto index = 0ul; index < count/3300; ++index) {
+#ifdef ENABLE_TESTS
+        Float tmp = Float::pi();
+        tmp.exp();
+        res = tmp;
+#endif
+    }
+    verify_float_result(res, "(23*2^(384)+604270256*2^(352)+2470026957*2^(320)+2806554522*2^(288)+3077131569*2^(256)+4195970706*2^(224)+781375253*2^(192)+636627796*2^(160)+1645223727*2^(128)+3864209884*2^(96)+214643593*2^(64)+1945637413*2^(32)+2466733368*2^(0)+0)*2^(-384)");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -336,20 +388,22 @@ auto output_test(double res, double base, const char* name)
     percent_string += "%";
     if (percent >= 0.0)
         percent_string = " " + percent_string;
-    printf("    <blue>%15s</blue>:  %15ss    baseline: %12ss     Change: %-30s\n", name, str(res).c_str(), str(base).c_str(), percent_string.c_str());
+    printf("    <blue>%20s</blue>:  %15ss    baseline: %12ss     Change: %-30s\n", name, str(res).c_str(), str(base).c_str(), percent_string.c_str());
     fflush(stdout);
 }
 
 int main(int argc, char* argv[])
 {
-    //printf("sizeof(Integer):       %lu\n", sizeof(DS::Numbers::Integer));
-    //printf("sizeof(BaseArray):     %lu\n", sizeof(DS::Numbers::BaseArray));
-    //printf("sizeof(SP):            %lu\n", sizeof(std::shared_ptr<std::vector<int>>));
-    //printf("sizeof(vector):        %lu\n", sizeof(std::vector<int>));
-    //printf("sizeof(std::array[8]): %lu\n", sizeof(std::array<char, 8>));
-    //printf("sizeof(Float):     %lu\n", sizeof(DS::Numbers::Float));
-    //printf("sizeof(bool):      %lu\n", sizeof(bool));
-    //printf("sizeof(int):       %lu\n", sizeof(int));
+    DS::Numbers::Float::pi();
+    /*
+    printf("sizeof(BaseArray):     %lu\n", sizeof(DS::Numbers::BaseArray));
+    printf("sizeof(Integer):       %lu\n", sizeof(DS::Numbers::Integer));
+    printf("sizeof(Float):         %lu\n", sizeof(DS::Numbers::Float));
+    printf("sizeof(short):         %lu\n", sizeof(short));
+    printf("sizeof(int):           %lu\n", sizeof(int));
+    printf("sizeof(long):          %lu\n", sizeof(long));
+    printf("sizeof(long long):     %lu\n", sizeof(long long));
+    */
     fflush(stdout);
 
     auto count = (unsigned long)(100000);
@@ -363,7 +417,10 @@ int main(int argc, char* argv[])
     output_test(time_fn(count, test_basearray_setting),  20.70, "test_setting");
     output_test(time_fn(count, test_basearray_getting),  20.09, "test_getting");
     output_test(time_fn(count, test_integer),            23.83, "test_integer");
-    output_test(time_fn(count, test_float),              19.61, "test_float");
+    output_test(time_fn(count, test_float_1),            20.52, "test_float_1");
+    output_test(time_fn(count, test_float_pisqrt),       21.62, "test_float_pisqrt");
+    output_test(time_fn(count, test_float_atan),         24.76, "test_float_atan");
+    output_test(time_fn(count, test_float_exppi),        19.17, "test_float_exppi");
 
     return 0;
 }

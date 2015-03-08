@@ -2,7 +2,13 @@ run: perftest
 	@echo COLORMAKE_BEGIN_RUN
 	./run 1000000
 
-CC_FLAGS := -Wall -Wpedantic -std=c++1y
+run3: perftest
+	@echo COLORMAKE_BEGIN_RUN
+	./run 1000000
+	./run 1000000
+	./run 1000000
+
+CC_FLAGS := -m64 -Wall -Wpedantic -std=c++1y
 CC       := g++ $(CC_FLAGS)
 
 clean:
@@ -22,3 +28,5 @@ Integer.o: Integer.cpp Integer.h BaseArray.h Makefile
 
 Float.o: Float.cpp Float.h Integer.h BaseArray.h Makefile
 	$(CC) Float.cpp     -c -o Float.o
+
+.PHONY: run clean 

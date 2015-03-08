@@ -3,19 +3,21 @@ therefore the digits have to be stored on the heap, at least for large
 sizes.
 
 Create a "shared array" class.  This is essentially a class that manages
-an reference-counted, fixed-size array (but whose size is not known at
-compile time) which is allocated on the heap and whose reference count is
-allocated in the same block of memory as the array elements.  The size of
-the array is stored in the shared_array object itself and not on the heap.
+an reference-counted, fixed-size array (but whose size is not known
+at compile time) which is allocated on the heap and whose reference
+count is allocated in the same block of memory as the array elements.
 This should remove one level of heap indirection from BaseArray.
 
 Next try some specialization for small BaseArrays, maybe one or two long,
 possible with a union.  This should remove all heap interaction for small
 BaseArrays.
 
-Next try to decrease the memory footprint of the BaseArray.
+Next try getting rid of the finalized flag, maybe try using some const stuff
+for safety checking.
 
-Next put in some move semantics.
+Next try to decrease the memory footprint of the BaseArray, maybe with packing
+
+Next put in some move semantics if they're not already being used by default
 
 Make sure member variables are in the right order and that there is no
 unnecessary point dereferencing.

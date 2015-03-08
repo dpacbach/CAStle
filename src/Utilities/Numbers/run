@@ -5,3 +5,4 @@ export PATH=.:$PATH
 COUNT=$1
 
 perftest $COUNT | xtc
+#valgrind --tool=cachegrind perftest $COUNT

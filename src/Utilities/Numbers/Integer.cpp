@@ -132,7 +132,7 @@ void Integer::operator+= (const Integer& _number) // need to optimize (-) sectio
         BaseArray::unit_t_long carry = 0;
         for (; i < longerSize; ++i)
         {
-            // TODO: is this right?!?!? =====-,
+            // TODO: verify conversion is happening from small --> big
             BaseArray::unit_t_long twoDigits = longerDigits[i] + carry;
             if (i < shorterSize)
                 twoDigits += shorterDigits[i];
@@ -195,11 +195,9 @@ void Integer::operator+= (const Integer& _number) // need to optimize (-) sectio
         {
             BaseArray::unit_t_long twoDigits = larger.digits[largerIt] - borrow - smaller.digits[smallerIt];
             borrow = 0;
-            // TODO: bug?
-            //if (twoDigits & 0x1000000000000000) // is negative
             if (twoDigits & ((BaseArray::unit_t_long)1 << (UNIT_T_LONG_BITS-1))) // is negative
             {
-                twoDigits += ((BaseArray::unit_t_long)1 << UNIT_T_BITS); //0x0000000100000000;
+                twoDigits += ((BaseArray::unit_t_long)1 << UNIT_T_BITS); // e.g., 0x0000000100000000;
                 borrow = 1;
             }
             result.set(twoDigits, largerIt);
@@ -208,12 +206,10 @@ void Integer::operator+= (const Integer& _number) // need to optimize (-) sectio
         {
             BaseArray::unit_t_long twoDigits = larger.digits[largerIt] - borrow;
             borrow = 0;
-            // TODO: bug?
-            //if (twoDigits & 0x1000000000000000) // is negative
-            if (twoDigits & ((BaseArray::unit_t_long)1 << (UNIT_T_LONG_BITS-1))) //0x1000000000000000) // is negative
+            if (twoDigits & ((BaseArray::unit_t_long)1 << (UNIT_T_LONG_BITS-1))) // is negative
             {
                 // Doesn't seem to get here much in practice
-                twoDigits += ((BaseArray::unit_t_long)1 << UNIT_T_BITS); //0x0000000100000000;
+                twoDigits += ((BaseArray::unit_t_long)1 << UNIT_T_BITS); // e.g., 0x0000000100000000;
                 borrow = 1;
             }
             result.set(twoDigits, largerIt);
@@ -358,7 +354,6 @@ void Integer::operator%= (const Integer& number)
 {
     if (number == 2)
     {
-        // TODO: type?
         *this = Integer(digits[0]%2);
         return;
     }
@@ -429,7 +424,7 @@ void Integer::multiplyByDigit(int digit)
     for (int i = 0; i < size; i++)
     {
         twoDigits = digit*digits[i] + carry;
-        result.set(twoDigits & 0x0000FFFF, i); // TODO: correct constant?
+        result.set(twoDigits & 0x0000FFFF, i); // probably incorrect constant
         carry = twoDigits >> UNIT_T_LONG_BITS_DIV_2;
     }
     if (carry)
@@ -458,7 +453,6 @@ bool Integer::shiftRightOneBit(void)
     BaseArray::unit_t lsb = 0;
     for (int i = digits.size()-1; i >=0; i--)
     {
-         // TODO: Examine parenthesis here
          result.set((digits[i] >> 1) | (lsb << (UNIT_T_BITS - 1)), i);
          lsb = digits[i] & 1;
     }
@@ -646,7 +640,7 @@ void Integer::divideByUnit(BaseArray::unit_t b)
             c = ((((BaseArray::unit_t_long)temp.digits[temp.digits.size()-1])<<UNIT_T_BITS) + temp.digits[temp.digits.size()-2] )/b;
             numberOfDividends = 2;
         }
-        // TODO: ??? unsigned long --> unit_t ???
+        static_assert(sizeof(BaseArray::unit_t) >= sizeof(c), "BaseArray::unit_t not big enough");
         cInt = Integer((BaseArray::unit_t)c); //(unsigned int)c);
         cInt.shiftLeftByUnits((int)temp.digits.size()-(int)numberOfDividends);
         acc += cInt;

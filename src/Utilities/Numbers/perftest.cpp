@@ -6,6 +6,7 @@
 #include <array>
 #include <memory>
 #include <vector>
+#include <cstdint>
 
 #include "BaseArray.h"
 #include "Integer.h"
@@ -25,6 +26,7 @@ using std::string;
 auto test_basearray_creation(unsigned long count)
 {
     using DS::Numbers::BaseArray;
+    count = (count == 0) ? 1 : count;
     for (auto i = 0ul; i < count; ++i) {
 #ifdef ENABLE_TESTS
         {
@@ -68,6 +70,7 @@ auto test_basearray_copying(unsigned long count)
     using DS::Numbers::BaseArray;
     BaseArray b(100);
     b.finalize();
+    count = (count == 0) ? 1 : count;
     for (auto i = 0ul; i < count; ++i) {
 #ifdef ENABLE_TESTS
         { BaseArray c(b); BaseArray d(1); d = b; d = c; c = d; b = c; b = d; }{ BaseArray c(b); BaseArray d(1); d = b; d = c; c = d; b = c; b = d; }
@@ -109,6 +112,7 @@ auto test_basearray_setting(unsigned long count)
     for (auto& ba : baa)
         ba = BaseArray(100);
     unsigned long t = 1000;
+    count = (count == 0) ? 1 : count;
     for (auto i = 0ul; i < count; ++i) {
 #ifdef ENABLE_TESTS
         baa[i%t].set(i,i%100);baa[i%999].set(i,i%99);baa[i%998].set(i,i%98);baa[i%997].set(i,i%97);baa[i%t].set(i,i%100);baa[i%999].set(i,i%99);baa[i%998].set(i,i%98);baa[i%997].set(i,i%97);baa[i%t].set(i,i%100);baa[i%999].set(i,i%99);baa[i%998].set(i,i%98);baa[i%997].set(i,i%97);baa[i%t].set(i,i%100);baa[i%999].set(i,i%99);baa[i%998].set(i,i%98);baa[i%997].set(i,i%97);
@@ -180,6 +184,7 @@ auto test_basearray_getting(unsigned long count)
     for (auto& ba : baa)
         ba = BaseArray(100);
     BaseArray::unit_t a = 0;
+    count = (count == 0) ? 1 : count;
     for (auto i = 0ul; i < count; ++i) {
 #ifdef ENABLE_TESTS
         a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];a+=baa[i % 1000][i % 100];
@@ -262,7 +267,9 @@ auto test_integer(unsigned long count)
 {
     using DS::Numbers::Integer;
     Integer m(0);
-    for (auto index = 0ul; index < count/10000; ++index) {
+    count = count / 10000;
+    count = (count == 0) ? 1 : count;
+    for (auto index = 0ul; index < count; ++index) {
 #ifdef ENABLE_TESTS
         {
             Integer i(3473); Integer j(125); Integer k(100);
@@ -283,18 +290,30 @@ auto test_integer(unsigned long count)
     cout << ((m == Integer(2)) ? "" : "               <red><b>**** Integer Result Incorrect! ****</b></red>\n");
 }
 
-void verify_float_result(const DS::Numbers::Float& f, const char* target)
+void verify_float_with_double(const DS::Numbers::Float& f, double target)
 {
-    std::stringstream s;
-    f.output(s);
-    cout << ((s.str() == target) ? "" : "               <red><b>**** Float Result Incorrect! ****</b></red>\n");
+    double tmp = f.toDouble() / target;
+    double ep = .00001;
+    if (tmp < 1.0+ep && tmp > 1.0-ep)
+        return;
+    cout << "               <red><b>**** Float Result Incorrect! (" << f.toDouble() << " != " << target << ") ****</b></red>\n";
+}
+
+void verify_float_is_zero(const DS::Numbers::Float& f, double ep)
+{
+    double tmp = f.toDouble();
+    if (tmp < ep && tmp > -ep)
+        return;
+    cout << "               <red><b>**** Float Result Incorrect! (" << f.toDouble() << " != 0) ****</b></red>\n";
 }
 
 auto test_float_1(unsigned long count)
 {
     using DS::Numbers::Float;
     Float res;
-    for (auto index = 0ul; index < count/1000; ++index) {
+    count = count / 1000;
+    count = (count == 0) ? 1 : count;
+    for (auto index = 0ul; index < count; ++index) {
 #ifdef ENABLE_TESTS
         Float f(12345.45678);
         f.sqrt();
@@ -302,19 +321,21 @@ auto test_float_1(unsigned long count)
         Float h(3456.0033);
         h.ln();
         h = h / g;
-        res = h;
         h.sin();
         h.sqrt();
+        res = h;
 #endif
     }
-    verify_float_result(res, "(314956277*2^(384)+1538707376*2^(352)+989686057*2^(320)+3741943418*2^(288)+2329427682*2^(256)+2326218685*2^(224)+3335557927*2^(192)+1133823119*2^(160)+3715106361*2^(128)+2575701856*2^(96)+2251213430*2^(64)+2617781194*2^(32)+2682567656*2^(0)+0)*2^(-416)");
+    verify_float_with_double(res, .270676);
 }
 
 auto test_float_pisqrt(unsigned long count)
 {
     using DS::Numbers::Float;
     Float two(2.0), one(1.0), zero(0.0), res;
-    for (auto index = 0ul; index < count/7500; ++index) {
+    count = count / 7500;
+    count = (count == 0) ? 1 : count;
+    for (auto index = 0ul; index < count; ++index) {
 #ifdef ENABLE_TESTS
         Float prev = zero;
         Float total = one;
@@ -327,35 +348,40 @@ auto test_float_pisqrt(unsigned long count)
 #endif
     }
     res = (one / res) * two - Float::pi();
-    verify_float_result(res, "-(156*2^(0)+0)*2^(-384)");
+    verify_float_is_zero(res, 1.0e-30);
 }
 
 auto test_float_atan(unsigned long count)
 {
     using DS::Numbers::Float;
     Float one(1.0), res;
-    for (auto index = 0ul; index < count/800; ++index) {
+    count = count / 800;
+    count = (count == 0) ? 1 : count;
+    for (auto index = 0ul; index < count; ++index) {
 #ifdef ENABLE_TESTS
         Float tmp = one;
         tmp.atan();
         res = tmp;
 #endif
     }
-    verify_float_result(res, "(3373259426*2^(384)+560513588*2^(352)+3301335691*2^(320)+2161908945*2^(288)+688016904*2^(256)+2322058356*2^(224)+34324134*2^(192)+991140642*2^(160)+1363806329*2^(128)+2385773789*2^(96)+4019526067*2^(64)+3443147548*2^(32)+1990164480*2^(0)+0)*2^(-416)");
+    res = res*Float(4.0) - Float::pi();
+    verify_float_is_zero(res, 1.0e-30);
 }
 
 auto test_float_exppi(unsigned long count)
 {
     using DS::Numbers::Float;
     Float one(1.0), res;
-    for (auto index = 0ul; index < count/3300; ++index) {
+    count /= 3300;
+    count = (count == 0) ? 1 : count;
+    for (auto index = 0ul; index < count; ++index) {
 #ifdef ENABLE_TESTS
         Float tmp = Float::pi();
         tmp.exp();
         res = tmp;
 #endif
     }
-    verify_float_result(res, "(23*2^(384)+604270256*2^(352)+2470026957*2^(320)+2806554522*2^(288)+3077131569*2^(256)+4195970706*2^(224)+781375253*2^(192)+636627796*2^(160)+1645223727*2^(128)+3864209884*2^(96)+214643593*2^(64)+1945637413*2^(32)+2466733368*2^(0)+0)*2^(-384)");
+    verify_float_with_double(res, 23.1407);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -392,30 +418,41 @@ auto output_test(double res, double base, const char* name)
     fflush(stdout);
 }
 
+#define PRINT_SIZE(type) (printf("  %-28s %lu\n", #type, sizeof(type)));
+
 int main(int argc, char* argv[])
 {
-    DS::Numbers::Float::pi();
-    /*
-    printf("sizeof(BaseArray):     %lu\n", sizeof(DS::Numbers::BaseArray));
-    printf("sizeof(Integer):       %lu\n", sizeof(DS::Numbers::Integer));
-    printf("sizeof(Float):         %lu\n", sizeof(DS::Numbers::Float));
-    printf("sizeof(short):         %lu\n", sizeof(short));
-    printf("sizeof(int):           %lu\n", sizeof(int));
-    printf("sizeof(long):          %lu\n", sizeof(long));
-    printf("sizeof(long long):     %lu\n", sizeof(long long));
-    */
+    using DS::Numbers::Float;
+
+    //PRINT_SIZE(uint_fast8_t);
+    //PRINT_SIZE(uint_fast16_t);
+    //PRINT_SIZE(uint_fast32_t);
+    //PRINT_SIZE(uint_fast64_t);
+    //PRINT_SIZE(uintmax_t);
+    //PRINT_SIZE(__uint128_t);
+    //PRINT_SIZE(DS::Numbers::BaseArray);
+    //PRINT_SIZE(DS::Numbers::Integer);
+    //PRINT_SIZE(DS::Numbers::Float);
+    //PRINT_SIZE(double);
+    //PRINT_SIZE(long double);
+    //cout << "UNIT_T_MINUS1_LONG:       " << ((DS::Numbers::BaseArray::unit_t_long)(((DS::Numbers::BaseArray::unit_t)0)-1)) << endl;
+    //cout << "UNIT_T_LONG_BITS_DIV_2:   " << UNIT_T_LONG_BITS_DIV_2 << endl;
+    cout << "UNIT_T_BITS:              " << UNIT_T_BITS << endl;
+    cout << "UNIT_T_LONG_BITS:         " << UNIT_T_LONG_BITS << endl;
     fflush(stdout);
+
+    DS::Numbers::Float::pi();
 
     auto count = (unsigned long)(100000);
     if (argc > 1)
         count = atol(argv[1]);
-
-    //printf("Running with count: %lu\n", count);
+    count--;count++;
 
     output_test(time_fn(count, test_basearray_creation), 20.90, "test_creation");
     output_test(time_fn(count, test_basearray_copying),  20.05, "test_copying");
     output_test(time_fn(count, test_basearray_setting),  20.70, "test_setting");
     output_test(time_fn(count, test_basearray_getting),  20.09, "test_getting");
+
     output_test(time_fn(count, test_integer),            23.83, "test_integer");
     output_test(time_fn(count, test_float_1),            20.52, "test_float_1");
     output_test(time_fn(count, test_float_pisqrt),       21.62, "test_float_pisqrt");

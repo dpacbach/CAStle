@@ -1,10 +1,3 @@
-/*
- * Integer.cpp
- *
- *  Created on: Jan 2, 2013
- *      Author: davidsicilia
- */
-
 #include "Integer.h"
 #include <stdexcept>
 #include <algorithm>
@@ -74,7 +67,8 @@ void Integer::copyFrom(int _number)
     digits = result;
     */
 }
-void Integer::copyFrom(unsigned int _number)
+
+void Integer::copyFrom(BaseArray::unit_t _number)
 {
     BaseArray result(1);
     sign = true;
@@ -83,16 +77,19 @@ void Integer::copyFrom(unsigned int _number)
     digits.finalize();
     digits = result;
 }
+
 void Integer::copyFrom(const Integer& _number)
 {
     digits.finalize();
     digits = _number.digits;
     sign = _number.sign;
 }
+
 Integer::~Integer()
 {
 
 }
+
 void Integer::negate(void)
 {
     if (bool(*this))
@@ -135,11 +132,12 @@ void Integer::operator+= (const Integer& _number) // need to optimize (-) sectio
         BaseArray::unit_t_long carry = 0;
         for (; i < longerSize; ++i)
         {
+            // TODO: is this right?!?!? =====-,
             BaseArray::unit_t_long twoDigits = longerDigits[i] + carry;
             if (i < shorterSize)
                 twoDigits += shorterDigits[i];
-            carry = twoDigits >> 32;
-            result.set(twoDigits & 0x00000000FFFFFFFF, i);
+            carry = twoDigits >> UNIT_T_LONG_BITS_DIV_2;
+            result.set(twoDigits & UNIT_T_MAX_AS_LONG, i);
         }
         if (carry)
             result.set(carry, i);
@@ -197,9 +195,11 @@ void Integer::operator+= (const Integer& _number) // need to optimize (-) sectio
         {
             BaseArray::unit_t_long twoDigits = larger.digits[largerIt] - borrow - smaller.digits[smallerIt];
             borrow = 0;
-            if (twoDigits & 0x1000000000000000) // is negative
+            // TODO: bug?
+            //if (twoDigits & 0x1000000000000000) // is negative
+            if (twoDigits & ((BaseArray::unit_t_long)1 << (UNIT_T_LONG_BITS-1))) // is negative
             {
-                twoDigits += 0x0000000100000000;
+                twoDigits += ((BaseArray::unit_t_long)1 << UNIT_T_BITS); //0x0000000100000000;
                 borrow = 1;
             }
             result.set(twoDigits, largerIt);
@@ -208,9 +208,12 @@ void Integer::operator+= (const Integer& _number) // need to optimize (-) sectio
         {
             BaseArray::unit_t_long twoDigits = larger.digits[largerIt] - borrow;
             borrow = 0;
-            if (twoDigits & 0x1000000000000000) // is negative
+            // TODO: bug?
+            //if (twoDigits & 0x1000000000000000) // is negative
+            if (twoDigits & ((BaseArray::unit_t_long)1 << (UNIT_T_LONG_BITS-1))) //0x1000000000000000) // is negative
             {
-                twoDigits += 0x0000000100000000;
+                // Doesn't seem to get here much in practice
+                twoDigits += ((BaseArray::unit_t_long)1 << UNIT_T_BITS); //0x0000000100000000;
                 borrow = 1;
             }
             result.set(twoDigits, largerIt);
@@ -256,19 +259,19 @@ void Integer::multiply_SchoolBook(const Integer& _number)
         {
             BaseArray::unit_t_long product = right.digits[k]*digit;
             product += carry;
-            BaseArray::unit_t_long newDigit = product & 0x00000000FFFFFFFF;
-            carry = product >> 32;
+            BaseArray::unit_t_long newDigit = product & UNIT_T_MAX_AS_LONG; //UNIT_T_MAX_AS_LONG;
+            carry = product >> UNIT_T_LONG_BITS_DIV_2;
             BaseArray::unit_t_long addCarry = 0;
             BaseArray::unit_t_long sum = resultDigits[i+k]+newDigit;
-            resultDigits.set(sum & 0x00000000FFFFFFFF, k+i);
-            addCarry = sum >> 32;
+            resultDigits.set(sum & UNIT_T_MAX_AS_LONG, k+i);
+            addCarry = sum >> UNIT_T_LONG_BITS_DIV_2;
             if (addCarry)
             {
                 for (unsigned int j = i+k+1; j < initialSize; j++)
                 {
                     sum = resultDigits[j]+addCarry;
-                    resultDigits.set(sum & 0x00000000FFFFFFFF, j);
-                    addCarry = sum >> 32;
+                    resultDigits.set(sum & UNIT_T_MAX_AS_LONG, j);
+                    addCarry = sum >> UNIT_T_LONG_BITS_DIV_2;
                     if (!addCarry)
                         break;
                 }
@@ -277,15 +280,15 @@ void Integer::multiply_SchoolBook(const Integer& _number)
         if (carry)
         {
             BaseArray::unit_t_long sum = resultDigits[i+rightSize]+carry;
-            resultDigits.set(sum & 0x00000000FFFFFFFF, rightSize+i);
-            BaseArray::unit_t_long addCarry = sum >> 32;
+            resultDigits.set(sum & UNIT_T_MAX_AS_LONG, rightSize+i);
+            BaseArray::unit_t_long addCarry = sum >> UNIT_T_LONG_BITS_DIV_2;
             if (addCarry)
             {
                 for (unsigned int j = i+rightSize+1; j < initialSize; j++)
                 {
                     sum = resultDigits[j]+addCarry;
-                    resultDigits.set(sum & 0x00000000FFFFFFFF, j);
-                    addCarry = sum >> 32;
+                    resultDigits.set(sum & UNIT_T_MAX_AS_LONG, j);
+                    addCarry = sum >> UNIT_T_LONG_BITS_DIV_2;
                     if (!addCarry)
                         break;
                 }
@@ -299,6 +302,7 @@ void Integer::multiply_SchoolBook(const Integer& _number)
     if (!bool(*this))
         sign = true;
 }
+
 void Integer::splitDigits(const Integer& src, Integer& upper, Integer& lower, unsigned int splitPoint)
 {
     // error checking?
@@ -308,6 +312,7 @@ void Integer::splitDigits(const Integer& src, Integer& upper, Integer& lower, un
     upper = src;
     upper.shiftRightByUnits(splitPoint);
 }
+
 void Integer::multiply_Karatsuba(const Integer& _number) // only seems to be faster when digits ~ 1000
 {
     unsigned int numLeftDigits  = numberOfDigits();
@@ -342,6 +347,7 @@ void Integer::multiply_Karatsuba(const Integer& _number) // only seems to be fas
 
     *this = z0;
 }
+
 void Integer::operator*= (const Integer& _number)
 {
     //multiply_Karatsuba(_number);
@@ -352,6 +358,7 @@ void Integer::operator%= (const Integer& number)
 {
     if (number == 2)
     {
+        // TODO: type?
         *this = Integer(digits[0]%2);
         return;
     }
@@ -382,6 +389,7 @@ bool Integer::isLessThan(const Integer& number) const
     else
         return true^signFlip;
 }
+
 bool Integer::isEqualTo(const Integer& number) const
 {
     if (!bool(*this) && !bool(number))
@@ -393,6 +401,7 @@ bool Integer::isEqualTo(const Integer& number) const
             return false;
     return true;
 }
+
 bool Integer::isNegative(void) const
 {
     return !sign;
@@ -402,6 +411,8 @@ void Integer::removeZeros(void) // unused?
 {
     digits.removeLeadingZeros();
 }
+
+/*
 void Integer::multiplyByDigit(int digit)
 {
     if (digit == 0)
@@ -418,8 +429,8 @@ void Integer::multiplyByDigit(int digit)
     for (int i = 0; i < size; i++)
     {
         twoDigits = digit*digits[i] + carry;
-        result.set(twoDigits & 0x0000FFFF, i);
-        carry = twoDigits >> 32;
+        result.set(twoDigits & 0x0000FFFF, i); // TODO: correct constant?
+        carry = twoDigits >> UNIT_T_LONG_BITS_DIV_2;
     }
     if (carry)
         result.set(carry, size);
@@ -431,6 +442,8 @@ void Integer::multiplyByDigit(int digit)
     result.finalize();
     digits = result;
 }
+*/
+
 bool Integer::shiftRightOneBit(void)
 {
     if (digits.size() == 0)
@@ -446,7 +459,7 @@ bool Integer::shiftRightOneBit(void)
     for (int i = digits.size()-1; i >=0; i--)
     {
          // TODO: Examine parenthesis here
-         result.set((digits[i] >> 1) | (lsb << (sizeof(BaseArray::unit_t)*8 - 1)), i);
+         result.set((digits[i] >> 1) | (lsb << (UNIT_T_BITS - 1)), i);
          lsb = digits[i] & 1;
     }
     result.finalize();
@@ -455,6 +468,7 @@ bool Integer::shiftRightOneBit(void)
     digits = result;
     return bool(lsb);
 }
+
 void Integer::shiftLeftByUnits(int power)
 {
     if (power < 0)
@@ -468,6 +482,7 @@ void Integer::shiftLeftByUnits(int power)
         return;
     digits.shiftLeft(static_cast<unsigned int>(power));
 }
+
 void Integer::shiftRightByUnits(int power)
 {
     if (power < 0)
@@ -484,6 +499,7 @@ void Integer::shiftRightByUnits(int power)
     }
     digits.shiftRight(static_cast<unsigned int>(power));
 }
+
 void Integer::modByUnits(int power)
 {
     if (power < 0)
@@ -495,20 +511,24 @@ void Integer::modByUnits(int power)
 
     digits.cutToSize(static_cast<unsigned int>(power));
 }
+
 BaseArray::unit_t  Integer::getModByOneUnit(void) const
 {
     return digits[0];
 }
+
 BaseArray::unit_t  Integer::getMostSigUnit(void) const
 {
     return digits[digits.size()-1];
 }
+
 BaseArray::unit_t  Integer::getSecondMostSigUnit(void) const
 {
     if (digits.size() <= 1)
         return 0;
     return digits[digits.size()-2];
 }
+
 void Integer::setToZero(void)
 {
     BaseArray zero(1);
@@ -518,18 +538,22 @@ void Integer::setToZero(void)
     digits = zero;
     sign = true;
 }
+
 void Integer::makeAbs(void)
 {
     sign = true;
 }
+
 int Integer::numberOfDigits(void) const
 {
     return digits.size();
 }
+
 bool Integer::isMultipleOfUnit(void) const
 {
     return digits[0] == 0;
 }
+
 int Integer::numberOfTrailingZeros(void) const
 {
     int result = 0, size = digits.size(), i = 0;
@@ -542,6 +566,7 @@ int Integer::numberOfTrailingZeros(void) const
     }
     return result;
 }
+
 Integer::operator bool() const
 {
     if (digits.size() > 1)
@@ -553,11 +578,11 @@ Integer::operator bool() const
 
 // Optional to implement
 
-Integer::Integer(int _number) : digits(0)
+Integer::Integer(int _number) : digits()
 {
     copyFrom(_number);
 }
-Integer::Integer(unsigned int _number) : digits(0)
+Integer::Integer(BaseArray::unit_t _number) : digits()
 {
     copyFrom(_number);
 }
@@ -598,7 +623,6 @@ Integer Integer::operator-- (int)
     return copy;
 }
 
-
 void Integer::operator-= (const Integer& _number)
 {
     Integer temp(_number);
@@ -619,14 +643,15 @@ void Integer::divideByUnit(BaseArray::unit_t b)
         numberOfDividends = 1;
         if (!c)
         {
-            c = ((((unsigned long)temp.digits[temp.digits.size()-1])<<32) + temp.digits[temp.digits.size()-2] )/b;
+            c = ((((BaseArray::unit_t_long)temp.digits[temp.digits.size()-1])<<UNIT_T_BITS) + temp.digits[temp.digits.size()-2] )/b;
             numberOfDividends = 2;
         }
-        cInt = Integer((unsigned int)c);
+        // TODO: ??? unsigned long --> unit_t ???
+        cInt = Integer((BaseArray::unit_t)c); //(unsigned int)c);
         cInt.shiftLeftByUnits((int)temp.digits.size()-(int)numberOfDividends);
         acc += cInt;
-        temp -= cInt * Integer((unsigned int)b);
-    }    while(1);
+        temp -= cInt * Integer(b);
+    }   while(1);
 
     // temp holds modulus
     *this = acc;
@@ -655,17 +680,18 @@ Integer Integer::divideBy(const Integer& _b)
     //this->output(cout);
     //cout << " by ";
     //_b.output(cout);
+    //cout << endl;
     if (!_b)
         throw invalid_argument("divide by zero in Integer::divideBy");
 
     if (!(*this))
-        return (unsigned int)0;
+        return (BaseArray::unit_t)0;
 
     if (_b.numberOfDigits() == 1 && _b.digits[0] == 1)
     {
         if (_b.isNegative())
             negate();
-        return (unsigned int)0;
+        return (BaseArray::unit_t)0;
     }
 
     bool negativeFlag = this->isNegative() ^ _b.isNegative();
@@ -705,7 +731,7 @@ Integer Integer::divideBy(const Integer& _b)
         temp -= b*tempA;
         //tempA.shiftLeftByUnits(b.digits.size()-1);
         acc += tempA;
-    }    while(1);
+    }   while(1);
 
     *this = acc;
     if (negativeFlag)
@@ -749,14 +775,14 @@ void Integer::intRoot(const Integer& n)
 {
     Integer one(1), two(2), b;
 
-    b = Integer(this->digits.size()*32);
+    b = Integer((BaseArray::unit_t)(this->digits.size()*UNIT_T_BITS));
     BaseArray::unit_t shift = this->digits[this->digits.size()-1];
     while (shift > 0)
     {
         shift >>= 1;
         b++;
     }
-    b -= Integer(32);
+    b -= Integer((BaseArray::unit_t)UNIT_T_BITS);
     b /= n;
     Integer x(2);
     x.pow(b);
@@ -818,7 +844,6 @@ void Integer::pow(const Integer& _power) // Needs to be optimized
     result *= temp;
     *this = result;
 }
-
 
 } /* namespace Numbers */
 } /* namespace DS */

@@ -1,16 +1,7 @@
-/*
- * Integer.h
- *
- *  Created on: Jan 2, 2013
- *      Author: davidsicilia
- */
-
 #ifndef INTEGER_H_
 #define INTEGER_H_
 
 #include <iostream>
-#include <vector>
-#include <list>
 #include "BaseArray.h"
 
 using namespace std;
@@ -21,14 +12,14 @@ namespace Numbers {
 class Integer
 {
 public:
+
     Integer();
     Integer(int);
-    Integer(unsigned int);
+    Integer(BaseArray::unit_t);
     Integer(const Integer&);
     Integer& operator= (const Integer&);
     Integer& operator= (int);
     ~Integer();
-
 
     std::ostream& output(std::ostream& out) const
     {
@@ -37,7 +28,6 @@ public:
         digits.output(out);
         return out;
     }
-
 
     void negate(void);
     void makeAbs(void);
@@ -75,10 +65,12 @@ public:
     BaseArray::unit_t getModByOneUnit(void) const;
     BaseArray::unit_t getMostSigUnit(void) const;
     BaseArray::unit_t getSecondMostSigUnit(void) const;
-protected:
+
+private:
+
     void copyFrom(const Integer&);
     void copyFrom(int);
-    void copyFrom(unsigned int);
+    void copyFrom(BaseArray::unit_t);
     void multiplyByDigit(int digit);
     void removeZeros(void);
     void setToZero(void);

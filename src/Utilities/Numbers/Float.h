@@ -1,10 +1,3 @@
-/*
- * Float.h
- *
- *  Created on: Jan 5, 2013
- *      Author: davidsicilia
- */
-
 #ifndef DSFLOAT_H_
 #define DSFLOAT_H_
 
@@ -18,6 +11,7 @@ namespace Numbers {
 class Float
 {
 public:
+
     typedef Integer intType;
 
     Float();
@@ -32,7 +26,7 @@ public:
     std::ostream& output(std::ostream& out) const
     {
         mantissa.output(out);
-        out << "*2^(" << exponent*32 << ")";
+        out << "*2^(" << (int)(exponent*UNIT_T_BITS) << ")";
         return out;
         /*
         if (mantissa == 0)
@@ -89,7 +83,9 @@ public:
     void multiplyByBase(int);
     void divideByBase(int);
     void divideByTwo(void);
-protected:
+
+private:
+
     void copyFrom(const Float&);
     void copyFrom(double); // very expensive
     void setToZero(void);

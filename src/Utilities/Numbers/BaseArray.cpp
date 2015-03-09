@@ -1,10 +1,3 @@
-/*
- * DigitArray.cpp
- *
- *  Created on: Feb 20, 2013
- *      Author: davidsicilia
- */
-
 #include <stdexcept>
 #include "BaseArray.h"
 
@@ -32,6 +25,7 @@ BaseArray::BaseArray(size_t size)
     startNumbers = 0;
     end = size;
 }
+
 BaseArray::BaseArray(const BaseArray& src)
 {
     // commented out for testing
@@ -49,6 +43,7 @@ void BaseArray::finalize(void)
 {
     finalized = true;
 }
+
 bool BaseArray::isFinalized(void) const
 {
     return finalized;
@@ -61,6 +56,7 @@ unsigned int BaseArray::size(void) const
 {
     return static_cast<unsigned int>(end-startPadding);
 }
+
 const BaseArray::unit_t& BaseArray::operator[] (unsigned int index) const
 {
     static const unit_t _dummyZero = 0;
@@ -116,6 +112,7 @@ void BaseArray::cutToSize(unsigned int size)
     startPadding += (-end);
     end = startNumbers = 0;
 }
+
 unsigned int BaseArray::removeTrailingZeros(void)
 {
     if (!isFinalized())
@@ -137,6 +134,7 @@ unsigned int BaseArray::removeTrailingZeros(void)
     }
     return count;
 }
+
 unsigned int BaseArray::removeLeadingZeros(void)
 {
     if (!isFinalized())
@@ -156,6 +154,7 @@ unsigned int BaseArray::removeLeadingZeros(void)
     }
     return count;
 }
+
 void BaseArray::shiftLeft(unsigned int i)
 {
     if (!isFinalized())
@@ -163,6 +162,7 @@ void BaseArray::shiftLeft(unsigned int i)
 
     startPadding -= static_cast<int>(i);
 }
+
 void BaseArray::shiftRight(unsigned int i)
 {
     if (!isFinalized())
@@ -174,7 +174,6 @@ void BaseArray::shiftRight(unsigned int i)
     if (startPadding > end)
         startNumbers = startPadding = end;
 }
-
 
 } /* namespace Numbers */
 } /* namespace DS */

@@ -1,10 +1,3 @@
-/*
- * Float.cpp
- *
- *  Created on: Jan 5, 2013
- *      Author: davidsicilia
- */
-
 #include <stdexcept>
 #include <iostream>
 #include "Float.h"
@@ -17,18 +10,27 @@ namespace Numbers {
 //   aren't going to cut it
 // Try the algorithm for exp(x) based on exp(x)-1 = (exp(x/2)-1)*(exp(x/2)+1)
 
-const int Float::maxMantissaDigits(13);    // 26 --> 200
+const int Float::maxMantissaDigits(7);
+//const int Float::maxMantissaDigits(13);    // 26 --> 200
                                         // 13 --> 100 decimal digits
                                         //  7 -->  50
+
+// This will do an inefficient calculation of (double)(1 << size)
+// which can be calculated at compile time
+constexpr double one_shift_left(size_t size)
+{
+    return (size == 0) ? 1.0 : (2.0 * one_shift_left(size-1));
+}
 
 double Float::toDouble(void) const
 {
     BaseArray::unit_t mostSignificant = mantissa.getMostSigUnit();
     BaseArray::unit_t secondMostSignificant = mantissa.getSecondMostSigUnit();
     double result = secondMostSignificant;
-    result /= 4294967296.0; // 2^32
+    constexpr double dividend = one_shift_left(UNIT_T_BITS);
+    result /= dividend;
     result += mostSignificant;
-    int resultExp = (mantissa.numberOfDigits()+exponent-1)*sizeof(BaseArray::unit_t)*8;
+    int resultExp = (mantissa.numberOfDigits()+exponent-1)*UNIT_T_BITS;
     result = ldexp(result, resultExp);
     if (isNegative())
         result = -result;
@@ -45,15 +47,17 @@ void Float::copyFrom(double number)
     int intExp = 0;
     double doubleMantissa = frexp(number, &intExp);
 
+    // TODO: make sure this doesn't have to be changed for
+    // 64 bit words
     doubleMantissa *= 2147483648; // 2^31
     BaseArray::unit_t intMantissa = static_cast<BaseArray::unit_t>(doubleMantissa);
 
     intExp -= 31;
 
     mantissa = intMantissa;
-    exponent = intExp/32;
+    exponent = intExp/(int)UNIT_T_BITS;
 
-    intExp %= 32;
+    intExp %= (int)UNIT_T_BITS;
 
     static const Float two(Integer(2));
     if (intExp > 0)
@@ -63,7 +67,7 @@ void Float::copyFrom(double number)
     }
     else if (intExp < 0)
     {
-        int shifts = 32+intExp;
+        int shifts = (int)UNIT_T_BITS+intExp;
         for (; shifts > 0; shifts--)
             *this *= two;
         exponent--;
@@ -84,6 +88,7 @@ void Float::floor(void)
     exponent = 0;
     removeExcessMantissa();
 }
+
 void Float::operator+= (const Float& number)
 {
     const Float *_smaller, *_larger;
@@ -137,6 +142,7 @@ void Float::operator+= (const Float& number)
     exponent = tempLargerExponent;
     removeExcessMantissa();
 }
+
 void Float::operator*= (const Float& number)
 {
     mantissa *= number.mantissa;
@@ -150,6 +156,7 @@ void Float::operator/= (const Float& number)
     temp.inverse();
     (*this) *= temp;
 }
+
 void Float::operator%= (const Float& number)
 {
     if (this->isLessThan(number))
@@ -166,7 +173,7 @@ void Float::inverse(void)
     const Float two(Integer(2));
     Float x = Float(1.0/toDouble());
 
-    unsigned int maxIterations = 1 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*32))/log(2));
+    unsigned int maxIterations = 1 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*UNIT_T_BITS))/log(2));
     unsigned int count = 0;
     Float temp;
     while (1)
@@ -180,6 +187,7 @@ void Float::inverse(void)
     }
     *this = x;
 }
+
 void Float::sqrt(void)
 {
     if (isNegative())
@@ -197,7 +205,7 @@ void Float::sqrt(void)
 
     Float x = Float(std::sqrt(toDouble()));
 
-    unsigned int maxIterations = 2 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*32))/log(2));
+    unsigned int maxIterations = 2 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*UNIT_T_BITS))/log(2));
     unsigned int count = 0;
     Float temp;
     while (1)
@@ -212,6 +220,7 @@ void Float::sqrt(void)
     }
     *this = x;
 }
+
 const Float& Float::pi(void)
 {
     static Float Pi;
@@ -229,7 +238,7 @@ const Float& Float::pi(void)
         p = one;
         aTemp = a;
 
-        unsigned int maxIterations = 1 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*32))/log(2));
+        unsigned int maxIterations = 1 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*UNIT_T_BITS))/log(2));
         unsigned int i;
         for (i = 0; i < maxIterations; i++)
         {
@@ -252,6 +261,7 @@ const Float& Float::pi(void)
     }
     return Pi;
 }
+
 void Float::AG_mean(const Float& _g) // make sure this doesn't go into an infinite loop
 {
     Float a(*this), g(_g);
@@ -259,7 +269,7 @@ void Float::AG_mean(const Float& _g) // make sure this doesn't go into an infini
     if (oneHalf.isZero())
         oneHalf = Float(Integer(1))/Float(Integer(2));
 
-    unsigned int maxIterations = 20 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*32))/log(2));
+    unsigned int maxIterations = 20 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*UNIT_T_BITS))/log(2));
                                 // unneeded + (base + scaling)
 
     unsigned int count = 0;
@@ -277,6 +287,7 @@ void Float::AG_mean(const Float& _g) // make sure this doesn't go into an infini
             break;
     }
 }
+
 const Float& Float::lnTwo(void)
 {
     static Float lnTwoVar;
@@ -293,10 +304,11 @@ const Float& Float::lnTwo(void)
             s *= two;
 
         AGM.AG_mean(four/s);
-        lnTwoVar = Float::pi() / (AGM*two*Float(Integer(m)));
+        lnTwoVar = Float::pi() / (AGM*two*Float(Integer((BaseArray::unit_t)m)));
     }
     return lnTwoVar;
 }
+
 void Float::ln(void)
 {
     static Float one(Integer(1)), two(Integer(2)), four(Integer(4));
@@ -326,7 +338,7 @@ void Float::ln(void)
     }
 
     const unsigned int m = 2 + (unsigned int)(double(Float::maxMantissaDigits)*13 + .5);
-    static Integer mInt(m);
+    static Integer mInt((BaseArray::unit_t)m);
     static Float s, fourOverS, piOverTwo, mFloat(mInt), mFloatLnTwo;
     if (s.isZero())
     {
@@ -343,6 +355,7 @@ void Float::ln(void)
 
     *this = piOverTwo / AGM - mFloatLnTwo + Float(Integer(reduction))*Float::lnTwo();
 }
+
 void Float::exp(void) // make reductions faster
 {
      // x'=x*(1+(a+1-Ln(x))^2)/2
@@ -353,7 +366,7 @@ void Float::exp(void) // make reductions faster
         negativeFlag = true;
         negate();
     }
-    unsigned int maxIterations = 20 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*32))/log(3));
+    unsigned int maxIterations = 20 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*UNIT_T_BITS))/log(3));
 
     static Float one(Integer(1)), two(Integer(2));
     static Float oneHalf(one/two);
@@ -427,7 +440,7 @@ void Float::sin(void)
 
     Float result, power(*this), fact(Integer(1)), temp;
     bool sign = true;
-    double numberOfDigits = Float::maxMantissaDigits*32.0/3.32;
+    double numberOfDigits = Float::maxMantissaDigits*double(UNIT_T_BITS)/3.32;
     // .25 for reductions
     int maxTerms = .25 * 2.0*std::pow(numberOfDigits, .7), i;
     for (i = 1; i < 1+2*maxTerms; i += 2)
@@ -457,6 +470,7 @@ void Float::sin(void)
         result.negate();
     *this = result;
 }
+
 void Float::atan(void)
 {
     static const Float one(Integer(1)), two(Integer(2));
@@ -502,7 +516,7 @@ void Float::atan(void)
     Float result, power(*this), denominator(one), temp;
     bool sign = true;
 
-    double numberOfDigits = Float::maxMantissaDigits*32.0/3.32;
+    double numberOfDigits = Float::maxMantissaDigits*double(UNIT_T_BITS)/3.32;
     int maxTerms = .4 * 2.0*std::pow(numberOfDigits, .7), i;
     for (i = 1; i < 1+2*maxTerms; i += 2)
     {
@@ -576,6 +590,7 @@ bool Float::isLessThan(const Float& number) const // may have to be optimized
 
     return (mantissaCopy < numberMantissaCopy);
 }
+
 bool Float::isEqualTo(const Float& number) const // this needs to be redone based on a difference
 {
     int nodl = (*this).mantissa.numberOfDigits();
@@ -623,14 +638,17 @@ int Float::numberOfMantissaUnits(void) const
 {
     return mantissa.numberOfDigits();
 }
+
 void Float::multiplyByBase(int number)
 {
     exponent += number;
 }
+
 void Float::divideByBase(int number)
 {
     exponent -= number;
 }
+
 void Float::divideByTwo(void)
 {
     BaseArray::unit_t lsu = mantissa.getModByOneUnit();
@@ -642,6 +660,7 @@ void Float::divideByTwo(void)
     mantissa.shiftRightOneBit();
     removeExcessMantissa();
 }
+
 void Float::setToZero(void)
 {
     mantissa = 0;
@@ -664,7 +683,7 @@ void Float::removeExcessMantissa(void)
         exponent += (excess-1);
         bool carry = false;
         BaseArray::unit_t digit = mantissa.getModByOneUnit();
-        if (digit >= 0x80000000)
+        if (digit >= ((BaseArray::unit_t)1 << (UNIT_T_BITS-1))) //0x80000000)
             carry = true;
         mantissa.shiftRightByUnits(1);
         exponent += 1;
@@ -772,6 +791,7 @@ void Float::pow(const Float& number)
     if (negativeFlag)
         this->negate();
 }
+
 void Float::operator-= (const Float& number)
 {
     Float temp = number;
@@ -826,7 +846,6 @@ Float gcd(const Float& a, const Float& b)
     bNew.divideByTwo();
     return two*gcd(aNew, bNew);
 }
-
 
 } /* namespace Numbers */
 } /* namespace DS */

@@ -1,16 +1,10 @@
-/*
- * DigitArray.h
- *
- *  Created on: Feb 20, 2013
- *      Author: davidsicilia
- */
-
 #ifndef BASEARRAY_H_
 #define BASEARRAY_H_
 
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <cstdint>
 
 #include "../memory/shared_array.hpp"
 
@@ -19,13 +13,19 @@ using namespace std;
 namespace DS {
 namespace Numbers {
 
-#define USE_SHARED_PTR
+//#define USE_SHARED_PTR
 
 class BaseArray
 {
 public:
-    typedef unsigned int unit_t;
-    typedef unsigned long int unit_t_long;
+    // TODO: put noexcept on most methods here after removing
+    // the finalization check
+
+    typedef uint64_t    unit_t;
+    typedef __uint128_t unit_t_long;
+    //typedef uint32_t  unit_t;
+    //typedef uint64_t  unit_t_long;
+
     static_assert(sizeof(unit_t_long) == 2*sizeof(unit_t),
                   "Size of long type must be double that of unit type");
 
@@ -53,9 +53,9 @@ public:
 
         out << "(";
         for (i = end-1; i >= startNumbers; i--)
-            out << ref[i] << "*2^(" << (exp--)*32 << ")+";
+            out << ref[i] << "*2^(" << (exp--)*(sizeof(unit_t)*8) << ")+";
         for (; i > startPadding; i--)
-            out << 0 << "*2^(" << (exp--)*32 << ")+";
+            out << 0 << "*2^(" << (exp--)*(sizeof(unit_t)*8) << ")+";
         out << "0)";
     }
 
@@ -94,6 +94,16 @@ private:
     int startNumbers;
     int end;
 };
+
+// TODO: Should pull this stuff out into a config file
+#define UNIT_T_MAX_AS_LONG     ((DS::Numbers::BaseArray::unit_t_long)(((DS::Numbers::BaseArray::unit_t)0)-1))
+#define UNIT_T_LARGEST         (((DS::Numbers::BaseArray::unit_t)0)-1)
+#define UNIT_T_LONG_BITS_DIV_2 ((size_t)(sizeof(DS::Numbers::BaseArray::unit_t_long)/2*8))
+#define UNIT_T_LONG_BITS       ((size_t)(sizeof(DS::Numbers::BaseArray::unit_t_long)*8))
+#define UNIT_T_BITS            ((size_t)(sizeof(DS::Numbers::BaseArray::unit_t)*8))
+
+static_assert(UNIT_T_LONG_BITS_DIV_2 == UNIT_T_LONG_BITS / 2, "Error in BaseArray type sizes");
+static_assert(UNIT_T_LONG_BITS       == UNIT_T_BITS * 2,      "Error in BaseArray type sizes");
 
 } /* namespace Numbers */
 } /* namespace DS */

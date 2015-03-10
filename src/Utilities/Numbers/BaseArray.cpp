@@ -4,20 +4,14 @@
 namespace DS {
 namespace Numbers {
 
-#ifdef USE_SHARED_PTR
-#    define DIGITS_REF (*digits)
-#else
-#    define DIGITS_REF digits
-#endif
-
 BaseArray::BaseArray(size_t size)
-#ifdef USE_SHARED_PTR
+#ifndef USE_SHARED_ARRAY
     : digits(new vector<unit_t>(size)) // does not initialize
 #else
     : digits(size) // does not initialize
 #endif
 {
-#ifndef USE_SHARED_PTR
+#ifdef USE_SHARED_ARRAY
     m_digits_size = size;
 #endif
     finalized = false;
@@ -57,26 +51,38 @@ unsigned int BaseArray::size(void) const
     return static_cast<unsigned int>(end-startPadding);
 }
 
-const BaseArray::unit_t& BaseArray::operator[] (unsigned int index) const
+#ifdef OPTIMIZE_GET_SET
+BaseArray::unit_t BaseArray::operator[] (unsigned int index) const NOEXCEPT
+{
+    int temp = startPadding + static_cast<int>(index);
+    if (temp < startNumbers)
+        return 0;
+#else
+const BaseArray::unit_t& BaseArray::operator[] (unsigned int index) const NOEXCEPT
 {
     static const unit_t _dummyZero = 0;
     int temp = startPadding + static_cast<int>(index);
     if (temp < startNumbers)
         return _dummyZero;
+#endif
+#ifndef NO_EXCEPTIONS
     if (temp >= end)
         throw out_of_range("index out of range in DigitArray::operator[] const");
+#endif
     return DIGITS_REF[temp];
 }
 
 // **********************************************************
 // * Before Finalization
 
-void BaseArray::set(BaseArray::unit_t c, unsigned int index)
+void BaseArray::set(BaseArray::unit_t c, unsigned int index) NOEXCEPT
 {
+#ifndef NO_EXCEPTIONS
     if (isFinalized())
         throw logic_error("*this is finalized in DigitArray::operator[]");
     if (static_cast<int>(index) >= end)
         throw out_of_range("index out of range in DigitArray::operator[]");
+#endif
     DIGITS_REF[(size_t)index] = c;
 }
 
@@ -85,11 +91,13 @@ void BaseArray::set(BaseArray::unit_t c, unsigned int index)
 
 BaseArray& BaseArray::operator= (const BaseArray& src)
 {
+#ifndef NO_EXCEPTIONS
     // commented out for testing
     //if (!isFinalized())
     //    throw logic_error("*this not finalized in DigitArray::operator=(const DigitArray&)");
     //if (!src.isFinalized())
     //    throw logic_error("src not finalized in DigitArray::operator=(const DigitArray&)");
+#endif
     digits = src.digits;
     startPadding = src.startPadding;
     startNumbers = src.startNumbers;
@@ -99,10 +107,12 @@ BaseArray& BaseArray::operator= (const BaseArray& src)
 
 void BaseArray::cutToSize(unsigned int size)
 {
+#ifndef NO_EXCEPTIONS
     if (!isFinalized())
         throw logic_error("*this not finalized in DigitArray::cutToSize");
     if (static_cast<int>(size) > (end-startPadding))
         throw invalid_argument("size > (end-startPadding) in DigitArray::cutToSize");
+#endif
     end = startPadding+static_cast<int>(size);
     if (end >= startNumbers)
         return;
@@ -115,8 +125,10 @@ void BaseArray::cutToSize(unsigned int size)
 
 unsigned int BaseArray::removeTrailingZeros(void)
 {
+#ifndef NO_EXCEPTIONS
     if (!isFinalized())
         throw logic_error("*this not finalized in DigitArray::removeTrailingZeros");
+#endif
     unsigned int count = 0;
 
     if (startPadding < startNumbers)
@@ -137,8 +149,10 @@ unsigned int BaseArray::removeTrailingZeros(void)
 
 unsigned int BaseArray::removeLeadingZeros(void)
 {
+#ifndef NO_EXCEPTIONS
     if (!isFinalized())
         throw logic_error("*this not finalized in DigitArray::removeLeadingZeros");
+#endif
     unsigned int count = 0;
     while (end > startNumbers)
     {
@@ -157,17 +171,19 @@ unsigned int BaseArray::removeLeadingZeros(void)
 
 void BaseArray::shiftLeft(unsigned int i)
 {
+#ifndef NO_EXCEPTIONS
     if (!isFinalized())
         throw logic_error("*this not finalized in DigitArray::shiftLeft");
-
+#endif
     startPadding -= static_cast<int>(i);
 }
 
 void BaseArray::shiftRight(unsigned int i)
 {
+#ifndef NO_EXCEPTIONS
     if (!isFinalized())
         throw logic_error("*this not finalized in DigitArray::shiftRight");
-
+#endif
     startPadding += static_cast<int>(i);
     if (startPadding > startNumbers)
         startNumbers = startPadding;

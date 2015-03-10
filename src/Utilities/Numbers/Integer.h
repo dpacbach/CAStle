@@ -17,7 +17,9 @@ public:
     Integer(int);
     Integer(BaseArray::unit_t);
     Integer(const Integer&);
+    MOVE(Integer(Integer&&) = default)
     Integer& operator= (const Integer&);
+    MOVE(Integer& operator= (Integer&&) = default)
     Integer& operator= (int);
     ~Integer();
 

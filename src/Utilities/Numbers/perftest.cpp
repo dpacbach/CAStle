@@ -448,6 +448,7 @@ int main(int argc, char* argv[])
         count = atol(argv[1]);
     count--;count++;
 
+    //count = 1;
     output_test(time_fn(count, test_basearray_creation), 20.90, "test_creation");
     output_test(time_fn(count, test_basearray_copying),  20.05, "test_copying");
     output_test(time_fn(count, test_basearray_setting),  20.70, "test_setting");

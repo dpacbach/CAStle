@@ -1,23 +1,25 @@
-In general, we cannot know at compile time the size of the base array,
-therefore the digits have to be stored on the heap, at least for large
-sizes.
-
-Create a "shared array" class.  This is essentially a class that manages
+DONE *** Create a "shared array" class.  This is essentially a class that manages
 an reference-counted, fixed-size array (but whose size is not known
 at compile time) which is allocated on the heap and whose reference
 count is allocated in the same block of memory as the array elements.
 This should remove one level of heap indirection from BaseArray.
 
+DONE *** Try to upgrade to a 64bit unit_t
+
+DONE *** Next put in some move semantics if they're not already being used by default
+         Doesn't seem to do very much.
+
+PARTIALLY DONE *** Put the exception throwing behind guards
+
 Next try some specialization for small BaseArrays, maybe one or two long,
 possible with a union.  This should remove all heap interaction for small
-BaseArrays.
+BaseArrays.  Try to distinguish between BaseArrays which are known to
+be small at compiler time versus only at runtime.
 
 Next try getting rid of the finalized flag, maybe try using some const stuff
 for safety checking.
 
 Next try to decrease the memory footprint of the BaseArray, maybe with packing
-
-Next put in some move semantics if they're not already being used by default
 
 Make sure member variables are in the right order and that there is no
 unnecessary point dereferencing.

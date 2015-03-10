@@ -10,10 +10,13 @@ namespace Numbers {
 //   aren't going to cut it
 // Try the algorithm for exp(x) based on exp(x)-1 = (exp(x/2)-1)*(exp(x/2)+1)
 
+#ifdef OPTIMIZE_UNIT_T
 const int Float::maxMantissaDigits(7);
-//const int Float::maxMantissaDigits(13);    // 26 --> 200
+#else
+const int Float::maxMantissaDigits(13);    // 26 --> 200
                                         // 13 --> 100 decimal digits
                                         //  7 -->  50
+#endif
 
 // This will do an inefficient calculation of (double)(1 << size)
 // which can be calculated at compile time
@@ -182,16 +185,20 @@ void Float::inverse(void)
         if (x.isEqualTo(temp))
             break;
         temp = x;
+#ifndef NO_FLOAT_EXCEPTIONS
         if (++count >= maxIterations)
             throw logic_error("count >= maxIterations in Float::inverse()");
+#endif
     }
     *this = x;
 }
 
 void Float::sqrt(void)
 {
+#ifndef NO_FLOAT_EXCEPTIONS
     if (isNegative())
         throw invalid_argument("sqrt of a negative number in Float::sqrt");
+#endif
 
     static Float one(Integer(1)), two(Integer(2)), six(Integer(6)), ten(Integer(10));
     static Float oneHalf, guessCache[2][10];
@@ -199,8 +206,10 @@ void Float::sqrt(void)
     if (oneHalf.isZero())
     {
         oneHalf = one/two;
+#ifndef NO_FLOAT_EXCEPTIONS
         if (oneHalf.numberOfMantissaUnits() != 1)
             throw logic_error("oneHalf.numberOfMantissaDecimalDigits() != 1 in Float::sqrt");
+#endif
     }
 
     Float x = Float(std::sqrt(toDouble()));
@@ -215,8 +224,10 @@ void Float::sqrt(void)
         if (x.isEqualTo(temp))
             break;
         temp = x;
+#ifndef NO_FLOAT_EXCEPTIONS
         if (++count >= maxIterations)
             throw logic_error("count >= maxIterations in Float::sqrt()");
+#endif
     }
     *this = x;
 }
@@ -255,8 +266,10 @@ const Float& Float::pi(void)
             if (a.isEqualTo(g))
                 break;
         }
+#ifndef NO_FLOAT_EXCEPTIONS
         if (i == maxIterations)
             throw logic_error("i == maxIterations in Float::pi()");
+#endif
         Pi = (a+g)*(a+g)/(four*t);
     }
     return Pi;
@@ -281,8 +294,10 @@ void Float::AG_mean(const Float& _g) // make sure this doesn't go into an infini
         g.sqrt();
         a = *this;
         count++;
+#ifndef NO_FLOAT_EXCEPTIONS
         if (count >= maxIterations)
             throw logic_error("count >= maxIterations in Float::AG_mean()");
+#endif
         if ((*this).isEqualTo(g))
             break;
     }
@@ -315,7 +330,9 @@ void Float::ln(void)
 
     if (this->mantissa.isNegative() || !bool(this->mantissa))
     {
+#ifndef NO_FLOAT_EXCEPTIONS
         throw invalid_argument("log of a non-positive number in Float::ln");
+#endif
         return;
     }
     if (*this == one)
@@ -396,8 +413,10 @@ void Float::exp(void) // make reductions faster
         if (x.isEqualTo(temp))
             break;
     }
+#ifndef NO_FLOAT_EXCEPTIONS
     if (i == maxIterations)
         throw logic_error("i == maxIterations in Float::exp()");
+#endif
 
     for (unsigned int j = 0; j < reductions; j++)
         x *= x;
@@ -458,8 +477,10 @@ void Float::sin(void)
         if (temp.isEqualTo(result))
             break;
     }
+#ifndef NO_FLOAT_EXCEPTIONS
     if (i == maxTerms*2+1)
         throw logic_error("i == maxTerms in Float::sin()");
+#endif
     //cout << endl << "terms = " << (i-1)/2 << ", maxTerms = " << maxTerms;
 
     // sin(3x) = 3*sin(x) - 4*sin(x)^3
@@ -532,8 +553,10 @@ void Float::atan(void)
         if (temp.isEqualTo(result))
             break;
     }
+#ifndef NO_FLOAT_EXCEPTIONS
     if (i == maxTerms*2+1)
         throw logic_error("i == maxTerms in Float::atan()");
+#endif
     //cout << endl << "terms = " << (i-1)/2 << ", maxTerms = " << maxTerms;
 
     for (int i = 0; i < reductions; i++)
@@ -781,7 +804,9 @@ void Float::pow(const Float& number)
         else
         {
             // error, raising a negative number to a non integer power
+#ifndef NO_FLOAT_EXCEPTIONS
             throw logic_error("error, raising a negative number to a non integer power in Float::pow");
+#endif
             return;
         }
     }
@@ -803,10 +828,12 @@ Float gcd(const Float& a, const Float& b)
 {
     const static Float zero(Integer(0)), one(Integer(1)), two(Integer(2));
 
+#ifndef NO_FLOAT_EXCEPTIONS
     if (a.exponent < 0 || b.exponent < 0)
         throw invalid_argument("a or b is not a whole number in Float gcd(Float,Float)");
     if (a.mantissa < 0 || b.mantissa < 0)
         throw invalid_argument("a or b is not a positive number in Float gcd(Float,Float)");
+#endif
 
     if (a.isZero()) return b;
     if (b.isZero()) return a;

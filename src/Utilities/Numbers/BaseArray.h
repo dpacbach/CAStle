@@ -13,26 +13,54 @@ using namespace std;
 namespace DS {
 namespace Numbers {
 
-//#define USE_SHARED_PTR
+//#define USE_SHARED_ARRAY
+//#define OPTIMIZE_GET_SET
+//#define OPTIMIZE_UNIT_T
+//#define ENABLE_MOVES
+//#define NO_EXCEPTIONS
+//#define NO_INT_EXCEPTIONS
+//#define NO_FLOAT_EXCEPTIONS
+
+#define UNSAFE_DISABLE_STATIC_ASSERTS
+
+#ifdef NO_EXCEPTIONS
+#define NOEXCEPT noexcept
+#else
+#define NOEXCEPT
+#endif
+
+#ifdef ENABLE_MOVES
+#    define MOVE(a) a;
+#else
+#    define MOVE(a)
+#endif
+
+#ifndef USE_SHARED_ARRAY
+#    define DIGITS_REF (*digits)
+#else
+#    define DIGITS_REF digits
+#endif
 
 class BaseArray
 {
+
 public:
-    // TODO: put noexcept on most methods here after removing
-    // the finalization check
-
-    typedef uint64_t    unit_t;
-    typedef __uint128_t unit_t_long;
-    //typedef uint32_t  unit_t;
-    //typedef uint64_t  unit_t_long;
-
+#ifdef OPTIMIZE_UNIT_T
+    using unit_t      = uint64_t;
+    using unit_t_long = __uint128_t;
+#else
+    using unit_t      = uint32_t;
+    using unit_t_long = uint64_t;
+#endif
     static_assert(sizeof(unit_t_long) == 2*sizeof(unit_t),
                   "Size of long type must be double that of unit type");
 
     BaseArray(size_t size = 0); // does not initialize
     BaseArray(const BaseArray&);
     ~BaseArray() = default;
+    MOVE(BaseArray(BaseArray&&) = default)
 
+    // should be inlined
     void finalize(void);
     bool isFinalized(void) const;
 
@@ -45,7 +73,7 @@ public:
         }
         int i, exp = size()-1;
 
-#ifdef USE_SHARED_PTR
+#ifndef USE_SHARED_ARRAY
         const vector<unit_t>& ref = *digits;
 #else
         const unit_t* ref = &digits[0];
@@ -62,19 +90,24 @@ public:
     //**********************************************************
     // Always
 
+    // should be inlined
     unsigned int size(void) const;
-    const unit_t& operator[] (unsigned int index) const;
+#ifdef OPTIMIZE_GET_SET
+    unit_t operator[] (unsigned int index) const NOEXCEPT;
+#else
+    const unit_t& operator[] (unsigned int index) const NOEXCEPT;
+#endif
 
     //**********************************************************
     // Before Finalization
 
-    //void set(char c, unsigned int index);
-    void set(unit_t n, unsigned int index);
+    void set(unit_t n, unsigned int index) NOEXCEPT;
 
     //**********************************************************
     // After finalization
 
     BaseArray& operator= (const BaseArray&);
+    MOVE(BaseArray& operator= (BaseArray&&) = default)
 
     void cutToSize(unsigned int);
     unsigned int removeTrailingZeros(void);
@@ -84,7 +117,7 @@ public:
 
 private:
     bool finalized;
-#ifdef USE_SHARED_PTR
+#ifndef USE_SHARED_ARRAY
     std::shared_ptr<vector<unit_t> > digits;
 #else
     size_t m_digits_size;

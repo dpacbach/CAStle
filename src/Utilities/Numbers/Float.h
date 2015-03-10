@@ -16,11 +16,13 @@ public:
 
     Float();
     Float(const Float&);
+    MOVE(Float(Float&&) = default)
     Float(const intType& mantissa, int exponent = 0);
     Float(int mantissa, int exponent = 0);
     Float(double); // very expensive
     Float& operator= (double); // very expensive
     Float& operator= (const Float&);
+    MOVE(Float& operator= (Float&&) = default)
     ~Float();
 
     std::ostream& output(std::ostream& out) const

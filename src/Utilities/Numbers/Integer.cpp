@@ -214,8 +214,10 @@ void Integer::operator+= (const Integer& _number) // need to optimize (-) sectio
             }
             result.set(twoDigits, largerIt);
         }
+#ifndef NO_INT_EXCEPTIONS
         if (borrow != 0)
             throw logic_error("borrow != 0 in Integer::operator +=");
+#endif
 
         result.finalize();
         digits = result;
@@ -441,8 +443,10 @@ void Integer::multiplyByDigit(int digit)
 
 bool Integer::shiftRightOneBit(void)
 {
+#ifndef NO_INT_EXCEPTIONS
     if (digits.size() == 0)
         throw logic_error("digits.size() == 0 in Integer::shiftRightNBits()");
+#endif
     if (digits.size() == 1 && getMostSigUnit() <= 1)
     {
             bool result = bool(getMostSigUnit());
@@ -496,8 +500,10 @@ void Integer::shiftRightByUnits(int power)
 
 void Integer::modByUnits(int power)
 {
+#ifndef NO_INT_EXCEPTIONS
     if (power < 0)
         throw logic_error("power < 0 in Integer::modByOneUnit()");
+#endif
     if (!bool(*this))
         return;
     if (static_cast<unsigned int>(power) >= digits.size())
@@ -640,7 +646,9 @@ void Integer::divideByUnit(BaseArray::unit_t b)
             c = ((((BaseArray::unit_t_long)temp.digits[temp.digits.size()-1])<<UNIT_T_BITS) + temp.digits[temp.digits.size()-2] )/b;
             numberOfDividends = 2;
         }
+#ifndef UNSAFE_DISABLE_STATIC_ASSERTS
         static_assert(sizeof(BaseArray::unit_t) >= sizeof(c), "BaseArray::unit_t not big enough");
+#endif
         cInt = Integer((BaseArray::unit_t)c); //(unsigned int)c);
         cInt.shiftLeftByUnits((int)temp.digits.size()-(int)numberOfDividends);
         acc += cInt;
@@ -675,8 +683,10 @@ Integer Integer::divideBy(const Integer& _b)
     //cout << " by ";
     //_b.output(cout);
     //cout << endl;
+#ifndef NO_INT_EXCEPTIONS
     if (!_b)
         throw invalid_argument("divide by zero in Integer::divideBy");
+#endif
 
     if (!(*this))
         return (BaseArray::unit_t)0;

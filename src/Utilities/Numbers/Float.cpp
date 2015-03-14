@@ -177,7 +177,9 @@ void Float::inverse(void)
     Float x = Float(1.0/toDouble());
 
     unsigned int maxIterations = 1 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*UNIT_T_BITS))/log(2));
+    ((void)maxIterations);
     unsigned int count = 0;
+    ((void)count);
     Float temp;
     while (1)
     {
@@ -215,7 +217,9 @@ void Float::sqrt(void)
     Float x = Float(std::sqrt(toDouble()));
 
     unsigned int maxIterations = 2 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*UNIT_T_BITS))/log(2));
+    ((void)maxIterations);
     unsigned int count = 0;
+    ((void)count);
     Float temp;
     while (1)
     {
@@ -284,7 +288,7 @@ void Float::AG_mean(const Float& _g) // make sure this doesn't go into an infini
 
     unsigned int maxIterations = 20 + (unsigned int)(.5 + log(double(Float::maxMantissaDigits*UNIT_T_BITS))/log(2));
                                 // unneeded + (base + scaling)
-
+    ((void)maxIterations);
     unsigned int count = 0;
     while (1)
     {

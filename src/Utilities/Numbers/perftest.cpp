@@ -263,6 +263,24 @@ auto test_basearray_getting(unsigned long count)
     return a;
 }
 
+auto test_small_integer(unsigned long count)
+{
+    using DS::Numbers::Integer;
+    Integer m(0);
+    count = count / 4;
+    count = (count == 0) ? 1 : count;
+    for (auto index = 0ul; index < count; ++index) {
+#ifdef ENABLE_TESTS
+        Integer m3(3), m4(4), m5(5), m6(6);
+        m = (m3*m3 + m4*m4) / m3 + m6 + m6/m3;
+        m = m*m + m + m;
+        m = (m*m + m) / m;
+        m = m-m/2;
+#endif
+    }
+    cout << ((m == Integer(145)) ? "" : "               <red><b>**** Integer Result Incorrect! ****</b></red>\n");
+}
+
 auto test_integer(unsigned long count)
 {
     using DS::Numbers::Integer;
@@ -414,51 +432,45 @@ auto output_test(double res, double base, const char* name)
     percent_string += "%";
     if (percent >= 0.0)
         percent_string = " " + percent_string;
-    printf("    <blue>%20s</blue>:  %15ss    baseline: %12ss     Change: %-30s\n", name, str(res).c_str(), str(base).c_str(), percent_string.c_str());
+    printf("<blue>%20s</blue>:  %15ss    baseline: %12ss     Change: %-30s\n", name, str(res).c_str(), str(base).c_str(), percent_string.c_str());
     fflush(stdout);
 }
 
-#define PRINT_SIZE(type) (printf("  %-28s %lu\n", #type, sizeof(type)));
+#define PRINT_SIZE(type) (printf("%-25s %lu\n", #type, sizeof(type)));
 
 int main(int argc, char* argv[])
 {
     using DS::Numbers::Float;
 
-    //PRINT_SIZE(uint_fast8_t);
-    //PRINT_SIZE(uint_fast16_t);
-    //PRINT_SIZE(uint_fast32_t);
-    //PRINT_SIZE(uint_fast64_t);
+    //PRINT_SIZE(uint_fast8_t); //PRINT_SIZE(uint_fast16_t); //PRINT_SIZE(uint_fast32_t); //PRINT_SIZE(uint_fast64_t);
     //PRINT_SIZE(uintmax_t);
-    //PRINT_SIZE(__uint128_t);
-    //PRINT_SIZE(DS::Numbers::BaseArray);
-    //PRINT_SIZE(DS::Numbers::Integer);
-    //PRINT_SIZE(DS::Numbers::Float);
-    //PRINT_SIZE(double);
-    //PRINT_SIZE(long double);
-    //cout << "UNIT_T_MINUS1_LONG:       " << ((DS::Numbers::BaseArray::unit_t_long)(((DS::Numbers::BaseArray::unit_t)0)-1)) << endl;
-    //cout << "UNIT_T_LONG_BITS_DIV_2:   " << UNIT_T_LONG_BITS_DIV_2 << endl;
+    PRINT_SIZE(DS::Numbers::BaseArray);
+    PRINT_SIZE(DS::Numbers::Integer);
+    PRINT_SIZE(DS::Numbers::Float);
     cout << "UNIT_T_BITS:              " << UNIT_T_BITS << endl;
     cout << "UNIT_T_LONG_BITS:         " << UNIT_T_LONG_BITS << endl;
     fflush(stdout);
 
-    DS::Numbers::Float::pi();
+    // TODO: //DS::Numbers::Float::pi();
 
     auto count = (unsigned long)(100000);
     if (argc > 1)
         count = atol(argv[1]);
-    count--;count++;
+    ((void)count);
 
-    //count = 1;
-    output_test(time_fn(count, test_basearray_creation), 20.90, "test_creation");
-    output_test(time_fn(count, test_basearray_copying),  20.05, "test_copying");
-    output_test(time_fn(count, test_basearray_setting),  20.70, "test_setting");
-    output_test(time_fn(count, test_basearray_getting),  20.09, "test_getting");
+    count = 1;
 
-    output_test(time_fn(count, test_integer),            23.83, "test_integer");
-    output_test(time_fn(count, test_float_1),            20.52, "test_float_1");
-    output_test(time_fn(count, test_float_pisqrt),       21.62, "test_float_pisqrt");
-    output_test(time_fn(count, test_float_atan),         24.76, "test_float_atan");
-    output_test(time_fn(count, test_float_exppi),        19.17, "test_float_exppi");
+    //output_test(time_fn(count, test_basearray_creation), 20.90, "test_creation");
+    //output_test(time_fn(count, test_basearray_copying),  20.05, "test_copying");
+    //output_test(time_fn(count, test_basearray_setting),  20.70, "test_setting");
+    //output_test(time_fn(count, test_basearray_getting),  20.09, "test_getting");
+
+    //output_test(time_fn(count, test_integer),            23.83, "test_integer");
+    output_test(time_fn(count, test_small_integer),      20.00, "test_small_integer");
+    //output_test(time_fn(count, test_float_1),            20.52, "test_float_1");
+    //output_test(time_fn(count, test_float_pisqrt),       21.62, "test_float_pisqrt");
+    //output_test(time_fn(count, test_float_atan),         24.76, "test_float_atan");
+    //output_test(time_fn(count, test_float_exppi),        19.17, "test_float_exppi");
 
     return 0;
 }

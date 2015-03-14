@@ -8,18 +8,21 @@
 
 #include "../memory/shared_array.hpp"
 
-using namespace std;
-
 namespace DS {
 namespace Numbers {
 
-//#define USE_SHARED_ARRAY
-//#define OPTIMIZE_GET_SET
-//#define OPTIMIZE_UNIT_T
-//#define ENABLE_MOVES
-//#define NO_EXCEPTIONS
-//#define NO_INT_EXCEPTIONS
-//#define NO_FLOAT_EXCEPTIONS
+//#define OPTIMIZE
+
+#ifdef OPTIMIZE
+    #define SPECIALIZE_SIZE_ONE
+    #define USE_SHARED_ARRAY
+    #define OPTIMIZE_UNIT_T
+    #define NO_EXCEPTIONS
+    #define NO_INT_EXCEPTIONS
+    #define NO_FLOAT_EXCEPTIONS
+    #define OPTIMIZE_GET_SET
+    #define ENABLE_MOVES
+#endif
 
 #define UNSAFE_DISABLE_STATIC_ASSERTS
 
@@ -36,9 +39,17 @@ namespace Numbers {
 #endif
 
 #ifndef USE_SHARED_ARRAY
-#    define DIGITS_REF (*digits)
+#    ifdef SPECIALIZE_SIZE_ONE
+#        define DIGITS_REF (*(m_digit_data.digits))
+#    else
+#        define DIGITS_REF (*digits)
+#    endif
 #else
-#    define DIGITS_REF digits
+#    ifdef SPECIALIZE_SIZE_ONE
+#        define DIGITS_REF (m_digit_data.digits)
+#    else
+#        define DIGITS_REF digits
+#    endif
 #endif
 
 class BaseArray
@@ -57,26 +68,30 @@ public:
 
     BaseArray(size_t size = 0); // does not initialize
     BaseArray(const BaseArray&);
-    ~BaseArray() = default;
+    ~BaseArray();
     MOVE(BaseArray(BaseArray&&) = default)
 
     // should be inlined
     void finalize(void);
     bool isFinalized(void) const;
 
-    void output(ostream& out) const
+    void output(std::ostream& out) const
     {
         if (size() == 0)
         {
             out << "0";
             return;
         }
-        int i, exp = size()-1;
-
+        //int i, exp = size()-1;
+/*
 #ifndef USE_SHARED_ARRAY
-        const vector<unit_t>& ref = *digits;
+    #ifdef SPECIALIZE_SIZE_ONE
+        const std::vector<unit_t>& ref = *digits;
+    #else
+        const std::vector<unit_t>& ref = *digits;
+    #endif
 #else
-        const unit_t* ref = &digits[0];
+        const unit_t* ref = &DIGITS_REF[0];
 #endif
 
         out << "(";
@@ -85,6 +100,7 @@ public:
         for (; i > startPadding; i--)
             out << 0 << "*2^(" << (exp--)*(sizeof(unit_t)*8) << ")+";
         out << "0)";
+        */
     }
 
     //**********************************************************
@@ -116,16 +132,48 @@ public:
     void shiftRight(unsigned int);
 
 private:
-    bool finalized;
-#ifndef USE_SHARED_ARRAY
-    std::shared_ptr<vector<unit_t> > digits;
+
+    void release();
+
+#ifdef SPECIALIZE_SIZE_ONE
+    #ifdef USE_SHARED_ARRAY
+        union digit_data {
+            digit_data() {}
+            ~digit_data() {}
+            shared_array<unit_t> digits;
+            unit_t digit;
+        } m_digit_data;
+    #else
+        union digit_data {
+            digit_data() {}
+            ~digit_data() {}
+            std::shared_ptr<std::vector<unit_t>> digits;
+            unit_t digit;
+        } m_digit_data;
+    #endif
 #else
-    size_t m_digits_size;
-    shared_array<unit_t> digits;
+    #ifdef USE_SHARED_ARRAY
+        shared_array<unit_t> digits;
+    #else
+        std::shared_ptr<std::vector<unit_t>> digits;
+    #endif
 #endif
-    int startPadding;
-    int startNumbers;
-    int end;
+
+    short finalized;
+    short startPadding;
+    short startNumbers;
+    short end;
+
+    //unsigned char m_digits_size;
+    size_t m_digits_size;
+    /*
+    struct _extra {
+        short finalized;
+        short startPadding;
+        short startNumbers;
+        short end;
+    } m_extra;
+    */
 };
 
 // TODO: Should pull this stuff out into a config file
@@ -137,6 +185,7 @@ private:
 
 static_assert(UNIT_T_LONG_BITS_DIV_2 == UNIT_T_LONG_BITS / 2, "Error in BaseArray type sizes");
 static_assert(UNIT_T_LONG_BITS       == UNIT_T_BITS * 2,      "Error in BaseArray type sizes");
+//static_assert(sizeof(BaseArray) <= 16, "BaseArray too big!");
 
 } /* namespace Numbers */
 } /* namespace DS */

@@ -1,10 +1,12 @@
 #include <stdexcept>
+#include <algorithm>
+
 #include "BaseArray.h"
 
 namespace DS {
 namespace Numbers {
 
-#ifdef SPECIALIZE_SIZE_ONE
+#ifdef SPECIALIZE_SIZE
     BaseArray::BaseArray(size_t size)
         : finalized(false)
         , startPadding(0)
@@ -12,7 +14,7 @@ namespace Numbers {
         , end(size)
         , m_digits_size(size)
     {
-        if (size > 1)
+        if (size > max_specialize_size)
     #ifdef USE_SHARED_ARRAY
             new (&m_digit_data.digits) shared_array<unit_t>(size);
     #else
@@ -31,13 +33,13 @@ namespace Numbers {
         , startNumbers(0)
         , end(size)
         , m_digits_size(size)
-    { if (size > 1) throw 0; }
+    { }
 #endif
 
 void BaseArray::release()
 {
-#ifdef SPECIALIZE_SIZE_ONE
-    if (m_digits_size > 1)
+#ifdef SPECIALIZE_SIZE
+    if (m_digits_size > max_specialize_size)
     #ifdef USE_SHARED_ARRAY
         m_digit_data.digits.~shared_array<unit_t>();
     #else
@@ -61,15 +63,16 @@ BaseArray::BaseArray(const BaseArray& src)
     // commented out for testing
     //if (!src.isFinalized())
     //    throw logic_error("src not finalized in DigitArray::DigitArray(const DigitArray&)");
-#ifdef SPECIALIZE_SIZE_ONE
-    if (m_digits_size > 1)
+#ifdef SPECIALIZE_SIZE
+    if (m_digits_size > max_specialize_size)
     #ifdef USE_SHARED_ARRAY
         new (&m_digit_data.digits) shared_array<unit_t>(src.m_digit_data.digits);
     #else
         new (&m_digit_data.digits) std::shared_ptr<std::vector<unit_t>>(src.m_digit_data.digits);
     #endif
     else
-        m_digit_data.digit = src.m_digit_data.digit;
+        //m_digit_data.digit = src.m_digit_data.digit;
+        std::copy(src.m_digit_data.digit, src.m_digit_data.digit+max_specialize_size, m_digit_data.digit); 
 #else
     digits = src.digits;
 #endif
@@ -112,11 +115,11 @@ const BaseArray::unit_t& BaseArray::operator[] (unsigned int index) const NOEXCE
     if (temp >= end)
         throw std::out_of_range("index out of range in DigitArray::operator[] const");
 #endif
-#ifdef SPECIALIZE_SIZE_ONE
-    if (m_digits_size > 1)
+#ifdef SPECIALIZE_SIZE
+    if (m_digits_size > max_specialize_size)
         return DIGITS_REF[temp];
     else
-        return m_digit_data.digit;
+        return m_digit_data.digit[temp];
 #else
     return DIGITS_REF[temp];
 #endif
@@ -133,11 +136,11 @@ void BaseArray::set(BaseArray::unit_t c, unsigned int index) NOEXCEPT
     if (static_cast<int>(index) >= end)
         throw std::out_of_range("index out of range in DigitArray::operator[]");
 #endif
-#ifdef SPECIALIZE_SIZE_ONE
-    if (m_digits_size > 1)
+#ifdef SPECIALIZE_SIZE
+    if (m_digits_size > max_specialize_size)
         DIGITS_REF[(size_t)index] = c;
     else
-        m_digit_data.digit = c; // index needs to be bounds checked
+        m_digit_data.digit[(size_t)index] = c; // index needs to be bounds checked
 #else
     DIGITS_REF[(size_t)index] = c;
 #endif
@@ -158,15 +161,16 @@ BaseArray& BaseArray::operator= (const BaseArray& src)
     //    throw std::logic_error("src not finalized in DigitArray::operator=(const DigitArray&)");
 #endif
     release();
-#ifdef SPECIALIZE_SIZE_ONE
-    if (src.m_digits_size > 1)
+#ifdef SPECIALIZE_SIZE
+    if (src.m_digits_size > max_specialize_size)
     #ifdef USE_SHARED_ARRAY
         new (&m_digit_data.digits) shared_array<unit_t>(src.m_digit_data.digits);
     #else
         new (&m_digit_data.digits) std::shared_ptr<std::vector<unit_t>>(src.m_digit_data.digits);
     #endif
     else
-        m_digit_data.digit = src.m_digit_data.digit;
+        //m_digit_data.digit = src.m_digit_data.digit;
+        std::copy(src.m_digit_data.digit, src.m_digit_data.digit+max_specialize_size, m_digit_data.digit); 
 #else
     digits = src.digits;
 #endif
@@ -210,13 +214,13 @@ unsigned int BaseArray::removeTrailingZeros(void)
     }
     while (startPadding < end)
     {
-#ifdef SPECIALIZE_SIZE_ONE
-        if (m_digits_size > 1) {
+#ifdef SPECIALIZE_SIZE
+        if (m_digits_size > max_specialize_size) {
             if (DIGITS_REF[startPadding] != 0)
                 break;
         }
         else {
-            if (m_digit_data.digit != 0)
+            if (m_digit_data.digit[startPadding] != 0)
                 break;
         }
 #else
@@ -239,13 +243,13 @@ unsigned int BaseArray::removeLeadingZeros(void)
     unsigned int count = 0;
     while (end > startNumbers)
     {
-#ifdef SPECIALIZE_SIZE_ONE
-        if (m_digits_size > 1) {
+#ifdef SPECIALIZE_SIZE
+        if (m_digits_size > max_specialize_size) {
             if (DIGITS_REF[end-1] != 0)
                 break;
         }
         else {
-            if (m_digit_data.digit != 0)
+            if (m_digit_data.digit[end-1] != 0)
                 break;
         }
 #else

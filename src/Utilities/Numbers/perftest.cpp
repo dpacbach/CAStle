@@ -26,40 +26,41 @@ using std::string;
 auto test_basearray_creation(unsigned long count)
 {
     using DS::Numbers::BaseArray;
+    count /= 9;
     count = (count == 0) ? 1 : count;
     for (auto i = 0ul; i < count; ++i) {
 #ifdef ENABLE_TESTS
         {
-            BaseArray a0b1(count % 1000);BaseArray a0b2(count % 1000);BaseArray a0b3(count % 1000);BaseArray a0b4(count % 1000);
-            BaseArray a1b1(count % 1000);BaseArray a1b2(count % 1000);BaseArray a1b3(count % 1000);BaseArray a1b4(count % 1000);
-            BaseArray a2b1(count % 1000);BaseArray a2b2(count % 1000);BaseArray a2b3(count % 1000);BaseArray a2b4(count % 1000);
-            BaseArray a3b1(count % 1000);BaseArray a3b2(count % 1000);BaseArray a3b3(count % 1000);BaseArray a3b4(count % 1000);
-            BaseArray a4b1(count % 1000);BaseArray a4b2(count % 1000);BaseArray a4b3(count % 1000);BaseArray a4b4(count % 1000);
-            BaseArray a5b1(count % 1000);BaseArray a5b2(count % 1000);BaseArray a5b3(count % 1000);BaseArray a5b4(count % 1000);
-            BaseArray a6b1(count % 1000);BaseArray a6b2(count % 1000);BaseArray a6b3(count % 1000);BaseArray a6b4(count % 1000);
-            BaseArray a7b1(count % 1000);BaseArray a7b2(count % 1000);BaseArray a7b3(count % 1000);BaseArray a7b4(count % 1000);
-            BaseArray a8b1(count % 1000);BaseArray a8b2(count % 1000);BaseArray a8b3(count % 1000);BaseArray a8b4(count % 1000);
-            BaseArray a9b1(count % 1000);BaseArray a9b2(count % 1000);BaseArray a9b3(count % 1000);BaseArray a9b4(count % 1000);
-            BaseArray aab1(count % 1000);BaseArray aab2(count % 1000);BaseArray aab3(count % 1000);BaseArray aab4(count % 1000);
-            BaseArray abb1(count % 1000);BaseArray abb2(count % 1000);BaseArray abb3(count % 1000);BaseArray abb4(count % 1000);
-            BaseArray acb1(count % 1000);BaseArray acb2(count % 1000);BaseArray acb3(count % 1000);BaseArray acb4(count % 1000);
-            BaseArray adb1(count % 1000);BaseArray adb2(count % 1000);BaseArray adb3(count % 1000);BaseArray adb4(count % 1000);
+            BaseArray a0b1(i % 1000);BaseArray a0b2(i % 1000);BaseArray a0b3(i % 1000);BaseArray a0b4(i % 1000);
+            BaseArray a1b1(i % 1000);BaseArray a1b2(i % 1000);BaseArray a1b3(i % 1000);BaseArray a1b4(i % 1000);
+            BaseArray a2b1(i % 1000);BaseArray a2b2(i % 1000);BaseArray a2b3(i % 1000);BaseArray a2b4(i % 1000);
+            BaseArray a3b1(i % 1000);BaseArray a3b2(i % 1000);BaseArray a3b3(i % 1000);BaseArray a3b4(i % 1000);
+            BaseArray a4b1(i % 1000);BaseArray a4b2(i % 1000);BaseArray a4b3(i % 1000);BaseArray a4b4(i % 1000);
+            BaseArray a5b1(i % 1000);BaseArray a5b2(i % 1000);BaseArray a5b3(i % 1000);BaseArray a5b4(i % 1000);
+            BaseArray a6b1(i % 1000);BaseArray a6b2(i % 1000);BaseArray a6b3(i % 1000);BaseArray a6b4(i % 1000);
+            BaseArray a7b1(i % 1000);BaseArray a7b2(i % 1000);BaseArray a7b3(i % 1000);BaseArray a7b4(i % 1000);
+            BaseArray a8b1(i % 1000);BaseArray a8b2(i % 1000);BaseArray a8b3(i % 1000);BaseArray a8b4(i % 1000);
+            BaseArray a9b1(i % 1000);BaseArray a9b2(i % 1000);BaseArray a9b3(i % 1000);BaseArray a9b4(i % 1000);
+            BaseArray aab1(i % 1000);BaseArray aab2(i % 1000);BaseArray aab3(i % 1000);BaseArray aab4(i % 1000);
+            BaseArray abb1(i % 1000);BaseArray abb2(i % 1000);BaseArray abb3(i % 1000);BaseArray abb4(i % 1000);
+            BaseArray acb1(i % 1000);BaseArray acb2(i % 1000);BaseArray acb3(i % 1000);BaseArray acb4(i % 1000);
+            BaseArray adb1(i % 1000);BaseArray adb2(i % 1000);BaseArray adb3(i % 1000);BaseArray adb4(i % 1000);
         }
         {
-            BaseArray a0b1(count % 1000);BaseArray a0b2(count % 1000);BaseArray a0b3(count % 1000);BaseArray a0b4(count % 1000);
-            BaseArray a1b1(count % 1000);BaseArray a1b2(count % 1000);BaseArray a1b3(count % 1000);BaseArray a1b4(count % 1000);
-            BaseArray a2b1(count % 1000);BaseArray a2b2(count % 1000);BaseArray a2b3(count % 1000);BaseArray a2b4(count % 1000);
-            BaseArray a3b1(count % 1000);BaseArray a3b2(count % 1000);BaseArray a3b3(count % 1000);BaseArray a3b4(count % 1000);
-            BaseArray a4b1(count % 1000);BaseArray a4b2(count % 1000);BaseArray a4b3(count % 1000);BaseArray a4b4(count % 1000);
-            BaseArray a5b1(count % 1000);BaseArray a5b2(count % 1000);BaseArray a5b3(count % 1000);BaseArray a5b4(count % 1000);
-            BaseArray a6b1(count % 1000);BaseArray a6b2(count % 1000);BaseArray a6b3(count % 1000);BaseArray a6b4(count % 1000);
-            BaseArray a7b1(count % 1000);BaseArray a7b2(count % 1000);BaseArray a7b3(count % 1000);BaseArray a7b4(count % 1000);
-            BaseArray a8b1(count % 1000);BaseArray a8b2(count % 1000);BaseArray a8b3(count % 1000);BaseArray a8b4(count % 1000);
-            BaseArray a9b1(count % 1000);BaseArray a9b2(count % 1000);BaseArray a9b3(count % 1000);BaseArray a9b4(count % 1000);
-            BaseArray aab1(count % 1000);BaseArray aab2(count % 1000);BaseArray aab3(count % 1000);BaseArray aab4(count % 1000);
-            BaseArray abb1(count % 1000);BaseArray abb2(count % 1000);BaseArray abb3(count % 1000);BaseArray abb4(count % 1000);
-            BaseArray acb1(count % 1000);BaseArray acb2(count % 1000);BaseArray acb3(count % 1000);BaseArray acb4(count % 1000);
-            BaseArray adb1(count % 1000);BaseArray adb2(count % 1000);BaseArray adb3(count % 1000);BaseArray adb4(count % 1000);
+            BaseArray a0b1(i % 1000);BaseArray a0b2(i % 1000);BaseArray a0b3(i % 1000);BaseArray a0b4(i % 1000);
+            BaseArray a1b1(i % 1000);BaseArray a1b2(i % 1000);BaseArray a1b3(i % 1000);BaseArray a1b4(i % 1000);
+            BaseArray a2b1(i % 1000);BaseArray a2b2(i % 1000);BaseArray a2b3(i % 1000);BaseArray a2b4(i % 1000);
+            BaseArray a3b1(i % 1000);BaseArray a3b2(i % 1000);BaseArray a3b3(i % 1000);BaseArray a3b4(i % 1000);
+            BaseArray a4b1(i % 1000);BaseArray a4b2(i % 1000);BaseArray a4b3(i % 1000);BaseArray a4b4(i % 1000);
+            BaseArray a5b1(i % 1000);BaseArray a5b2(i % 1000);BaseArray a5b3(i % 1000);BaseArray a5b4(i % 1000);
+            BaseArray a6b1(i % 1000);BaseArray a6b2(i % 1000);BaseArray a6b3(i % 1000);BaseArray a6b4(i % 1000);
+            BaseArray a7b1(i % 1000);BaseArray a7b2(i % 1000);BaseArray a7b3(i % 1000);BaseArray a7b4(i % 1000);
+            BaseArray a8b1(i % 1000);BaseArray a8b2(i % 1000);BaseArray a8b3(i % 1000);BaseArray a8b4(i % 1000);
+            BaseArray a9b1(i % 1000);BaseArray a9b2(i % 1000);BaseArray a9b3(i % 1000);BaseArray a9b4(i % 1000);
+            BaseArray aab1(i % 1000);BaseArray aab2(i % 1000);BaseArray aab3(i % 1000);BaseArray aab4(i % 1000);
+            BaseArray abb1(i % 1000);BaseArray abb2(i % 1000);BaseArray abb3(i % 1000);BaseArray abb4(i % 1000);
+            BaseArray acb1(i % 1000);BaseArray acb2(i % 1000);BaseArray acb3(i % 1000);BaseArray acb4(i % 1000);
+            BaseArray adb1(i % 1000);BaseArray adb2(i % 1000);BaseArray adb3(i % 1000);BaseArray adb4(i % 1000);
         }
 #endif
     }
@@ -267,7 +268,7 @@ auto test_small_integer(unsigned long count)
 {
     using DS::Numbers::Integer;
     Integer m(0);
-    count = count / 4;
+    count = count / 3;
     count = (count == 0) ? 1 : count;
     for (auto index = 0ul; index < count; ++index) {
 #ifdef ENABLE_TESTS
@@ -432,45 +433,47 @@ auto output_test(double res, double base, const char* name)
     percent_string += "%";
     if (percent >= 0.0)
         percent_string = " " + percent_string;
-    printf("<blue>%20s</blue>:  %15ss    baseline: %12ss     Change: %-30s\n", name, str(res).c_str(), str(base).c_str(), percent_string.c_str());
+    string new_name = str(name) + ":";
+    printf("<blue>%-20s</blue>  %15ss    baseline: %12ss     Change: %-30s\n", new_name.c_str(), str(res).c_str(), str(base).c_str(), percent_string.c_str());
     fflush(stdout);
 }
 
-#define PRINT_SIZE(type) (printf("%-25s %lu\n", #type, sizeof(type)));
+#define PRINT_SIZE(type) (printf("  %-25s %lu\n", #type, sizeof(type)));
 
 int main(int argc, char* argv[])
 {
     using DS::Numbers::Float;
 
+    printf("Sizes:\n");
     //PRINT_SIZE(uint_fast8_t); //PRINT_SIZE(uint_fast16_t); //PRINT_SIZE(uint_fast32_t); //PRINT_SIZE(uint_fast64_t);
     //PRINT_SIZE(uintmax_t);
     PRINT_SIZE(DS::Numbers::BaseArray);
     PRINT_SIZE(DS::Numbers::Integer);
     PRINT_SIZE(DS::Numbers::Float);
-    cout << "UNIT_T_BITS:              " << UNIT_T_BITS << endl;
-    cout << "UNIT_T_LONG_BITS:         " << UNIT_T_LONG_BITS << endl;
+    cout << "  UNIT_T_BITS:              " << UNIT_T_BITS << endl;
+    cout << "  UNIT_T_LONG_BITS:         " << UNIT_T_LONG_BITS << endl;
     fflush(stdout);
 
-    // TODO: //DS::Numbers::Float::pi();
+    DS::Numbers::Float::pi();
 
     auto count = (unsigned long)(100000);
     if (argc > 1)
         count = atol(argv[1]);
     ((void)count);
 
-    count = 1;
+    //count = 1;
 
-    //output_test(time_fn(count, test_basearray_creation), 20.90, "test_creation");
-    //output_test(time_fn(count, test_basearray_copying),  20.05, "test_copying");
-    //output_test(time_fn(count, test_basearray_setting),  20.70, "test_setting");
-    //output_test(time_fn(count, test_basearray_getting),  20.09, "test_getting");
+    output_test(time_fn(count, test_basearray_creation), 19.05, "test_creation");
+    output_test(time_fn(count, test_basearray_copying),  20.05, "test_copying");
+    output_test(time_fn(count, test_basearray_setting),  20.70, "test_setting");
+    output_test(time_fn(count, test_basearray_getting),  20.09, "test_getting");
 
-    //output_test(time_fn(count, test_integer),            23.83, "test_integer");
-    output_test(time_fn(count, test_small_integer),      20.00, "test_small_integer");
-    //output_test(time_fn(count, test_float_1),            20.52, "test_float_1");
-    //output_test(time_fn(count, test_float_pisqrt),       21.62, "test_float_pisqrt");
-    //output_test(time_fn(count, test_float_atan),         24.76, "test_float_atan");
-    //output_test(time_fn(count, test_float_exppi),        19.17, "test_float_exppi");
+    output_test(time_fn(count, test_integer),            23.83, "test_integer");
+    output_test(time_fn(count, test_small_integer),      25.06, "test_small_integer");
+    output_test(time_fn(count, test_float_1),            20.52, "test_float_1");
+    output_test(time_fn(count, test_float_pisqrt),       21.62, "test_float_pisqrt");
+    output_test(time_fn(count, test_float_atan),         24.76, "test_float_atan");
+    output_test(time_fn(count, test_float_exppi),        19.17, "test_float_exppi");
 
     return 0;
 }

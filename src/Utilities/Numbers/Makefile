@@ -8,7 +8,7 @@ run3: perftest
 	./run 1000000
 	./run 1000000
 
-CC_FLAGS := -g -m64 -Wall -Wpedantic -std=c++1y
+CC_FLAGS := -m64 -Wall -Wpedantic -std=c++1y
 CC       := g++ $(CC_FLAGS)
 
 clean:

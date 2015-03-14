@@ -11,10 +11,10 @@
 namespace DS {
 namespace Numbers {
 
-//#define OPTIMIZE
+#define OPTIMIZE
 
 #ifdef OPTIMIZE
-    #define SPECIALIZE_SIZE_ONE
+    #define SPECIALIZE_SIZE
     #define USE_SHARED_ARRAY
     #define OPTIMIZE_UNIT_T
     #define NO_EXCEPTIONS
@@ -22,6 +22,10 @@ namespace Numbers {
     #define NO_FLOAT_EXCEPTIONS
     #define OPTIMIZE_GET_SET
     #define ENABLE_MOVES
+#endif
+
+#ifdef SPECIALIZE_SIZE
+const size_t max_specialize_size = 2; // making this bigger doesn't seem to have further effect
 #endif
 
 #define UNSAFE_DISABLE_STATIC_ASSERTS
@@ -39,13 +43,13 @@ namespace Numbers {
 #endif
 
 #ifndef USE_SHARED_ARRAY
-#    ifdef SPECIALIZE_SIZE_ONE
+#    ifdef SPECIALIZE_SIZE
 #        define DIGITS_REF (*(m_digit_data.digits))
 #    else
 #        define DIGITS_REF (*digits)
 #    endif
 #else
-#    ifdef SPECIALIZE_SIZE_ONE
+#    ifdef SPECIALIZE_SIZE
 #        define DIGITS_REF (m_digit_data.digits)
 #    else
 #        define DIGITS_REF digits
@@ -85,7 +89,7 @@ public:
         //int i, exp = size()-1;
 /*
 #ifndef USE_SHARED_ARRAY
-    #ifdef SPECIALIZE_SIZE_ONE
+    #ifdef SPECIALIZE_SIZE
         const std::vector<unit_t>& ref = *digits;
     #else
         const std::vector<unit_t>& ref = *digits;
@@ -135,20 +139,20 @@ private:
 
     void release();
 
-#ifdef SPECIALIZE_SIZE_ONE
+#ifdef SPECIALIZE_SIZE
     #ifdef USE_SHARED_ARRAY
         union digit_data {
             digit_data() {}
             ~digit_data() {}
             shared_array<unit_t> digits;
-            unit_t digit;
+            unit_t digit[max_specialize_size];
         } m_digit_data;
     #else
         union digit_data {
             digit_data() {}
             ~digit_data() {}
             std::shared_ptr<std::vector<unit_t>> digits;
-            unit_t digit;
+            unit_t digit[max_specialize_size];
         } m_digit_data;
     #endif
 #else
@@ -158,7 +162,13 @@ private:
         std::shared_ptr<std::vector<unit_t>> digits;
     #endif
 #endif
-
+/*
+    struct flags {
+        bool finalized : 1,
+        bool onedigit  : 1,
+        bool sign      : 1
+    }
+*/
     short finalized;
     short startPadding;
     short startNumbers;

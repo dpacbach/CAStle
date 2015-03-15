@@ -8,11 +8,12 @@ namespace Numbers {
 
 #ifdef SPECIALIZE_SIZE
     BaseArray::BaseArray(size_t size)
-        : finalized(false)
+        : m_flags(0, (uint8_t)(size <= max_specialize_size))
+        //: finalized(false)
         , startPadding(0)
         , startNumbers(0)
         , end(size)
-        , m_digits_size(size)
+        //, m_digits_size(size)
     {
         if (size > max_specialize_size)
     #ifdef USE_SHARED_ARRAY
@@ -28,18 +29,19 @@ namespace Numbers {
     #else
         : digits(new std::vector<unit_t>(size)) // does not initialize
     #endif
-        , finalized(false)
+        , m_flags(0, 0)
+        //, finalized(false)
         , startPadding(0)
         , startNumbers(0)
         , end(size)
-        , m_digits_size(size)
+        //, m_digits_size(size)
     { }
 #endif
 
 void BaseArray::release()
 {
 #ifdef SPECIALIZE_SIZE
-    if (m_digits_size > max_specialize_size)
+    if (!m_flags.fewdigits)
     #ifdef USE_SHARED_ARRAY
         m_digit_data.digits.~shared_array<unit_t>();
     #else
@@ -54,17 +56,18 @@ BaseArray::~BaseArray()
 }
 
 BaseArray::BaseArray(const BaseArray& src)
-    : finalized(true)
+    : m_flags(src.m_flags)
+    //: finalized(true)
     , startPadding(src.startPadding)
     , startNumbers(src.startNumbers)
     , end(src.end)
-    , m_digits_size(src.m_digits_size)
+    //, m_digits_size(src.m_digits_size)
 {
     // commented out for testing
     //if (!src.isFinalized())
     //    throw logic_error("src not finalized in DigitArray::DigitArray(const DigitArray&)");
 #ifdef SPECIALIZE_SIZE
-    if (m_digits_size > max_specialize_size)
+    if (!m_flags.fewdigits)
     #ifdef USE_SHARED_ARRAY
         new (&m_digit_data.digits) shared_array<unit_t>(src.m_digit_data.digits);
     #else
@@ -79,23 +82,8 @@ BaseArray::BaseArray(const BaseArray& src)
 
 }
 
-void BaseArray::finalize(void)
-{
-    finalized = true;
-}
-
-bool BaseArray::isFinalized(void) const
-{
-    return finalized;
-}
-
 // **********************************************************
 // * Always
-
-unsigned int BaseArray::size(void) const
-{
-    return static_cast<unsigned int>(end-startPadding);
-}
 
 #ifdef OPTIMIZE_GET_SET
 BaseArray::unit_t BaseArray::operator[] (unsigned int index) const NOEXCEPT
@@ -116,7 +104,7 @@ const BaseArray::unit_t& BaseArray::operator[] (unsigned int index) const NOEXCE
         throw std::out_of_range("index out of range in DigitArray::operator[] const");
 #endif
 #ifdef SPECIALIZE_SIZE
-    if (m_digits_size > max_specialize_size)
+    if (!m_flags.fewdigits)
         return DIGITS_REF[temp];
     else
         return m_digit_data.digit[temp];
@@ -137,7 +125,7 @@ void BaseArray::set(BaseArray::unit_t c, unsigned int index) NOEXCEPT
         throw std::out_of_range("index out of range in DigitArray::operator[]");
 #endif
 #ifdef SPECIALIZE_SIZE
-    if (m_digits_size > max_specialize_size)
+    if (!m_flags.fewdigits)
         DIGITS_REF[(size_t)index] = c;
     else
         m_digit_data.digit[(size_t)index] = c; // index needs to be bounds checked
@@ -162,7 +150,7 @@ BaseArray& BaseArray::operator= (const BaseArray& src)
 #endif
     release();
 #ifdef SPECIALIZE_SIZE
-    if (src.m_digits_size > max_specialize_size)
+    if (!src.m_flags.fewdigits)
     #ifdef USE_SHARED_ARRAY
         new (&m_digit_data.digits) shared_array<unit_t>(src.m_digit_data.digits);
     #else
@@ -177,7 +165,8 @@ BaseArray& BaseArray::operator= (const BaseArray& src)
     startPadding  = src.startPadding;
     startNumbers  = src.startNumbers;
     end           = src.end;
-    m_digits_size = src.m_digits_size;
+    m_flags       = src.m_flags;
+    //m_digits_size = src.m_digits_size;
     return *this;
 }
 
@@ -215,7 +204,7 @@ unsigned int BaseArray::removeTrailingZeros(void)
     while (startPadding < end)
     {
 #ifdef SPECIALIZE_SIZE
-        if (m_digits_size > max_specialize_size) {
+        if (!m_flags.fewdigits) {
             if (DIGITS_REF[startPadding] != 0)
                 break;
         }
@@ -244,7 +233,7 @@ unsigned int BaseArray::removeLeadingZeros(void)
     while (end > startNumbers)
     {
 #ifdef SPECIALIZE_SIZE
-        if (m_digits_size > max_specialize_size) {
+        if (!m_flags.fewdigits) {
             if (DIGITS_REF[end-1] != 0)
                 break;
         }

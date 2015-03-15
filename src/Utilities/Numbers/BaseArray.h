@@ -76,8 +76,8 @@ public:
     MOVE(BaseArray(BaseArray&&) = default)
 
     // should be inlined
-    void finalize(void);
-    bool isFinalized(void) const;
+    inline void finalize(void) { m_flags.finalized = 1; }
+    inline bool isFinalized(void) const { return m_flags.finalized; }
 
     void output(std::ostream& out) const
     {
@@ -111,7 +111,7 @@ public:
     // Always
 
     // should be inlined
-    unsigned int size(void) const;
+    inline unsigned int size(void) const { return end-startPadding; }
 #ifdef OPTIMIZE_GET_SET
     unit_t operator[] (unsigned int index) const NOEXCEPT;
 #else
@@ -162,20 +162,24 @@ private:
         std::shared_ptr<std::vector<unit_t>> digits;
     #endif
 #endif
-/*
+
     struct flags {
-        bool finalized : 1,
-        bool onedigit  : 1,
-        bool sign      : 1
-    }
-*/
-    short finalized;
+        flags(uint8_t f, uint8_t o) : finalized(f), fewdigits(o) {}
+        uint8_t  finalized : 1;
+        uint8_t  fewdigits : 1;
+        uint8_t  sign      : 1;
+        uint16_t padding   : 13;
+    } m_flags;
+    static_assert(sizeof(m_flags) == 2, "flags structure has unintended size");
+
+    //short finalized;
     short startPadding;
     short startNumbers;
     short end;
 
     //unsigned char m_digits_size;
-    size_t m_digits_size;
+    //size_t m_digits_size;
+
     /*
     struct _extra {
         short finalized;

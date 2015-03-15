@@ -434,7 +434,7 @@ auto output_test(double res, double base, const char* name)
     if (percent >= 0.0)
         percent_string = " " + percent_string;
     string new_name = str(name) + ":";
-    printf("<blue>%-20s</blue>  %15ss    baseline: %12ss     Change: %-30s\n", new_name.c_str(), str(res).c_str(), str(base).c_str(), percent_string.c_str());
+    printf("<blue>%-20s</blue>  %10ss    Change: %-30s\n", new_name.c_str(), str(res).c_str(), percent_string.c_str());
     fflush(stdout);
 }
 

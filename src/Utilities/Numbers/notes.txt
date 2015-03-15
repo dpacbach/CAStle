@@ -9,17 +9,20 @@ DONE *** Try to upgrade to a 64bit unit_t
 DONE *** Next put in some move semantics if they're not already being used by default
          Doesn't seem to do very much.
 
-PARTIALLY DONE *** Put the exception throwing behind guards
+DONE *** Put the exception throwing behind guards
 
-Next try some specialization for small BaseArrays, maybe one or two long,
-possible with a union.  This should remove all heap interaction for small
-BaseArrays.  Try to distinguish between BaseArrays which are known to
-be small at compiler time versus only at runtime.
+DONE *** Next try some specialization for small BaseArrays, maybe one or
+two long, possible with a union.  This should remove all heap interaction
+for small BaseArrays.  Try to distinguish between BaseArrays which are
+known to be small at compiler time versus only at runtime.
+
+Next try to decrease the memory footprint of the BaseArray, maybe with packing
+
+
+
 
 Next try getting rid of the finalized flag, maybe try using some const stuff
 for safety checking.
-
-Next try to decrease the memory footprint of the BaseArray, maybe with packing
 
 Make sure member variables are in the right order and that there is no
 unnecessary point dereferencing.

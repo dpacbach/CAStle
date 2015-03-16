@@ -28,6 +28,8 @@
 //// array.  For this reason we only allow instantiation with scalar
 //// types.
 
+#pragma once
+
 #include <cstddef>
 
 namespace DS {

@@ -1,18 +1,16 @@
 run: perftest
 	@echo COLORMAKE_BEGIN_RUN
-	./run 1000000
+	./run run | xtc
 
-run3: perftest
+baseline: perftest
 	@echo COLORMAKE_BEGIN_RUN
-	./run 1000000
-	./run 1000000
-	./run 1000000
+	./run baseline | tee baselines.in
 
 CC_FLAGS := -m64 -Wall -Wpedantic -std=c++1y
 CC       := g++ $(CC_FLAGS)
 
 clean:
-	-rm perftest perftest.o Float.o Integer.o BaseArray.o
+	-rm perftest perftest.o Float.o Integer.o BaseArray.o baselines.in
 
 perftest: perftest.o Float.o Integer.o BaseArray.o Makefile
 	$(CC) perftest.o Float.o Integer.o BaseArray.o -o perftest
@@ -29,4 +27,4 @@ Integer.o: Integer.cpp Integer.h BaseArray.h ../memory/shared_array.hpp Makefile
 Float.o: Float.cpp Float.h Integer.h BaseArray.h ../memory/shared_array.hpp Makefile
 	$(CC) Float.cpp     -c -o Float.o
 
-.PHONY: run clean 
+.PHONY: run clean rebase

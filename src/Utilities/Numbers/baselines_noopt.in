@@ -1,0 +1,7 @@
+test_integer 40 9.90151
+test_small_integer 136102 9.97242
+test_float_1 499 10.0111
+test_float_pisqrt 61 9.99421
+test_float_atan 508 10.0094
+test_float_exppi 160 9.92563
+test_coscos 52 9.91244

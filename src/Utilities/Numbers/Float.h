@@ -1,5 +1,4 @@
-#ifndef DSFLOAT_H_
-#define DSFLOAT_H_
+#pragma once
 
 #include <sstream>
 #include <string>
@@ -323,5 +322,3 @@ inline Float atan(const Float& number)
 Float gcd(const Float& a, const Float& b);
 
 } }
-
-#endif

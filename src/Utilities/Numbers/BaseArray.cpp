@@ -6,32 +6,20 @@
 namespace DS {
 namespace Numbers {
 
-#ifdef SPECIALIZE_SIZE
-    BaseArray::BaseArray(size_t size)
-        : m_flags(0, (uint8_t)(size <= max_specialize_size))
-        , startPadding(0)
-        , startNumbers(0)
-        , end(size)
-    {
-        if (size > max_specialize_size)
-            new (&m_digit_data.digits) shared_array<unit_t>(size);
-    }
-#else
-    BaseArray::BaseArray(size_t size)
-        : digits(size) // does not initialize
-        , m_flags(0, 0)
-        , startPadding(0)
-        , startNumbers(0)
-        , end(size)
-    { }
-#endif
+BaseArray::BaseArray(size_t size)
+    : m_flags(0, (uint8_t)(size <= max_specialize_size))
+    , startPadding(0)
+    , startNumbers(0)
+    , end(size)
+{
+    if (size > max_specialize_size)
+        new (&m_digit_data.digits) shared_array<unit_t>(size);
+}
 
 void BaseArray::release()
 {
-#ifdef SPECIALIZE_SIZE
     if (!m_flags.fewdigits)
         m_digit_data.digits.~shared_array<unit_t>();
-#endif
 }
 
 BaseArray::~BaseArray()
@@ -49,15 +37,10 @@ BaseArray::BaseArray(const BaseArray& src)
     if (!src.isFinalized())
         throw std::logic_error("src not finalized in DigitArray::DigitArray(const DigitArray&)");
 #endif
-#ifdef SPECIALIZE_SIZE
     if (!m_flags.fewdigits)
         new (&m_digit_data.digits) shared_array<unit_t>(src.m_digit_data.digits);
     else
         std::copy(src.m_digit_data.digit, src.m_digit_data.digit+max_specialize_size, m_digit_data.digit); 
-#else
-    digits = src.digits;
-#endif
-
 }
 
 // **********************************************************
@@ -72,14 +55,10 @@ BaseArray::unit_t BaseArray::operator[] (unsigned int index) const NOEXCEPT
     if (temp >= end)
         throw std::out_of_range("index out of range in DigitArray::operator[] const");
 #endif
-#ifdef SPECIALIZE_SIZE
     if (!m_flags.fewdigits)
-        return DIGITS_REF[temp];
+        return m_digit_data.digits[temp];
     else
         return m_digit_data.digit[temp];
-#else
-    return DIGITS_REF[temp];
-#endif
 }
 
 // **********************************************************
@@ -93,14 +72,10 @@ void BaseArray::set(BaseArray::unit_t c, unsigned int index) NOEXCEPT
     if (static_cast<int>(index) >= end)
         throw std::out_of_range("index out of range in DigitArray::operator[]");
 #endif
-#ifdef SPECIALIZE_SIZE
     if (!m_flags.fewdigits)
-        DIGITS_REF[(size_t)index] = c;
+        m_digit_data.digits[(size_t)index] = c;
     else
         m_digit_data.digit[(size_t)index] = c; // index needs to be bounds checked
-#else
-    DIGITS_REF[(size_t)index] = c;
-#endif
 }
 
 // **********************************************************
@@ -117,14 +92,10 @@ BaseArray& BaseArray::operator= (const BaseArray& src)
         throw std::logic_error("src not finalized in DigitArray::operator=(const DigitArray&)");
 #endif
     release();
-#ifdef SPECIALIZE_SIZE
     if (!src.m_flags.fewdigits)
         new (&m_digit_data.digits) shared_array<unit_t>(src.m_digit_data.digits);
     else
         std::copy(src.m_digit_data.digit, src.m_digit_data.digit+max_specialize_size, m_digit_data.digit); 
-#else
-    digits = src.digits;
-#endif
     startPadding  = src.startPadding;
     startNumbers  = src.startNumbers;
     end           = src.end;
@@ -165,19 +136,14 @@ unsigned int BaseArray::removeTrailingZeros(void)
     }
     while (startPadding < end)
     {
-#ifdef SPECIALIZE_SIZE
         if (!m_flags.fewdigits) {
-            if (DIGITS_REF[startPadding] != 0)
+            if (m_digit_data.digits[startPadding] != 0)
                 break;
         }
         else {
             if (m_digit_data.digit[startPadding] != 0)
                 break;
         }
-#else
-        if (DIGITS_REF[startPadding] != 0)
-            break;
-#endif
         count++;
         startPadding++;
         startNumbers++;
@@ -194,19 +160,14 @@ unsigned int BaseArray::removeLeadingZeros(void)
     unsigned int count = 0;
     while (end > startNumbers)
     {
-#ifdef SPECIALIZE_SIZE
         if (!m_flags.fewdigits) {
-            if (DIGITS_REF[end-1] != 0)
+            if (m_digit_data.digits[end-1] != 0)
                 break;
         }
         else {
             if (m_digit_data.digit[end-1] != 0)
                 break;
         }
-#else
-        if (DIGITS_REF[end-1] != 0)
-            break;
-#endif
         count++;
         end--;
     }

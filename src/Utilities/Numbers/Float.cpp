@@ -10,13 +10,10 @@ namespace Numbers {
 //   aren't going to cut it
 // Try the algorithm for exp(x) based on exp(x)-1 = (exp(x/2)-1)*(exp(x/2)+1)
 
-#ifdef OPTIMIZE_UNIT_T
 const int Float::maxMantissaDigits(7);
-#else
-const int Float::maxMantissaDigits(13);    // 26 --> 200
+//const int Float::maxMantissaDigits(13);    // 26 --> 200
                                         // 13 --> 100 decimal digits
                                         //  7 -->  50
-#endif
 
 // This will do an inefficient calculation of (double)(1 << size)
 // which can be calculated at compile time

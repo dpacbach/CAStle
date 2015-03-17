@@ -1,5 +1,4 @@
-#ifndef INTEGER_H_
-#define INTEGER_H_
+#pragma once
 
 #include <iostream>
 #include "BaseArray.h"
@@ -285,5 +284,3 @@ bool operator>= (const T& lhs, const Integer& rhs)
 }
 
 } }
-
-#endif /* INTEGER_H_ */

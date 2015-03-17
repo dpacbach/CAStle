@@ -1,11 +1,9 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
-#include <memory>
 #include <cstdint>
 
-#include "../memory/shared_array.hpp"
+#include "shared_array.hpp"
 
 namespace DS {
 namespace Numbers {
@@ -13,15 +11,12 @@ namespace Numbers {
 //#define OPTIMIZE
 
 #ifdef OPTIMIZE
-    #define SPECIALIZE_SIZE
-    //#define NO_EXCEPTIONS
-    //#define NO_INT_EXCEPTIONS
-    //#define NO_FLOAT_EXCEPTIONS
+    #define NO_EXCEPTIONS
+    #define NO_INT_EXCEPTIONS
+    #define NO_FLOAT_EXCEPTIONS
 #endif
 
-#ifdef SPECIALIZE_SIZE
-const size_t max_specialize_size = 2; // making this bigger doesn't seem to have further effect
-#endif
+constexpr const size_t max_specialize_size = 2; // making this bigger doesn't seem to have further effect
 
 #define UNSAFE_DISABLE_STATIC_ASSERTS
 
@@ -31,28 +26,23 @@ const size_t max_specialize_size = 2; // making this bigger doesn't seem to have
 #define NOEXCEPT
 #endif
 
-#ifdef SPECIALIZE_SIZE
-#    define DIGITS_REF (m_digit_data.digits)
-#else
-#    define DIGITS_REF digits
-#endif
-
 class BaseArray
 {
 
 public:
+    // If these sizes are changed then it will also be necessary
+    // to change the max size of the Float.
     using unit_t      = uint64_t;
     using unit_t_long = __uint128_t;
 
     static_assert(sizeof(unit_t_long) == 2*sizeof(unit_t),
                   "Size of long type must be double that of unit type");
 
-    BaseArray(size_t size = 0); // does not initialize
+    BaseArray(size_t size = 0);
     BaseArray(const BaseArray&);
     ~BaseArray();
     BaseArray(BaseArray&&) = default;
 
-    // should be inlined
     inline void finalize(void) { m_flags.finalized = 1; }
     inline bool isFinalized(void) const { return m_flags.finalized; }
 
@@ -64,7 +54,7 @@ public:
             return;
         }
         //int i, exp = size()-1;
-/*
+        /*
         const unit_t* ref = &DIGITS_REF[0];
 
         out << "(";
@@ -79,7 +69,6 @@ public:
     //**********************************************************
     // Always
 
-    // should be inlined
     inline unsigned int size(void) const { return end-startPadding; }
     unit_t operator[] (unsigned int index) const NOEXCEPT;
 
@@ -104,16 +93,12 @@ private:
 
     void release();
 
-#ifdef SPECIALIZE_SIZE
     union digit_data {
         digit_data() {}
         ~digit_data() {}
         shared_array<unit_t> digits;
         unit_t digit[max_specialize_size];
     } m_digit_data;
-#else
-    shared_array<unit_t> digits;
-#endif
 
     struct flags {
         flags(uint8_t f, uint8_t o) : finalized(f), fewdigits(o) {}

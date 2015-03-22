@@ -73,7 +73,6 @@ private:
     void copyFrom(int);
     void copyFrom(BaseArray::unit_t);
     void multiplyByDigit(int digit);
-    void removeZeros(void);
     void setToZero(void);
 
     void multiply_SchoolBook(const Integer&);

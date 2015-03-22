@@ -8,7 +8,9 @@
 namespace DS {
 namespace Numbers {
 
-//#define OPTIMIZE
+#define OPTIMIZE
+
+//#define NO_BA_EXCEPTIONS
 
 #ifdef OPTIMIZE
     #define NO_BA_EXCEPTIONS
@@ -42,10 +44,20 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     //// Construction / Destruction / Copying / Moving
     ////
-    BaseArray(size_t size = 0)  NOEXCEPT;
+    BaseArray(size_t size = 0) NOEXCEPT
+        : m_flags(0, (uint8_t)(size <= inline_size))
+        , startPadding(0)
+        , startNumbers(0)
+        , end(size)
+    {
+        if (size > inline_size)
+            new (&m_digit_data.digits) shared_array<unit_t>(size);
+        //assert(invariants());
+    }
+
     BaseArray(const BaseArray&) NOEXCEPT;
     BaseArray(BaseArray&&) = default;
-    ~BaseArray() NOEXCEPT;
+    ~BaseArray() NOEXCEPT { release(); }
 
     void output(std::ostream& out) const NOEXCEPT;
 
@@ -60,7 +72,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     //// Before finalization
     ////
-    void set(unit_t n, unsigned int index) NOEXCEPT;
+    void set(unit_t n, size_t index) NOEXCEPT;
 
     ////////////////////////////////////////////////////////////////////////////
     //// After finalization
@@ -68,16 +80,20 @@ public:
     BaseArray& operator= (const BaseArray&) NOEXCEPT;
     BaseArray& operator= (BaseArray&&) = default;
 
-    void cutToSize(unsigned int)     NOEXCEPT;
-    void shiftLeft(unsigned int)     NOEXCEPT;
-    void shiftRight(unsigned int)    NOEXCEPT;
-    size_t removeTrailingZeros(void) NOEXCEPT;
-    size_t removeLeadingZeros(void)  NOEXCEPT;
+    void cutToSize(size_t)         NOEXCEPT;
+    void shiftLeft(size_t)         NOEXCEPT;
+    void shiftRight(size_t)        NOEXCEPT;
+    void removeLeadingZeros(void)  NOEXCEPT;
 
 private:
 
     // Destroy shared_array if it's being used
-    void release() NOEXCEPT;
+    inline void release() NOEXCEPT {
+        if (!m_flags.fewdigits)
+            m_digit_data.digits.~shared_array<unit_t>();
+    }
+
+    bool invariants() const NOEXCEPT;
 
     ////////////////////////////////////////////////////////////////////////////
     //// Non-Digit data

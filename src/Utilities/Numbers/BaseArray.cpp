@@ -1,6 +1,9 @@
+////
+//// Implementation of BaseArray
+////
+
 #include <stdexcept>
 #include <algorithm>
-#include <cassert>
 
 #include "BaseArray.h"
 
@@ -8,9 +11,13 @@
 #define NDEBUG
 #endif
 
+// This must come after BaseArray.h and NDEBUG
+#include <cassert>
+
 namespace DS {
 namespace Numbers {
 
+/*
 BaseArray::BaseArray(size_t size) NOEXCEPT
     : m_flags(0, (uint8_t)(size <= inline_size))
     , startPadding(0)
@@ -19,18 +26,10 @@ BaseArray::BaseArray(size_t size) NOEXCEPT
 {
     if (size > inline_size)
         new (&m_digit_data.digits) shared_array<unit_t>(size);
-}
 
-void BaseArray::release() NOEXCEPT
-{
-    if (!m_flags.fewdigits)
-        m_digit_data.digits.~shared_array<unit_t>();
+    assert(invariants());
 }
-
-BaseArray::~BaseArray() NOEXCEPT
-{
-    release();
-}
+*/
 
 BaseArray::BaseArray(const BaseArray& src) NOEXCEPT
     : m_flags(src.m_flags)
@@ -39,20 +38,26 @@ BaseArray::BaseArray(const BaseArray& src) NOEXCEPT
     , end(src.end)
 {
     assert(src.isFinalized());
+
     if (!m_flags.fewdigits)
         new (&m_digit_data.digits)
              shared_array<unit_t>(src.m_digit_data.digits);
     else
         std::copy(src.m_digit_data.digit, src.m_digit_data.digit+inline_size,
                   m_digit_data.digit); 
+
+    assert(invariants());
 }
 
-// **********************************************************
-// * Always
+////////////////////////////////////////////////////////////////////////////
+//// Always
+////
 
 BaseArray::unit_t BaseArray::operator[] (size_t index) const NOEXCEPT
 {
-    int temp = startPadding + static_cast<int>(index);
+    assert(invariants());
+
+    short temp = startPadding + (short)index;
     if (temp < startNumbers)
         return 0;
 
@@ -64,23 +69,27 @@ BaseArray::unit_t BaseArray::operator[] (size_t index) const NOEXCEPT
         return m_digit_data.digit[temp];
 }
 
-// **********************************************************
-// * Before Finalization
+////////////////////////////////////////////////////////////////////////////
+//// Before finalization
+////
 
-void BaseArray::set(BaseArray::unit_t c, unsigned int index) NOEXCEPT
+void BaseArray::set(BaseArray::unit_t c, size_t index) NOEXCEPT
 {
     assert(!isFinalized());
-    assert(static_cast<int>(index) < end);
+    assert(invariants());
+    assert(index < (size_t)end);
 
     if (!m_flags.fewdigits)
-        m_digit_data.digits[(size_t)index] = c;
+        m_digit_data.digits[index] = c;
     else
-        // index needs to be bounds checked
-        m_digit_data.digit[(size_t)index] = c;
+        m_digit_data.digit[index] = c;
+
+    assert(invariants());
 }
 
-// **********************************************************
-// * After finalization
+////////////////////////////////////////////////////////////////////////////
+//// After finalization
+////
 
 BaseArray& BaseArray::operator= (const BaseArray& src) NOEXCEPT
 {
@@ -101,98 +110,87 @@ BaseArray& BaseArray::operator= (const BaseArray& src) NOEXCEPT
     startNumbers  = src.startNumbers;
     end           = src.end;
     m_flags       = src.m_flags;
+
+    assert(invariants());
+    assert(src.invariants());
+
     return *this;
 }
 
-void BaseArray::cutToSize(unsigned int size) NOEXCEPT
+bool BaseArray::invariants() const NOEXCEPT
 {
-    assert(isFinalized());
-    assert(static_cast<int>(size) <= (end-startPadding));
+    if (!(end >= startNumbers))
+        return false;
+    if (!(startNumbers >= 0))
+        return false;
+    if (!(startNumbers >= startPadding))
+        return false;
 
-    end = startPadding+static_cast<int>(size);
-    if (end >= startNumbers)
-        return;
-    startNumbers = end;
-    if (end >= 0)
-        return;
-    startPadding += (-end);
-    end = startNumbers = 0;
-}
-
-size_t BaseArray::removeTrailingZeros(void) NOEXCEPT
-{
-    assert(isFinalized());
-
-    unsigned int count = 0;
-
-    if (startPadding < startNumbers)
-    {
-        count += static_cast<unsigned int>(startNumbers-startPadding);
-        startPadding = startNumbers;
-    }
-    while (startPadding < end)
-    {
-        if (!m_flags.fewdigits) {
-            if (m_digit_data.digits[startPadding] != 0)
-                break;
-        }
-        else {
-            if (m_digit_data.digit[startPadding] != 0)
-                break;
-        }
-        count++;
-        startPadding++;
-        startNumbers++;
-    }
-    return count;
-}
-
-size_t BaseArray::removeLeadingZeros(void) NOEXCEPT
-{
-    assert(isFinalized());
-
-    unsigned int count = 0;
-    while (end > startNumbers)
-    {
-        if (!m_flags.fewdigits) {
-            if (m_digit_data.digits[end-1] != 0)
-                break;
-        }
-        else {
-            if (m_digit_data.digit[end-1] != 0)
-                break;
-        }
-        count++;
-        end--;
-    }
     if (end == startNumbers)
-    {
-        count += static_cast<unsigned int>(startNumbers-startPadding);
-        end = startNumbers = startPadding = 0;
+        return (end == 0) && (startNumbers == 0) && (startPadding == 0);
+
+    if (!isFinalized())
+        return (startPadding == 0);
+
+    return true;
+}
+
+void BaseArray::cutToSize(size_t size) NOEXCEPT
+{
+    assert(isFinalized());
+    assert(size <= (size_t)(end-startPadding));
+
+    end = startPadding + (short)size;
+    if (end > startNumbers) {
+        assert(invariants());
+        return;
     }
-    return count;
+    end = startNumbers = startPadding = 0;
+
+    assert(invariants());
 }
 
-void BaseArray::shiftLeft(unsigned int i) NOEXCEPT
+void BaseArray::removeLeadingZeros(void) NOEXCEPT
 {
     assert(isFinalized());
 
-    startPadding -= static_cast<int>(i);
+    BaseArray::unit_t* digit = m_flags.fewdigits ? &m_digit_data.digit[end]
+                                                 : &m_digit_data.digits[end];
+
+    while (end > startNumbers && !(*(--digit)))
+        end--;
+
+    if (end == startNumbers)
+        end = startNumbers = startPadding = 0;
+
+    assert(invariants());
 }
 
-void BaseArray::shiftRight(unsigned int i) NOEXCEPT
+void BaseArray::shiftLeft(size_t i) NOEXCEPT
 {
     assert(isFinalized());
 
-    startPadding += static_cast<int>(i);
+    startPadding -= (short)i;
+
+    assert(invariants());
+}
+
+void BaseArray::shiftRight(size_t i) NOEXCEPT
+{
+    assert(isFinalized());
+
+    startPadding += (short)i;
     if (startPadding > startNumbers)
         startNumbers = startPadding;
     if (startPadding > end)
         startNumbers = startPadding = end;
+
+    assert(invariants());
 }
 
 void BaseArray::output(std::ostream& out) const NOEXCEPT
 {
+    assert(invariants());
     if (size() == 0)
     {
         out << "0";

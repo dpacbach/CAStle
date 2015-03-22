@@ -225,7 +225,7 @@ void Integer::operator+= (const Integer& _number) // need to optimize (-) sectio
             sign = true;
         else
             sign = false;
-        removeZeros();
+        digits.removeLeadingZeros();
         return;
     }
 }
@@ -402,11 +402,6 @@ bool Integer::isEqualTo(const Integer& number) const
 bool Integer::isNegative(void) const
 {
     return !sign;
-}
-
-void Integer::removeZeros(void) // unused?
-{
-    digits.removeLeadingZeros();
 }
 
 /*

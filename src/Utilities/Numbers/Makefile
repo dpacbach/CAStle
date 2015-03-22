@@ -1,20 +1,20 @@
-run: perftest
+performance.out: perftest baselines.in
 	@echo COLORMAKE_BEGIN_RUN
-	./run run | xtc
+	./run run | xtc | tee performance.out
 
-baseline: perftest
+baselines.in:
 	@echo COLORMAKE_BEGIN_RUN
 	./run baseline | tee baselines.in
-
-OPT_FLAGS := -Ofast -mtune=corei7 
-CC_FLAGS  := -m64 -Wall -Wpedantic -std=c++1y
-CC        := g++ $(CC_FLAGS)
 
 clean:
 	-rm perftest perftest.o Float.o Integer.o BaseArray.o
 
 distclean:
-	-rm perftest perftest.o Float.o Integer.o BaseArray.o baselines.in
+	-rm perftest perftest.o Float.o Integer.o BaseArray.o baselines.in performance.out
+
+OPT_FLAGS := -Ofast -mtune=corei7 
+CC_FLAGS  := -m64 -Wall -Wpedantic -std=c++1y
+CC        := g++ $(CC_FLAGS)
 
 perftest: perftest.o Float.o Integer.o BaseArray.o Makefile
 	$(CC) perftest.o Float.o Integer.o BaseArray.o -o perftest
@@ -31,4 +31,4 @@ Integer.o: Integer.cpp Integer.h BaseArray.h shared_array.hpp Makefile
 Float.o: Float.cpp Float.h Integer.h BaseArray.h shared_array.hpp Makefile
 	$(CC) Float.cpp     -c -o Float.o
 
-.PHONY: run clean rebase
+.PHONY: run clean distclean

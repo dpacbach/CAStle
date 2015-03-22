@@ -1,0 +1,3 @@
+#!/bin/bash
+[ "$1" == "-R" ] && vim -s edit_ro.vim
+[ "$1" != "-R" ] && vim -s edit.vim

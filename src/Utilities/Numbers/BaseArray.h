@@ -10,8 +10,6 @@ namespace Numbers {
 
 #define OPTIMIZE
 
-//#define NO_BA_EXCEPTIONS
-
 #ifdef OPTIMIZE
     #define NO_BA_EXCEPTIONS
     #define NO_INT_EXCEPTIONS
@@ -20,11 +18,14 @@ namespace Numbers {
 
 #ifdef NO_BA_EXCEPTIONS
     #define NOEXCEPT noexcept
+    #define NDEBUG
 #else
     #define NOEXCEPT
 #endif
 
 #define UNSAFE_DISABLE_STATIC_ASSERTS
+
+#include <cassert>
 
 class BaseArray
 {
@@ -33,7 +34,6 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     //// Config info
     ////
-
     using unit_t      = uint64_t;    // If these sizes are changed then it will
     using unit_t_long = __uint128_t; // also be necessary to change the max size
                                      // of the Float.
@@ -45,14 +45,15 @@ public:
     //// Construction / Destruction / Copying / Moving
     ////
     BaseArray(size_t size = 0) NOEXCEPT
-        : m_flags(0, (uint8_t)(size <= inline_size))
-        , startPadding(0)
-        , startNumbers(0)
-        , end(size)
+        : m_indexes(0)
     {
-        if (size > inline_size)
-            new (&m_digit_data.digits) shared_array<unit_t>(size);
-        //assert(invariants());
+        m_indexes.single_index.end = size;
+        if (size > inline_size) {
+            new (&m_digit_data.digits_heap) shared_array<unit_t>(size);
+            m_digits = &m_digit_data.digits_heap[0];
+        }
+        else
+            m_digits = &m_digit_data.digits_stack[0];
     }
 
     BaseArray(const BaseArray&) NOEXCEPT;
@@ -65,14 +66,22 @@ public:
     //// Always
     ////
     unit_t operator[] (size_t index) const NOEXCEPT;
-    inline size_t size(void) const       NOEXCEPT { return end-startPadding; }
-    inline void finalize(void)           NOEXCEPT { m_flags.finalized = 1; }
-    inline bool isFinalized(void) const  NOEXCEPT { return m_flags.finalized; }
+    inline size_t size(void) const NOEXCEPT {
+        return m_indexes.single_index.end-m_indexes.single_index.startPadding;
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     //// Before finalization
     ////
-    void set(unit_t n, size_t index) NOEXCEPT;
+    void set(unit_t n, size_t index) NOEXCEPT
+    {
+        assert(invariants());
+        assert(index < (size_t)m_indexes.single_index.end);
+
+        m_digits[index] = n;
+
+        assert(invariants());
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     //// After finalization
@@ -87,30 +96,34 @@ public:
 
 private:
 
+    inline bool has_few_digits() const NOEXCEPT { return m_digits == m_digit_data.digits_stack; }
+
     // Destroy shared_array if it's being used
     inline void release() NOEXCEPT {
-        if (!m_flags.fewdigits)
-            m_digit_data.digits.~shared_array<unit_t>();
+        if (!has_few_digits())
+            m_digit_data.digits_heap.~shared_array<unit_t>();
     }
 
     bool invariants() const NOEXCEPT;
 
     ////////////////////////////////////////////////////////////////////////////
-    //// Non-Digit data
+    //// Indexing data
     ////
-    struct flags
+    union indexes_union
     {
-        flags(uint8_t f, uint8_t o) : finalized(f), fewdigits(o) {}
-        uint8_t  finalized : 1;
-        uint8_t  fewdigits : 1;
-        uint8_t  sign      : 1;
-        uint16_t padding   : 13;
+        indexes_union(uint64_t _all_indexes)    : all_indexes(_all_indexes)    {}
+        indexes_union(const indexes_union& src) : all_indexes(src.all_indexes) {}
+        struct indexes
+        {
+            short startPadding;
+            short startNumbers;
+            short end;
+            short padding;
+        }
+        single_index;
+        uint64_t all_indexes; 
     }
-    m_flags;
-    
-    short startPadding;
-    short startNumbers;
-    short end;
+    m_indexes;
 
     ////////////////////////////////////////////////////////////////////////////
     //// Digit data
@@ -119,15 +132,18 @@ private:
     {
         digit_data() {}
         ~digit_data() {}
-        shared_array<unit_t> digits;
-        unit_t digit[inline_size];
+        shared_array<unit_t> digits_heap;
+        unit_t digits_stack[inline_size];
     }
     m_digit_data;
+
+    // Holds a pointer to the start of the digit data
+    unit_t* m_digits;
 
     ////////////////////////////////////////////////////////////////////////////
     //// Assertions about sizes
     ////
-    static_assert(sizeof(m_flags) == 2,
+    static_assert(sizeof(m_indexes) == 8,
                   "flags structure has unintended size");
     static_assert(sizeof(unit_t_long) == 2*sizeof(unit_t),
                   "Size of long type must be double that of unit type");
@@ -144,7 +160,7 @@ static_assert(UNIT_T_LONG_BITS_DIV_2 == UNIT_T_LONG_BITS / 2,
               "Error in BaseArray type sizes");
 static_assert(UNIT_T_LONG_BITS       == UNIT_T_BITS * 2,
               "Error in BaseArray type sizes");
-static_assert(sizeof(BaseArray) == 8 + BaseArray::inline_size*sizeof(BaseArray::unit_t),
+static_assert(sizeof(BaseArray) == 16 + BaseArray::inline_size*sizeof(BaseArray::unit_t),
               "BaseArray structure has unintended size");
 
 } /* namespace Numbers */

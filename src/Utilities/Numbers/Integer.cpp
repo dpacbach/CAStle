@@ -8,7 +8,7 @@ namespace Numbers {
 Integer::Integer() : digits(1), sign(true)
 {
     digits.set(0, 0);
-    digits.finalize();
+    //digits.finalize();
 }
 
 void Integer::copyFrom(int _number)
@@ -22,8 +22,8 @@ void Integer::copyFrom(int _number)
     else
         sign = true;
     result.set(_number, 0);
-    result.finalize();
-    digits.finalize();
+    //result.finalize();
+    //digits.finalize();
     digits = result;
 
     /*
@@ -73,14 +73,14 @@ void Integer::copyFrom(BaseArray::unit_t _number)
     BaseArray result(1);
     sign = true;
     result.set(_number, 0);
-    result.finalize();
-    digits.finalize();
+    //result.finalize();
+    //digits.finalize();
     digits = result;
 }
 
 void Integer::copyFrom(const Integer& _number)
 {
-    digits.finalize();
+    //digits.finalize();
     digits = _number.digits;
     sign = _number.sign;
 }
@@ -143,10 +143,10 @@ void Integer::operator+= (const Integer& _number) // need to optimize (-) sectio
             result.set(carry, i);
         else
         {
-            result.finalize();
+            //result.finalize();
             result.cutToSize(longerSize);
         }
-        result.finalize();
+        //result.finalize();
         digits = result;
         return;
     }
@@ -219,7 +219,7 @@ void Integer::operator+= (const Integer& _number) // need to optimize (-) sectio
             throw logic_error("borrow != 0 in Integer::operator +=");
 #endif
 
-        result.finalize();
+        //result.finalize();
         digits = result;
         if (larger.sign == true)
             sign = true;
@@ -293,7 +293,7 @@ void Integer::multiply_SchoolBook(const Integer& _number)
             }
         }
     }
-    resultDigits.finalize();
+    //resultDigits.finalize();
     resultDigits.removeLeadingZeros();
     digits = resultDigits;
     sign = !(sign^_number.sign);
@@ -455,7 +455,7 @@ bool Integer::shiftRightOneBit(void)
          result.set((digits[i] >> 1) | (lsb << (UNIT_T_BITS - 1)), i);
          lsb = digits[i] & 1;
     }
-    result.finalize();
+    //result.finalize();
     if (result[result.size()-1] == 0)
         result.cutToSize(result.size()-1);
     digits = result;
@@ -528,8 +528,8 @@ void Integer::setToZero(void)
 {
     BaseArray zero(1);
     zero.set(0, 0);
-    zero.finalize();
-    digits.finalize();
+    //zero.finalize();
+    //digits.finalize();
     digits = zero;
     sign = true;
 }

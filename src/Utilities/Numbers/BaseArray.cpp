@@ -7,46 +7,49 @@
 
 #include "BaseArray.h"
 
-#ifdef NO_BA_EXCEPTIONS
-#define NDEBUG
-#endif
-
-// This must come after BaseArray.h and NDEBUG
-#include <cassert>
-
 namespace DS {
 namespace Numbers {
 
-/*
-BaseArray::BaseArray(size_t size) NOEXCEPT
-    : m_flags(0, (uint8_t)(size <= inline_size))
-    , startPadding(0)
-    , startNumbers(0)
-    , end(size)
-{
-    if (size > inline_size)
-        new (&m_digit_data.digits) shared_array<unit_t>(size);
-
-    assert(invariants());
-}
-*/
-
 BaseArray::BaseArray(const BaseArray& src) NOEXCEPT
-    : m_flags(src.m_flags)
-    , startPadding(src.startPadding)
-    , startNumbers(src.startNumbers)
-    , end(src.end)
+    : m_indexes(src.m_indexes)
 {
-    assert(src.isFinalized());
+    assert(src.invariants());
 
-    if (!m_flags.fewdigits)
-        new (&m_digit_data.digits)
-             shared_array<unit_t>(src.m_digit_data.digits);
-    else
-        std::copy(src.m_digit_data.digit, src.m_digit_data.digit+inline_size,
-                  m_digit_data.digit); 
+    if (!src.has_few_digits()) {
+        new (&m_digit_data.digits_heap) shared_array<unit_t>(src.m_digit_data.digits_heap);
+        m_digits = &m_digit_data.digits_heap[0];
+    }
+    else {
+        std::copy(src.m_digit_data.digits_stack,
+                  src.m_digit_data.digits_stack+inline_size,
+                  m_digit_data.digits_stack); 
+        m_digits = &m_digit_data.digits_stack[0];
+    }
 
     assert(invariants());
+    assert(src.invariants());
+}
+
+// Return false if any of the class invariants don't hold
+bool BaseArray::invariants() const NOEXCEPT
+{
+    const short& sp = m_indexes.single_index.startPadding;
+    const short& sn = m_indexes.single_index.startNumbers;
+    const short& e  = m_indexes.single_index.end;
+    ///////////////////////////////////////////////////////////
+    //// | 1 2 | 3 4 5 6 7 8 9 | 0 1 2 3 4 5 | ? ? ? ? ? |
+    ////      end   >=    startNumbers  >=  zero    startPadding
+    ////
+    //// The above results in the following number:
+    ////     345678900000000000
+    ///////////////////////////////////////////////////////////
+    if (!(e >= sn) || !(sn >= 0) || !(sn >= sp))
+        return false;
+
+    if (e == sn)
+        return (e == 0) && (sn == 0) && (sp == 0);
+
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -57,34 +60,12 @@ BaseArray::unit_t BaseArray::operator[] (size_t index) const NOEXCEPT
 {
     assert(invariants());
 
-    short temp = startPadding + (short)index;
-    if (temp < startNumbers)
+    short temp = m_indexes.single_index.startPadding + (short)index;
+    if (temp < m_indexes.single_index.startNumbers)
         return 0;
 
-    assert(temp < end);
-
-    if (!m_flags.fewdigits)
-        return m_digit_data.digits[temp];
-    else
-        return m_digit_data.digit[temp];
-}
-
-////////////////////////////////////////////////////////////////////////////
-//// Before finalization
-////
-
-void BaseArray::set(BaseArray::unit_t c, size_t index) NOEXCEPT
-{
-    assert(!isFinalized());
-    assert(invariants());
-    assert(index < (size_t)end);
-
-    if (!m_flags.fewdigits)
-        m_digit_data.digits[index] = c;
-    else
-        m_digit_data.digit[index] = c;
-
-    assert(invariants());
+    assert(temp < m_indexes.single_index.end);
+    return m_digits[temp];
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -96,94 +77,78 @@ BaseArray& BaseArray::operator= (const BaseArray& src) NOEXCEPT
     if (this == &src)
         return *this;
 
-    assert(isFinalized());
-    assert(src.isFinalized());
-
     release();
-    if (!src.m_flags.fewdigits)
-        new (&m_digit_data.digits)
-            shared_array<unit_t>(src.m_digit_data.digits);
-    else
-        std::copy(src.m_digit_data.digit, src.m_digit_data.digit+inline_size,
-                  m_digit_data.digit); 
-    startPadding  = src.startPadding;
-    startNumbers  = src.startNumbers;
-    end           = src.end;
-    m_flags       = src.m_flags;
+    if (!src.has_few_digits()) {
+        new (&m_digit_data.digits_heap)
+            shared_array<unit_t>(src.m_digit_data.digits_heap);
+        m_digits = &m_digit_data.digits_heap[0];
+    }
+    else {
+        m_digits = &m_digit_data.digits_stack[0];
+        std::copy(src.m_digits, src.m_digits+inline_size, m_digits); 
+    }
+
+    m_indexes.all_indexes = src.m_indexes.all_indexes;
 
     assert(invariants());
     assert(src.invariants());
-
     return *this;
 }
 
-bool BaseArray::invariants() const NOEXCEPT
-{
-    if (!(end >= startNumbers))
-        return false;
-    if (!(startNumbers >= 0))
-        return false;
-    if (!(startNumbers >= startPadding))
-        return false;
-
-    if (end == startNumbers)
-        return (end == 0) && (startNumbers == 0) && (startPadding == 0);
-
-    if (!isFinalized())
-        return (startPadding == 0);
-
-    return true;
-}
+////////////////////////////////////////////////////////////////////////////
+//// Index-shifting functions
+////
 
 void BaseArray::cutToSize(size_t size) NOEXCEPT
 {
-    assert(isFinalized());
-    assert(size <= (size_t)(end-startPadding));
+    assert(size <= (size_t)(m_indexes.single_index.end-m_indexes.single_index.startPadding));
 
-    end = startPadding + (short)size;
-    if (end > startNumbers) {
+    m_indexes.single_index.end = m_indexes.single_index.startPadding + (short)size;
+    if (m_indexes.single_index.end > m_indexes.single_index.startNumbers) {
         assert(invariants());
         return;
     }
-    end = startNumbers = startPadding = 0;
+    m_indexes.all_indexes = 0;
 
     assert(invariants());
 }
 
 void BaseArray::removeLeadingZeros(void) NOEXCEPT
 {
-    assert(isFinalized());
+    short& sn = m_indexes.single_index.startNumbers;
+    short& e  = m_indexes.single_index.end;
 
-    BaseArray::unit_t* digit = m_flags.fewdigits ? &m_digit_data.digit[end]
-                                                 : &m_digit_data.digits[end];
+    while (e > sn) {
+        if (m_digits[e-1]) {
+            assert(invariants());
+            return;
+        }
+        e--;
+    }
 
-    while (end > startNumbers && !(*(--digit)))
-        end--;
-
-    if (end == startNumbers)
-        end = startNumbers = startPadding = 0;
+    m_indexes.all_indexes = 0;
 
     assert(invariants());
 }
 
 void BaseArray::shiftLeft(size_t i) NOEXCEPT
 {
-    assert(isFinalized());
-
-    startPadding -= (short)i;
+    m_indexes.single_index.startPadding -= (short)i;
 
     assert(invariants());
 }
 
 void BaseArray::shiftRight(size_t i) NOEXCEPT
 {
-    assert(isFinalized());
+    short& sp = m_indexes.single_index.startPadding;
+    short& sn = m_indexes.single_index.startNumbers;
+    short& e  = m_indexes.single_index.end;
 
-    startPadding += (short)i;
-    if (startPadding > startNumbers)
-        startNumbers = startPadding;
-    if (startPadding > end)
-        startNumbers = startPadding = end;
+    sp += (short)i;
+    if (sp > sn)
+        sn = sp;
+    if (sp > e)
+        sn = sp = e;
 
     assert(invariants());
 }
@@ -198,16 +163,12 @@ void BaseArray::output(std::ostream& out) const NOEXCEPT
     }
     int i, exp = size()-1;
 
-    const unit_t* ref;
-    if (!m_flags.fewdigits)
-        ref = &m_digit_data.digits[0];
-    else
-        ref = &m_digit_data.digit[0];
+    const unit_t* ref = m_digits;
 
     out << "(";
-    for (i = end-1; i >= startNumbers; i--)
+    for (i = m_indexes.single_index.end-1; i >= m_indexes.single_index.startNumbers; i--)
         out << ref[i] << "*2^(" << (exp--)*(sizeof(unit_t)*8) << ")+";
-    for (; i > startPadding; i--)
+    for (; i > m_indexes.single_index.startPadding; i--)
         out << 0 << "*2^(" << (exp--)*(sizeof(unit_t)*8) << ")+";
     out << "0)";
 }

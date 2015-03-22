@@ -3,6 +3,9 @@
 #include "Float.h"
 #include <cmath>
 
+#define IF(a, b, c) ((a) ? (b) : (c))
+#define ELSE
+
 namespace DS {
 namespace Numbers {
 
@@ -19,7 +22,12 @@ const int Float::maxMantissaDigits(7);
 // which can be calculated at compile time
 constexpr double one_shift_left(size_t size)
 {
-    return (size == 0) ? 1.0 : (2.0 * one_shift_left(size-1));
+return
+    IF( size == 0,
+        1.0,
+    ELSE
+        2.0 * one_shift_left(size-1)
+    );
 }
 
 double Float::toDouble(void) const

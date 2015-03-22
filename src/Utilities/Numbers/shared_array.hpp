@@ -33,6 +33,7 @@
 #include <cstddef>
 
 namespace DS {
+namespace Numbers {
 
 ///////////////////////////////////////////////////////////////////////////////
 //// shared_array
@@ -177,4 +178,5 @@ shared_array<T>& shared_array<T>::operator= (shared_array<T>&& rhs)
     return *this;
 }
 
+} // namespace Numbers
 } // namespace DS

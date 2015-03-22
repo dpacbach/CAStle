@@ -16,10 +16,9 @@ two long, possible with a union.  This should remove all heap interaction
 for small BaseArrays.  Try to distinguish between BaseArrays which are
 known to be small at compiler time versus only at runtime.
 
-Next try to decrease the memory footprint of the BaseArray, maybe with packing
+DONE *** Didn't have any effect. Try putting in a custom allocator for the shared_array
 
-
-
+IN PROGRESS *** Next try to decrease the memory footprint of the BaseArray, maybe with packing
 
 Next try getting rid of the finalized flag, maybe try using some const stuff
 for safety checking.

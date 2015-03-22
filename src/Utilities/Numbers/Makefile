@@ -6,8 +6,9 @@ baseline: perftest
 	@echo COLORMAKE_BEGIN_RUN
 	./run baseline | tee baselines.in
 
-CC_FLAGS := -m64 -Wall -Wpedantic -std=c++1y
-CC       := g++ $(CC_FLAGS)
+OPT_FLAGS := -Ofast -mtune=corei7 
+CC_FLAGS  := -m64 -Wall -Wpedantic -std=c++1y
+CC        := g++ $(CC_FLAGS)
 
 clean:
 	-rm perftest perftest.o Float.o Integer.o BaseArray.o

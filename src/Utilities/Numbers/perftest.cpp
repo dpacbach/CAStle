@@ -11,6 +11,7 @@
 #include <map>
 #include <algorithm>
 #include <exception>
+#include <cmath>
 
 #include "BaseArray.h"
 #include "Integer.h"
@@ -60,6 +61,18 @@ auto test_small_integer(unsigned long count)
         m = m-m/2;
     }
     cout << ((m == Integer(145)) ? "" : "               <red><b>**** Integer Result Incorrect! ****</b></red>\n");
+    /*
+    using DS::Numbers::Integer;
+    unsigned long m(0);
+    for (auto index = 0ul; index < count; ++index) {
+        unsigned long m3(3), m4(4), m5(5), m6(6);
+        m = (m3*m3 + m4*m4) / m3 + m6 + m6/m3;
+        m = m*m + m + m;
+        m = (m*m + m) / m;
+        m = m-m/2;
+    }
+    cout << ((m == (unsigned long)(145)) ? "" : "               <red><b>**** Integer Result Incorrect! ****</b></red>\n");
+    */
 }
 
 auto test_integer(unsigned long count)
@@ -123,6 +136,23 @@ auto test_float_pisqrt(unsigned long count)
     }
     res = (one / res) * two - Float::pi();
     verify_float_is_zero(res, 1.0e-30);
+    /*
+     * standard double version
+    double two(2.0), one(1.0), zero(0.0), res;
+    for (auto index = 0ul; index < count; ++index) {
+        double prev = zero;
+        double total = one;
+        for (auto term = 0ul; term < 200; ++term) {
+            double tmp = sqrt(prev + two);
+            prev = tmp;
+            total *= tmp / two;
+        }
+        res = total;
+    }
+    res = (one / res) * two;// - 3.1415926535898;//Float::pi();
+    cout << endl << "result: " << res << endl;
+    //verify_float_is_zero(res, 1.0e-30);
+    */
 }
 
 auto test_float_atan(unsigned long count)

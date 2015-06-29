@@ -1,6 +1,6 @@
 performance.out: perftest baselines.in
 	@echo COLORMAKE_BEGIN_RUN
-	./run run | xtc | tee performance.out
+	./run run 2>&1 | xtc | tee performance.out
 
 baselines.in:
 	@echo COLORMAKE_BEGIN_RUN
@@ -14,7 +14,7 @@ distclean:
 		unity.cpp perftest_unity
 
 CPP         := g++
-OPT_FLAGS   := #-O3 -march=corei7 -mtune=corei7
+OPT_FLAGS   := -Ofast -march=corei7 -mtune=corei7
 ASM_FLAGS   := #-S -masm=intel 
 DEBUG_FLAGS := -g
 CPP_FLAGS   := $(ASM_FLAGS) $(DEBUG_FLAGS) $(OPT_FLAGS) -m64 -Wall -Wpedantic -std=c++1y

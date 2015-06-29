@@ -18,6 +18,7 @@
 #include "Float.h"
 
 using std::cout;
+using std::cerr;
 using std::endl;
 using std::function;
 using std::string;
@@ -34,7 +35,16 @@ void verify_float_with_double(const DS::Numbers::Float& f, double target)
     double ep = .00001;
     if (tmp < 1.0+ep && tmp > 1.0-ep)
         return;
-    cout << "               <red><b>**** Float Result Incorrect! (" << f.toDouble() << " != " << target << ") ****</b></red>\n";
+    cerr << "               <red><b>**** Float Result Incorrect! (" << f.toDouble() << " != " << target << ") ****</b></red>\n";
+}
+
+void verify_float_with_double(double f, double target)
+{
+    double tmp = f / target;
+    double ep = .00001;
+    if (tmp < 1.0+ep && tmp > 1.0-ep)
+        return;
+    cerr << "               <red><b>**** double Result Incorrect! (" << f << " != " << target << ") ****</b></red>\n";
 }
 
 void verify_float_is_zero(const DS::Numbers::Float& f, double ep)
@@ -42,25 +52,34 @@ void verify_float_is_zero(const DS::Numbers::Float& f, double ep)
     double tmp = f.toDouble();
     if (tmp < ep && tmp > -ep)
         return;
-    cout << "               <red><b>**** Float Result Incorrect! (" << f.toDouble() << " != 0) ****</b></red>\n";
+    cerr << "               <red><b>**** Float Result Incorrect! (" << f.toDouble() << " != 0) ****</b></red>\n";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Integer Performance Tests
 ////////////////////////////////////////////////////////////////////////////////
 
+//DS::Numbers::Integer init(0);
+DS::Numbers::Integer init(0);
+DS::Numbers::Integer o_f_f(145);
+
 auto test_small_integer(unsigned long count)
 {
     using DS::Numbers::Integer;
-    Integer m(0);
+    using intType = Integer;
+    intType m(145);
     for (auto index = 0ul; index < count; ++index) {
-        Integer m3(3), m4(4), m5(5), m6(6);
-        m = (m3*m3 + m4*m4) / m3 + m6 + m6/m3;
+        m -= o_f_f;
+        intType m3(init+intType(3)), m4(init+intType(4)), m6(init+intType(6));
+        m += init;
+        m = (m3*m3 + m4*m4) / m3 + m6 + m6/m3 + m;
+        init += m;
         m = m*m + m + m;
         m = (m*m + m) / m;
         m = m-m/2;
+        init -= (m3*m3 + m4*m4) / m3 + m6 + m6/m3;
     }
-    cout << ((m == Integer(145)) ? "" : "               <red><b>**** Integer Result Incorrect! ****</b></red>\n");
+    cerr << ((m == intType(145)) ? "" : "               <red><b>**** Integer Result Incorrect! ****</b></red>\n");
     /*
     using DS::Numbers::Integer;
     unsigned long m(0);
@@ -71,7 +90,7 @@ auto test_small_integer(unsigned long count)
         m = (m*m + m) / m;
         m = m-m/2;
     }
-    cout << ((m == (unsigned long)(145)) ? "" : "               <red><b>**** Integer Result Incorrect! ****</b></red>\n");
+    cerr << ((m == (unsigned long)(145)) ? "" : "               <red><b>**** Integer Result Incorrect! ****</b></red>\n");
     */
 }
 
@@ -95,12 +114,43 @@ auto test_integer(unsigned long count)
             m = i / (i/Integer(2));
         }
     }
-    cout << ((m == Integer(2)) ? "" : "               <red><b>**** Integer Result Incorrect! ****</b></red>\n");
+    cerr << ((m == Integer(2)) ? "" : "               <red><b>**** Integer Result Incorrect! ****</b></red>\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Float Performance Tests
 ////////////////////////////////////////////////////////////////////////////////
+
+auto test_float_basic(unsigned long count)
+{
+    using DS::Numbers::Float;
+    using floatType = Float;
+    floatType res(0.0);
+    floatType _f(12345.45678);
+    floatType _g(1234.4567);
+    floatType _h(3456.0033);
+    floatType m(1);
+
+    floatType f(_f), g(_g), h(_h);
+    f = f * f;
+    g = f / g - f - h * f;
+    h = (h - g) * g;
+    h = h / g;
+    res += m*(f + g + h);
+    m = -m;
+
+    for (auto index = 0ul; index < count; ++index) {
+        floatType f(_f), g(_g), h(_h);
+        f = f * f;
+        g = f / g - f - h * f;
+        h = (h - g) * g;
+        h = h / g;
+        res += m*(f + g + h);
+        m = -m;
+    }
+    verify_float_with_double(res, 152413759.11016846);
+    return res;
+}
 
 auto test_float_1(unsigned long count)
 {
@@ -135,7 +185,7 @@ auto test_float_pisqrt(unsigned long count)
         res = total;
     }
     res = (one / res) * two - Float::pi();
-    verify_float_is_zero(res, 1.0e-30);
+    verify_float_is_zero(res, 1.0e-15);
     /*
      * standard double version
     double two(2.0), one(1.0), zero(0.0), res;
@@ -150,8 +200,8 @@ auto test_float_pisqrt(unsigned long count)
         res = total;
     }
     res = (one / res) * two;// - 3.1415926535898;//Float::pi();
-    cout << endl << "result: " << res << endl;
-    //verify_float_is_zero(res, 1.0e-30);
+    cerr << endl << "result: " << res << endl;
+    //verify_float_is_zero(res, 1.0e-15);
     */
 }
 
@@ -165,7 +215,7 @@ auto test_float_atan(unsigned long count)
         res = tmp;
     }
     res = res*Float(4.0) - Float::pi();
-    verify_float_is_zero(res, 1.0e-30);
+    verify_float_is_zero(res, 1.0e-15);
 }
 
 auto test_float_exppi(unsigned long count)
@@ -310,6 +360,7 @@ int main(int argc, char* argv[])
     tests_t tests = {
         ADD_TEST(test_integer),
         ADD_TEST(test_small_integer),
+        ADD_TEST(test_float_basic),
         ADD_TEST(test_float_1),
         ADD_TEST(test_float_pisqrt),
         ADD_TEST(test_float_atan),

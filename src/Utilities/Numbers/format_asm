@@ -1,0 +1,3 @@
+sed -r -i "/^\t\./d" $1.o
+sed -r -i "/^\.L[A-Z]+/d" $1.o
+sed -r -i "s/^_Z/\n_Z/g" $1.o

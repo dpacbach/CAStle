@@ -57,7 +57,8 @@ public:
     }
 
     BaseArray(const BaseArray&) NOEXCEPT;
-    BaseArray(BaseArray&&) = default;
+    // TODO: How does the default know how to move this class?
+    //BaseArray(BaseArray&&) = default;
     ~BaseArray() NOEXCEPT { release(); }
 
     void output(std::ostream& out) const NOEXCEPT;
@@ -66,7 +67,7 @@ public:
     //// Always
     ////
     unit_t operator[] (size_t index) const NOEXCEPT;
-    inline size_t size(void) const NOEXCEPT {
+    size_t size(void) const NOEXCEPT {
         return m_indexes.single_index.end-m_indexes.single_index.startPadding;
     }
 
@@ -87,19 +88,25 @@ public:
     //// After finalization
     ////
     BaseArray& operator= (const BaseArray&) NOEXCEPT;
-    BaseArray& operator= (BaseArray&&) = default;
+    // TODO: how does the default know how to move this class?
+    //BaseArray& operator= (BaseArray&&) = default;
 
-    void cutToSize(size_t)         NOEXCEPT;
-    void shiftLeft(size_t)         NOEXCEPT;
-    void shiftRight(size_t)        NOEXCEPT;
     void removeLeadingZeros(void)  NOEXCEPT;
+    void cutToSize(size_t)         NOEXCEPT;
+    void shiftRight(size_t i)      NOEXCEPT;
+    void shiftLeft(size_t i) NOEXCEPT
+    {
+        m_indexes.single_index.startPadding -= (short)i;
+        assert(invariants());
+    }
 
 private:
 
-    inline bool has_few_digits() const NOEXCEPT { return m_digits == m_digit_data.digits_stack; }
+    bool has_few_digits() const NOEXCEPT { return m_digits == m_digit_data.digits_stack; }
 
     // Destroy shared_array if it's being used
-    inline void release() NOEXCEPT {
+    void release() NOEXCEPT
+    {
         if (!has_few_digits())
             m_digit_data.digits_heap.~shared_array<unit_t>();
     }
@@ -160,7 +167,7 @@ static_assert(UNIT_T_LONG_BITS_DIV_2 == UNIT_T_LONG_BITS / 2,
               "Error in BaseArray type sizes");
 static_assert(UNIT_T_LONG_BITS       == UNIT_T_BITS * 2,
               "Error in BaseArray type sizes");
-static_assert(sizeof(BaseArray) == 16 + BaseArray::inline_size*sizeof(BaseArray::unit_t),
+static_assert(sizeof(BaseArray) <= 24 + BaseArray::inline_size*sizeof(BaseArray::unit_t),
               "BaseArray structure has unintended size");
 
 } /* namespace Numbers */

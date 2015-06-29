@@ -23,10 +23,7 @@
 ////
 //// This class is only needed in cases when optimization is critical.
 //// Otherwise, a shared_ptr<vector<>> is fine, or if the size is known
-//// at compile time then shared_ptr<array<>>.  NOTE: This class will
-//// not call the constructors or destructors for the elements in the
-//// array.  For this reason we only allow instantiation with scalar
-//// types.
+//// at compile time then shared_ptr<array<>>.
 
 #pragma once
 
@@ -76,12 +73,12 @@ private:
     {
         using ref_count_t = unsigned long;
 
-        control()                                  = delete;
-        ~control()                                 = delete;
-        control(const control&)                    = delete;
-        control(control&&)                         = delete;
-        const control& operator= (const control&)  = delete;
-        const control& operator= (control&&)       = delete;
+        control()                                 = delete;
+        ~control()                                = delete;
+        control(const control&)                   = delete;
+        control(control&&)                        = delete;
+        const control& operator= (const control&) = delete;
+        const control& operator= (control&&)      = delete;
 
         ref_count_t ref_count;
         // Array can actually be empty, but we put size 1 here
@@ -93,7 +90,7 @@ private:
 };
 
 // Probably not necessary to check this, but it should be true
-// given the design goals of this class.
+// given the intended use cases of this class.
 static_assert(sizeof(shared_array<int>) == sizeof(void*),
               "The memory footprint of this class is intended to occupy "
               "no more than the size of a raw pointer");

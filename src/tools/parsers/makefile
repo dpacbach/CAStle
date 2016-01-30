@@ -1,6 +1,6 @@
 ifndef TOPLEVELWD
     include $(dir $(lastword $(MAKEFILE_LIST)))../makefile
-    #$(call set_default_goal,TOKENS)
+    $(call set_default_goal,PARSERDEFAULT)
 else
-    $(call make_so,TOKENS,castleparsers)
+    $(call make_so,TOKENS,castleparsersdefault)
 endif

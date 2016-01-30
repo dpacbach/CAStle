@@ -1,28 +1,19 @@
-/*
- * Scanner.h
- *
- *  Created on: Feb 8, 2013
- *      Author: davidsicilia
- */
-
-#ifndef TOKENSCANNER_H_
-#define TOKENSCANNER_H_
+#pragma once
 
 #include <iterator>
 #include <string>
 #include <utility>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 using namespace std;
 
 namespace DS {
 namespace Tokens {
 
-class Scanner : private boost::noncopyable
+class Scanner
 {
 public:
-    typedef boost::shared_ptr<Scanner> Ptr;
+    typedef shared_ptr<Scanner> Ptr;
     typedef string::const_iterator iterator_t;
     typedef pair<iterator_t, iterator_t> bounds;
     static bounds make_bounds(iterator_t _first, iterator_t _second)
@@ -34,10 +25,12 @@ public:
 
     virtual bounds scan(bounds abound) = 0;
 
+    Scanner(const Scanner&)            = delete;
+    Scanner& operator=(const Scanner&) = delete;
+
 protected:
     Scanner() {}
 };
 
 } /* namespace Token */
 } /* namespace DS */
-#endif /* SCANNER_H_ */

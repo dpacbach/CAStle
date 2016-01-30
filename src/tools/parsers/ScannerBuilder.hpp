@@ -1,25 +1,19 @@
-/*
- * ScannerBuilder.h
- *
- *  Created on: Feb 8, 2013
- *      Author: davidsicilia
- */
-
-#ifndef SCANNERBUILDER_H_
-#define SCANNERBUILDER_H_
+#pragma once
 
 #include <string>
 #include <stack>
-#include "Scanner.h"
-#include <boost/noncopyable.hpp>
+#include "Scanner.hpp"
 
 namespace DS {
 namespace Tokens {
 
-class ScannerBuilder : private boost::noncopyable
+class ScannerBuilder
 {
 public:
     ScannerBuilder() {}
+    ScannerBuilder(const ScannerBuilder&)            = delete;
+    ScannerBuilder& operator=(const ScannerBuilder&) = delete;
+
     virtual ~ScannerBuilder() {}
 
     virtual void clearStack(void);
@@ -75,4 +69,3 @@ protected:
 
 } /* namespace Token */
 } /* namespace DS */
-#endif /* SCANNERBUILDER_H_ */

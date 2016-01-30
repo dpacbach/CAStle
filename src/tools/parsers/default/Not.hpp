@@ -1,12 +1,6 @@
-/*
- * Not.h
- *
- *  Created on: Feb 10, 2013
- *      Author: davidsicilia
- */
+#pragma once
 
-#ifndef SCANNERNOT_H_
-#define SCANNERNOT_H_
+#include "Scanner.hpp"
 
 namespace DS {
 namespace Tokens {
@@ -27,4 +21,3 @@ protected:
 } /* namespace Scanners */
 } /* namespace Tokens */
 } /* namespace DS */
-#endif /* NOT_H_ */

@@ -1,12 +1,6 @@
-/*
- * Repeat.h
- *
- *  Created on: Feb 8, 2013
- *      Author: davidsicilia
- */
+#pragma once
 
-#ifndef REPEAT_H_
-#define REPEAT_H_
+#include "Scanner.hpp"
 
 namespace DS {
 namespace Tokens {
@@ -27,4 +21,3 @@ protected:
 } /* namespace Scanners */
 } /* namespace Tokens */
 } /* namespace DS */
-#endif /* REPEAT_H_ */

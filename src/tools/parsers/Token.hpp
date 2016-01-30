@@ -1,12 +1,4 @@
-/*
- * Token.h
- *
- *  Created on: Feb 8, 2013
- *      Author: davidsicilia
- */
-
-#ifndef TOKEN_H_
-#define TOKEN_H_
+#pragma once
 
 #include <string>
 
@@ -32,4 +24,3 @@ protected:
 };
 
 } /* namespace DS */
-#endif /* TOKEN_H_ */

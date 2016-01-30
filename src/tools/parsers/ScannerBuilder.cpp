@@ -1,12 +1,5 @@
-/*
- * ScannerBuilder.cpp
- *
- *  Created on: Feb 10, 2013
- *      Author: davidsicilia
- */
-
-#include "ScannerBuilder.h"
-#include "../Templates.h"
+#include "ScannerBuilder.hpp"
+#include "Templates.hpp"
 
 namespace DS {
 namespace Tokens {

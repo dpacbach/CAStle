@@ -1,14 +1,7 @@
-/*
- * CharString.h
- *
- *  Created on: Feb 8, 2013
- *      Author: davidsicilia
- */
-
-#ifndef CHARSTRING_H_
-#define CHARSTRING_H_
+#pragma once
 
 #include <string>
+#include "Scanner.hpp"
 
 using namespace std;
 
@@ -34,4 +27,3 @@ protected:
 } /* namespace Scanners */
 } /* namespace Token */
 } /* namespace DS */
-#endif /* CHARSTRING_H_ */

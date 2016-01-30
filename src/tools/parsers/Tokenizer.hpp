@@ -1,28 +1,22 @@
-/*
- * Tokenizer.h
- *
- *  Created on: Feb 8, 2013
- *      Author: davidsicilia
- */
-
-#ifndef TOKENIZER_H_
-#define TOKENIZER_H_
+#pragma once
 
 #include <string>
 #include <vector>
-#include <boost/noncopyable.hpp>
-#include "Token.h"
-#include "Scanner.h"
+#include "Token.hpp"
+#include "Scanner.hpp"
 
 using namespace std;
 
 namespace DS {
 namespace Tokens {
 
-class Tokenizer : private boost::noncopyable
+class Tokenizer
 {
 public:
     Tokenizer();
+    Tokenizer(const Tokenizer&)            = delete;
+    Tokenizer& operator=(const Tokenizer&) = delete;
+
     virtual ~Tokenizer();
 
     virtual bool tokenizePriority(const string& source, const vector<Scanner::Ptr>& scanners, vector<Token>& destination);
@@ -36,4 +30,3 @@ protected:
 
 } /* namespace Token */
 } /* namespace DS */
-#endif /* TOKENIZER_H_ */

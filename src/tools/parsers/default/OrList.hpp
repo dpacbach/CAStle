@@ -1,14 +1,7 @@
-/*
- * OrList.h
- *
- *  Created on: Feb 8, 2013
- *      Author: davidsicilia
- */
-
-#ifndef ORLIST_H_
-#define ORLIST_H_
+#pragma once
 
 #include <vector>
+#include "Scanner.hpp"
 
 namespace DS {
 namespace Tokens {
@@ -29,4 +22,3 @@ protected:
 } /* namespace Scanners */
 } /* namespace Tokens */
 } /* namespace DS */
-#endif /* ORLIST_H_ */

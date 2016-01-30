@@ -39,7 +39,8 @@ endif
 ###############################################################################
 # Dependency info
 
-#TEST_deps := LIB
+PARSERSDEFAULT_deps := PARSERS
+PARSERS_deps := TOOLS
 #LIB_deps  := LIB_INT
 
 # This is the location holding the main runnable program

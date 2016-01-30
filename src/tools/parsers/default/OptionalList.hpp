@@ -1,14 +1,7 @@
-/*
- * OptionalList.h
- *
- *  Created on: Feb 8, 2013
- *      Author: davidsicilia
- */
-
-#ifndef OPTIONALLIST_H_
-#define OPTIONALLIST_H_
+#pragma once
 
 #include <vector>
+#include "Scanner.hpp"
 
 namespace DS {
 namespace Tokens {
@@ -31,4 +24,3 @@ protected:
 } /* namespace Scanners */
 } /* namespace Tokens */
 } /* namespace DS */
-#endif /* OPTIONALLIST_H_ */

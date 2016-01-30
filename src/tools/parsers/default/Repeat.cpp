@@ -16,7 +16,7 @@ Scanner::bounds Repeat::scan(Scanner::bounds bounds)
     if (bounds.first == bounds.second)
         return bounds;
 
-    typeof(bounds.first) index = bounds.first;
+    decltype(bounds.first) index = bounds.first;
     Scanner::bounds currentBounds = Scanner::make_bounds(index, bounds.second);
 
     bool found = false;

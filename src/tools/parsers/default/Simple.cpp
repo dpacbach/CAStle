@@ -5,8 +5,14 @@
  *      Author: davidsicilia
  */
 
-#include "Simple.h"
-#include "../Scanners/scanners.h"
+#include "Simple.hpp"
+#include "Scanner.hpp"
+
+#include "CharString.hpp"
+#include "Not.hpp"
+#include "Repeat.hpp"
+#include "OrList.hpp"
+#include "OptionalList.hpp"
 
 namespace DS {
 namespace Tokens {

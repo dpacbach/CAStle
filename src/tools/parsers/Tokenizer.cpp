@@ -6,7 +6,7 @@
  */
 
 #include <stdexcept>
-#include "Tokenizer.h"
+#include "Tokenizer.hpp"
 
 namespace DS {
 namespace Tokens {

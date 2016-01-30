@@ -1,14 +1,6 @@
-/*
- * Simple.h
- *
- *  Created on: Feb 10, 2013
- *      Author: davidsicilia
- */
+#pragma once
 
-#ifndef SCANNERBUILDERSIMPLE_H_
-#define SCANNERBUILDERSIMPLE_H_
-
-#include "../ScannerBuilder.h"
+#include "ScannerBuilder.hpp"
 
 namespace DS {
 namespace Tokens {
@@ -30,4 +22,3 @@ public:
 } /* namespace ScannerBuilders */
 } /* namespace Tokens */
 } /* namespace DS */
-#endif /* SIMPLE_H_ */

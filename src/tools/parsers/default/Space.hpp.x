@@ -8,6 +8,8 @@
 #ifndef SPACE_H_
 #define SPACE_H_
 
+#include "Scanner.hpp"
+
 namespace DS {
 namespace Tokens {
 namespace Scanners {

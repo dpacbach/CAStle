@@ -1,25 +1,19 @@
-/*
- * NumberFactory.h
- *
- *  Created on: Dec 30, 2012
- *      Author: davidsicilia
- */
+#pragma once
 
-#ifndef NUMBERFACTORY_H_
-#define NUMBERFACTORY_H_
-
-#include <boost/noncopyable.hpp>
 #include <math.h>
-#include "Number.h"
-#include "NumberProxy.h"
+#include "Number.hpp"
+#include "NumberProxy.hpp"
 
 namespace DS {
 namespace CAS {
 namespace Numbers {
 
-class NumberFactory : private boost::noncopyable
+class NumberFactory
 {
 public:
+    NumberFactor(const NumberFactory&)            = delete;
+    NumberFactor& operator=(const NumberFactory&) = delete;
+
     virtual ~NumberFactory() {}
 
     virtual Number* number(double realPart = 0, double imaginaryPart = 0) const = 0;
@@ -108,5 +102,3 @@ public:
 };
 
 } } }
-
-#endif /* NUMBERFACTORY_H_ */

@@ -1,20 +1,11 @@
-/*
- * NumberFormatter.h
- *
- *  Created on: Dec 31, 2012
- *      Author: davidsicilia
- */
-
-#ifndef NUMBERFORMATTER_H_
-#define NUMBERFORMATTER_H_
+#pragma once
 
 #include <iostream>
 #include <string>
 #include <utility>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
-#include "Number.h"
-#include "NumberFactory.h"
+#include <memory>
+#include "Number.hpp"
+#include "NumberFactory.hpp"
 
 using namespace std;
 
@@ -22,9 +13,12 @@ namespace DS {
 namespace CAS {
 namespace Numbers {
 
-class NumberFormatter : private boost::noncopyable
+class NumberFormatter
 {
 public:
+    NumberFormatter(const NumberFormatter&)           = delete;
+    NumberFormatter operator=(const NumberFormatter&) = delete;
+
     virtual ~NumberFormatter() { }
 
     virtual Number*              format(const string&) = 0;
@@ -56,10 +50,8 @@ public:
     }
 
 protected:
-    NumberFormatter(boost::shared_ptr<NumberFactory> _factory) : factory(_factory) {}
-    boost::shared_ptr<NumberFactory> factory;
+    NumberFormatter(shared_ptr<NumberFactory> _factory) : factory(_factory) {}
+    shared_ptr<NumberFactory> factory;
 };
 
 } } }
-
-#endif /* NUMBERFORMATTER_H_ */

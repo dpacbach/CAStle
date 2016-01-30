@@ -1,15 +1,7 @@
-/*
- * NumberProxy.h
- *
- *  Created on: Dec 27, 2012
- *      Author: David Sicilia
- */
-
-#ifndef NUMBERPROXY_H_
-#define NUMBERPROXY_H_
+#pragma once
 
 #include <iostream>
-#include "Number.h"
+#include "Number.hpp"
 
 namespace DS {
 namespace CAS {
@@ -166,7 +158,12 @@ protected:
 
 typedef NumberProxy NumberP;
 
-NumberProxy operator+ (const NumberProxy& lhs, const NumberProxy& rhs);
+NumberProxy operator+ (const NumberProxy& lhs, const NumberProxy& rhs) {
+    NumberProxy result = lhs;
+    result += rhs;
+    return result;
+}
+
 template<typename T>
 NumberProxy operator+ (const NumberProxy& lhs, const T& rhs)
 {
@@ -180,7 +177,12 @@ NumberProxy operator+ (const T& lhs, const NumberProxy& rhs)
     return rhs+lhs;
 }
 
-NumberProxy operator* (const NumberProxy& lhs, const NumberProxy& rhs);
+NumberProxy operator* (const NumberProxy& lhs, const NumberProxy& rhs) {
+    NumberProxy result = lhs;
+    result *= rhs;
+    return result;
+}
+
 template<typename T>
 NumberProxy operator* (const NumberProxy& lhs, const T& rhs)
 {
@@ -194,7 +196,12 @@ NumberProxy operator* (const T& lhs, const NumberProxy& rhs)
     return rhs*lhs;
 }
 
-NumberProxy operator- (const NumberProxy& lhs, const NumberProxy& rhs);
+NumberProxy operator- (const NumberProxy& lhs, const NumberProxy& rhs) {
+    NumberProxy result = lhs;
+    result -= rhs;
+    return result;
+}
+
 template<typename T>
 NumberProxy operator- (const NumberProxy& lhs, const T& rhs)
 {
@@ -211,7 +218,12 @@ NumberProxy operator- (const T& lhs, const NumberProxy& rhs)
     return temp;
 }
 
-NumberProxy operator/ (const NumberProxy& lhs, const NumberProxy& rhs);
+NumberProxy operator/ (const NumberProxy& lhs, const NumberProxy& rhs) {
+    NumberProxy result = lhs;
+    result /= rhs;
+    return result;
+}
+
 template<typename T>
 NumberProxy operator/ (const NumberProxy& lhs, const T& rhs)
 {
@@ -228,14 +240,34 @@ NumberProxy operator/ (const T& lhs, const NumberProxy& rhs)
     return temp;
 }
 
-NumberProxy operator- (const NumberProxy& number);
-NumberProxy sqrt(const NumberProxy& number);
-NumberProxy exp(const NumberProxy& number);
-NumberProxy ln(const NumberProxy& number);
-NumberProxy pow(const NumberProxy& base, const NumberProxy& power);
+inline NumberProxy operator- (const NumberProxy& number) {
+    NumberProxy result = number;
+    result.negate();
+    return result;
+}
 
+NumberProxy sqrt(const NumberProxy& number) {
+    NumberProxy result = number;
+    result.squareRoot();
+    return result;
+}
 
+NumberProxy exp(const NumberProxy& number) {
+    NumberProxy result = number;
+    result.raiseEToSelf();
+    return result;
+}
+
+NumberProxy ln(const NumberProxy& number) {
+    NumberProxy result = number;
+    result.naturalLog();
+    return result;
+}
+
+NumberProxy pow(const NumberProxy& base, const NumberProxy& power) {
+    NumberProxy result = base;
+    result.raiseToPower(power);
+    return result;
+}
 
 } } } }
-
-#endif

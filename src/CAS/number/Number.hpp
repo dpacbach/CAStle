@@ -1,66 +1,57 @@
-/*
- * Number.h
- *
- *  Created on: Dec 23, 2012
- *      Author: David Sicilia
- *
- *  Interface for Complex Number Class
- */
-
-#ifndef NUMBER_H_
-#define NUMBER_H_
-
-#include <boost/noncopyable.hpp>
+#pragma once
 
 namespace DS {
 namespace CAS {
 namespace Numbers {
 
-class Number : private boost::noncopyable
+class Number
 {
 public:
+    Number(const Number&)           = delete;
+    Number operator=(const Number&) = delete;
+
     virtual Number* create(double realPart = 0, double imaginaryPart = 0) const = 0;
     virtual void     copyFrom(const Number&) = 0;
 
-    virtual bool isReal(void)                    const = 0;
+    virtual bool isReal(void)                     const = 0;
     virtual bool isImaginary(void)                const = 0;
-    virtual bool isPositiveReal(void)            const = 0;
-    virtual bool isNegativeReal(void)            const = 0;
+    virtual bool isPositiveReal(void)             const = 0;
+    virtual bool isNegativeReal(void)             const = 0;
     virtual bool isPositiveImaginary(void)        const = 0;
     virtual bool isNegativeImaginary(void)        const = 0;
-    virtual bool isOne(void)                    const = 0;
+    virtual bool isOne(void)                      const = 0;
     virtual bool isImaginaryUnit(void)            const = 0;
-    virtual bool isZero(void)                    const = 0;
-    virtual bool isNegativeOne(void)            const = 0;
-    virtual bool isRealPartInteger(void)        const = 0;
-    virtual bool isImaginaryPartInteger(void)    const = 0;
+    virtual bool isZero(void)                     const = 0;
+    virtual bool isNegativeOne(void)              const = 0;
+    virtual bool isRealPartInteger(void)          const = 0;
+    virtual bool isImaginaryPartInteger(void)     const = 0;
     virtual bool isInfinity(void)                 const = 0;
-    virtual bool isPositiveInfinity(void)        const = 0;
-    virtual bool isNegativeInfinity(void)        const = 0;
-    virtual bool isNotANumber(void)                const = 0;
+    virtual bool isPositiveInfinity(void)         const = 0;
+    virtual bool isNegativeInfinity(void)         const = 0;
+    virtual bool isNotANumber(void)               const = 0;
 
-    virtual bool isEqualReals(const Number&)     const = 0;
-    virtual bool isEqualImaginary(const Number&) const = 0;
-    virtual bool isLessReals(const Number&)         const = 0;
-    virtual bool isLessImaginaries(const Number&)const = 0;
+    virtual bool isEqualReals(const Number&)      const = 0;
+    virtual bool isEqualImaginary(const Number&)  const = 0;
+    virtual bool isLessReals(const Number&)       const = 0;
+    virtual bool isLessImaginaries(const Number&) const = 0;
 
-    virtual void negate(void)                     = 0;
-    virtual void conjugate(void)                 = 0;
-    virtual void makeRealPart(void)             = 0;
-    virtual void exchangeRealAndImaginary(void) = 0;
-    virtual void modulusSquared(void)             = 0;
-    virtual void modulus(void)                     = 0;
-    virtual void argument(void)                 = 0;
+    virtual void negate(void)                           = 0;
+    virtual void conjugate(void)                        = 0;
+    virtual void makeRealPart(void)                     = 0;
+    virtual void exchangeRealAndImaginary(void)         = 0;
+    virtual void modulusSquared(void)                   = 0;
+    virtual void modulus(void)                          = 0;
+    virtual void argument(void)                         = 0;
 
-    virtual void add(const Number&)              = 0;
-    virtual void multiply(const Number&)          = 0;
-    virtual void divideBy(const Number&)          = 0;
-    virtual void naturalLog(void)                  = 0;
-    virtual void raiseEToSelf(void)              = 0;
-    virtual void raiseToPower(const Number&)     = 0;
-    virtual void GCD(const Number&)                = 0;
+    virtual void add(const Number&)                     = 0;
+    virtual void multiply(const Number&)                = 0;
+    virtual void divideBy(const Number&)                = 0;
+    virtual void naturalLog(void)                       = 0;
+    virtual void raiseEToSelf(void)                     = 0;
+    virtual void raiseToPower(const Number&)            = 0;
+    virtual void GCD(const Number&)                     = 0;
 
-    virtual void makePi(void)                    = 0;
+    virtual void makePi(void)                           = 0;
 
     enum RoundingMode {RoundDown, RoundUp, RoundClosest};
     virtual void roundUsingMode(enum RoundingMode roundingMode) = 0;
@@ -373,5 +364,3 @@ inline TO number_cast(const Number& from)
 }
 
 } } }
-
-#endif

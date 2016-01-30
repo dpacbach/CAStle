@@ -1,8 +1,9 @@
 ifndef TOPLEVELWD
     include $(dir $(lastword $(MAKEFILE_LIST)))../makefile
-    #$(call set_default_goal,CASNUMBER)
+    #$(call set_default_goal,)
 else
-    $(call make_so,CASNUMBER,castlecasnumber)
-
-    $(call enter,default)
+    $(call set_location,CAS)
+    # In general, must enter in order of dependencies.
+    locations := number
+    $(call enter_all,$(locations))
 endif

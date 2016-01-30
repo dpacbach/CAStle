@@ -1,32 +1,32 @@
 /*
- * Repeat.h
+ * OrList.h
  *
  *  Created on: Feb 8, 2013
  *      Author: davidsicilia
  */
 
-#ifndef REPEAT_H_
-#define REPEAT_H_
+#ifndef ORLIST_H_
+#define ORLIST_H_
 
-#include "../Scanner.h"
+#include <vector>
 
 namespace DS {
 namespace Tokens {
 namespace Scanners {
 
-class Repeat: public DS::Tokens::Scanner
+class OrList: public DS::Tokens::Scanner
 {
 public:
-    Repeat(Scanner::Ptr _repeated) : repeated(_repeated) {}
-    virtual ~Repeat() {}
+    OrList(const vector<Scanner::Ptr>&);
+    virtual ~OrList() {}
 
     virtual Scanner::bounds scan(Scanner::bounds);
 
 protected:
-    Scanner::Ptr repeated;
+    vector<Scanner::Ptr> theList;
 };
 
 } /* namespace Scanners */
 } /* namespace Tokens */
 } /* namespace DS */
-#endif /* REPEAT_H_ */
+#endif /* ORLIST_H_ */

@@ -5,7 +5,7 @@
  *      Author: davidsicilia
  */
 
-#include "Space.h"
+#include "Space.hpp"
 
 namespace DS {
 namespace Tokens {

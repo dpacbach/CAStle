@@ -9,7 +9,6 @@
 #define CHARSTRING_H_
 
 #include <string>
-#include "../Scanner.h"
 
 using namespace std;
 

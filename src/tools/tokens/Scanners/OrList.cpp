@@ -6,7 +6,7 @@
  */
 
 #include <stdexcept>
-#include "OrList.h"
+#include "OrList.hpp"
 
 namespace DS {
 namespace Tokens {

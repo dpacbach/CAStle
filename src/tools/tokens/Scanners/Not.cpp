@@ -5,7 +5,7 @@
  *      Author: davidsicilia
  */
 
-#include "Not.h"
+#include "Not.hpp"
 
 namespace DS {
 namespace Tokens {

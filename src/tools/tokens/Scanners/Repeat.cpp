@@ -5,7 +5,7 @@
  *      Author: davidsicilia
  */
 
-#include "Repeat.h"
+#include "Repeat.hpp"
 
 namespace DS {
 namespace Tokens {

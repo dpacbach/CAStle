@@ -8,8 +8,6 @@
 #ifndef SPACE_H_
 #define SPACE_H_
 
-#include "../Scanner.h"
-
 namespace DS {
 namespace Tokens {
 namespace Scanners {

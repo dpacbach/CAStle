@@ -5,7 +5,7 @@
  *      Author: davidsicilia
  */
 
-#include "CharString.h"
+#include "CharString.hpp"
 
 namespace DS {
 namespace Tokens {

@@ -9,7 +9,6 @@
 #define OPTIONALLIST_H_
 
 #include <vector>
-#include "../Scanner.h"
 
 namespace DS {
 namespace Tokens {

@@ -8,8 +8,6 @@
 #ifndef SCANNERNOT_H_
 #define SCANNERNOT_H_
 
-#include "../Scanner.h"
-
 namespace DS {
 namespace Tokens {
 namespace Scanners {

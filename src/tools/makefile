@@ -4,6 +4,6 @@ ifndef TOPLEVELWD
     #$(call set_default_goal,)
 else
     # In general, must enter in order of dependencies.
-    locations := matrix token
+    locations := matrix parsers
     $(call enter_all,$(locations))
 endif

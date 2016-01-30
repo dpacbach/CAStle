@@ -13,9 +13,9 @@
 #include <exception>
 #include <cmath>
 
-#include "BaseArray.h"
-#include "Integer.h"
-#include "Float.h"
+#include "BaseArray.hpp"
+#include "Integer.hpp"
+#include "Float.hpp"
 
 using std::cout;
 using std::cerr;

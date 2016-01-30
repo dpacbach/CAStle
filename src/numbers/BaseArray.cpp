@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <algorithm>
 
-#include "BaseArray.h"
+#include "BaseArray.hpp"
 
 namespace DS {
 namespace Numbers {

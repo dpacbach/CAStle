@@ -2,7 +2,8 @@
 
 #include <sstream>
 #include <string>
-#include "Integer.h"
+// TODO: try to get rid of this header
+#include "Integer.hpp"
 
 namespace DS {
 namespace Numbers {

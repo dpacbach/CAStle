@@ -11,6 +11,9 @@ $(call enter,src)
 
 include $(makerules)/postsrc.mk
 
+all: $(BINARIES)
+.DEFAULT_GOAL := all
+
 #test: $(TEST_BINARY)
 #	$(print_run) LD_LIBRARY_PATH=$(dir $(LIB_BINARY)) ./$(TEST_BINARY)
 

@@ -1,6 +1,6 @@
 #include <stdexcept>
 #include <iostream>
-#include "Float.h"
+#include "Float.hpp"
 #include <cmath>
 
 #define IF(a, b, c) ((a) ? (b) : (c))

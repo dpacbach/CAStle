@@ -1,14 +1,6 @@
-/*
- * NumberFactoryPrototype.h
- *
- *  Created on: Dec 30, 2012
- *      Author: davidsicilia
- */
+#pragma once
 
-#ifndef NUMBERFACTORYPROTOTYPE_H_
-#define NUMBERFACTORYPROTOTYPE_H_
-
-#include "../../../NumberFactory.h"
+#include "NumberFactory.hpp"
 
 namespace DS {
 namespace CAS {
@@ -32,4 +24,3 @@ protected:
 };
 
 } } }
-#endif /* NUMBERFACTORYPROTOTYPE_H_ */

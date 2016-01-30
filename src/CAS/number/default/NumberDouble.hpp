@@ -1,17 +1,9 @@
-/*
- * NumberDouble.h
- *
- *  Created on: Dec 27, 2012
- *      Author: davidsicilia
- */
-
-#ifndef NumberDouble_H_
-#define NumberDouble_H_
+#pragma once
 
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
-#include "../../../Number.h"
+#include "Number.hpp"
 
 using namespace std;
 
@@ -452,4 +444,3 @@ void NumberDouble<T>::roundUsingMode(enum RoundingMode roundingMode)
 }
 
 } } }
-#endif /* NumberDouble_H_ */

@@ -1,12 +1,5 @@
-/*
- * NumberFactoryPrototype.cpp
- *
- *  Created on: Dec 30, 2012
- *      Author: davidsicilia
- */
-
-#include "NumberFactoryPrototype.h"
 #include <iostream>
+#include "NumberFactoryPrototype.hpp"
 
 using namespace std;
 

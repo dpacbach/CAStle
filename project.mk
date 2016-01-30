@@ -41,6 +41,9 @@ endif
 
 PARSERSDEFAULT_deps := PARSERS
 PARSERS_deps := TOOLS
+CASNUMBERDEFAULT_deps := CASNUMBER PARSERS
+CASNUMBER_deps := PARSERS
+
 #LIB_deps  := LIB_INT
 
 # This is the location holding the main runnable program

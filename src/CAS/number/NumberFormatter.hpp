@@ -17,7 +17,7 @@ class NumberFormatter
 {
 public:
     NumberFormatter(const NumberFormatter&)           = delete;
-    NumberFormatter operator=(const NumberFormatter&) = delete;
+    NumberFormatter& operator=(const NumberFormatter&) = delete;
 
     virtual ~NumberFormatter() { }
 

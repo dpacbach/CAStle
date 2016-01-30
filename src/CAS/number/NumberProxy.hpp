@@ -158,7 +158,7 @@ protected:
 
 typedef NumberProxy NumberP;
 
-NumberProxy operator+ (const NumberProxy& lhs, const NumberProxy& rhs) {
+inline NumberProxy operator+ (const NumberProxy& lhs, const NumberProxy& rhs) {
     NumberProxy result = lhs;
     result += rhs;
     return result;
@@ -177,7 +177,7 @@ NumberProxy operator+ (const T& lhs, const NumberProxy& rhs)
     return rhs+lhs;
 }
 
-NumberProxy operator* (const NumberProxy& lhs, const NumberProxy& rhs) {
+inline NumberProxy operator* (const NumberProxy& lhs, const NumberProxy& rhs) {
     NumberProxy result = lhs;
     result *= rhs;
     return result;
@@ -196,7 +196,7 @@ NumberProxy operator* (const T& lhs, const NumberProxy& rhs)
     return rhs*lhs;
 }
 
-NumberProxy operator- (const NumberProxy& lhs, const NumberProxy& rhs) {
+inline NumberProxy operator- (const NumberProxy& lhs, const NumberProxy& rhs) {
     NumberProxy result = lhs;
     result -= rhs;
     return result;
@@ -218,7 +218,7 @@ NumberProxy operator- (const T& lhs, const NumberProxy& rhs)
     return temp;
 }
 
-NumberProxy operator/ (const NumberProxy& lhs, const NumberProxy& rhs) {
+inline NumberProxy operator/ (const NumberProxy& lhs, const NumberProxy& rhs) {
     NumberProxy result = lhs;
     result /= rhs;
     return result;
@@ -246,25 +246,25 @@ inline NumberProxy operator- (const NumberProxy& number) {
     return result;
 }
 
-NumberProxy sqrt(const NumberProxy& number) {
+inline NumberProxy sqrt(const NumberProxy& number) {
     NumberProxy result = number;
     result.squareRoot();
     return result;
 }
 
-NumberProxy exp(const NumberProxy& number) {
+inline NumberProxy exp(const NumberProxy& number) {
     NumberProxy result = number;
     result.raiseEToSelf();
     return result;
 }
 
-NumberProxy ln(const NumberProxy& number) {
+inline NumberProxy ln(const NumberProxy& number) {
     NumberProxy result = number;
     result.naturalLog();
     return result;
 }
 
-NumberProxy pow(const NumberProxy& base, const NumberProxy& power) {
+inline NumberProxy pow(const NumberProxy& base, const NumberProxy& power) {
     NumberProxy result = base;
     result.raiseToPower(power);
     return result;

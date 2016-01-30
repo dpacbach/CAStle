@@ -7,8 +7,8 @@ namespace Numbers {
 class Number
 {
 public:
-    Number(const Number&)           = delete;
-    Number operator=(const Number&) = delete;
+    Number();
+    Number(const Number&) = delete;
 
     virtual Number* create(double realPart = 0, double imaginaryPart = 0) const = 0;
     virtual void     copyFrom(const Number&) = 0;

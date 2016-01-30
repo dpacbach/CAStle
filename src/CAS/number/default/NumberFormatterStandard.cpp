@@ -1,17 +1,14 @@
-/*
- * NumberFormatterStandard.cpp
- *
- *  Created on: Dec 31, 2012
- *      Author: davidsicilia
- */
-
-#include "../../../NumberProxy.h"
-#include "NumberFormatterStandard.h"
-#include "../../NumberImp/Complex/NumberDouble.h"
 #include <stdexcept>
 #include <sstream>
 #include <string>
 #include <iostream>
+
+#include "NumberProxy.hpp"
+#include "NumberFormatterStandard.hpp"
+#include "NumberDouble.hpp"
+
+#include "Tokenizer.hpp"
+#include "ScannerBuilder.hpp"
 
 namespace DS {
 namespace CAS {

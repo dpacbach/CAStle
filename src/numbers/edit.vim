@@ -1,9 +1,9 @@
 :e perftest.cpp
 :tabe shared_array.hpp
 :tabe BaseArray.cpp
-:vsplit BaseArray.h
+:vsplit BaseArray.hpp
 :tabe Integer.cpp
-:vsplit Integer.h
+:vsplit Integer.hpp
 :tabe Float.cpp
-:vsplit Float.h
+:vsplit Float.hpp
 [[

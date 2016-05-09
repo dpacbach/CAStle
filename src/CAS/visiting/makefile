@@ -4,6 +4,6 @@ ifndef TOPLEVELWD
 else
     $(call make_so,CASVISITING,castlecasvisiting)
 
-    locations := 
+    locations := numeval rendering restructuring
     $(call enter_all,$(locations))
 endif

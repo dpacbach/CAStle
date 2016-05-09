@@ -1,5 +1,5 @@
 #include "Power.hpp"
-#include "visiting/Visitor.hpp"
+#include "../../visiting/Visitor.hpp"
 #include <stdexcept>
 
 namespace DS          {
@@ -21,7 +21,7 @@ Expression::Ptr Power::getChild(unsigned int i) const
         return base;
     if (i == 1)
         return exponent;
-    throw out_of_range("i out of range in Power::getChild");
+    throw std::out_of_range("i out of range in Power::getChild");
 }
 
 } /* namespace Expression */

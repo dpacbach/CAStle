@@ -9,7 +9,7 @@ namespace Expressions {
 
 class Multiply: public DS::CAS::Expressions::Expression {
 public:
-    Multiply(const vector<Expression::Ptr>&);
+    Multiply(const std::vector<Expression::Ptr>&);
 
     virtual ~Multiply() {}
 
@@ -20,7 +20,7 @@ public:
     virtual Ptr  getChild(unsigned int) const;
 
 protected:
-    vector<Expression::Ptr> children;
+    std::vector<Expression::Ptr> children;
 };
 
 } /* namespace Expression */

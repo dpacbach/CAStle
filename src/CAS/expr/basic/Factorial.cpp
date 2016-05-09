@@ -1,5 +1,5 @@
 #include "Factorial.hpp"
-#include "visiting/Visitor.hpp"
+#include "../../visiting/Visitor.hpp"
 #include <stdexcept>
 
 namespace DS          {
@@ -18,7 +18,7 @@ Expression::Ptr Factorial::getChild(unsigned int i) const
 {
     if (i == 0)
         return child;
-    throw out_of_range("i != 0 in Factorial::getChild");
+    throw std::out_of_range("i != 0 in Factorial::getChild");
 }
 
 } /* namespace Expression */

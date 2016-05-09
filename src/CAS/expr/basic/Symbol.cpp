@@ -1,16 +1,9 @@
-/*
- * ExpressionSymbol.cpp
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
-#include "Symbol.h"
-#include "../../ExpressionVisiting/Visitor.h"
+#include "Symbol.hpp"
+#include "../../visiting/Visitor.hpp"
 #include <stdexcept>
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 bool Symbol::acceptVisitor(Visitor& visitor) const
@@ -25,10 +18,10 @@ Expression::Ptr Symbol::getChild(unsigned int i) const
 {
     if (i < children.size())
         return children[i];
-    throw out_of_range("i out of range in Symbol::getChild");
+    throw std::out_of_range("i out of range in Symbol::getChild");
 }
 
-const string& Symbol::getName(void) const
+const std::string& Symbol::getName(void) const
 {
     return name;
 }

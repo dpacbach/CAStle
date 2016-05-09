@@ -11,8 +11,8 @@ namespace Expressions {
 class Symbol: public DS::CAS::Expressions::Expression
 {
 public:
-    Symbol(const string& _name) : name(_name) {}
-    Symbol(const string& _name, const vector<Expression::Ptr>& _children) : name(_name), children(_children) {}
+    Symbol(const std::string& _name) : name(_name) {}
+    Symbol(const std::string& _name, const std::vector<Expression::Ptr>& _children) : name(_name), children(_children) {}
 
     virtual ~Symbol() {}
 
@@ -22,11 +22,11 @@ public:
     virtual unsigned int  numberOfChildren(void) const;
     virtual Ptr  getChild(unsigned int) const;
 
-    const string& getName(void) const;
+    const std::string& getName(void) const;
 
 protected:
-    string name;
-    vector<Expression::Ptr> children;
+    std::string name;
+    std::vector<Expression::Ptr> children;
 };
 
 } /* namespace Expression */

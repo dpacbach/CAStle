@@ -1,17 +1,12 @@
-/*
- * Standard.cpp
- *
- *  Created on: Jan 22, 2013
- *      Author: davidsicilia
- */
-
 #include <stdexcept>
-#include "Standard.h"
+#include "Standard.hpp"
+#include "Number.hpp"
+#include "AllBasic.hpp"
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
-namespace Builders {
+namespace Builders    {
 
 Standard::Standard() {
     // TODO Auto-generated constructor stub
@@ -22,24 +17,24 @@ Standard::~Standard() {
     // TODO Auto-generated destructor stub
 }
 
-Expression::Ptr Standard::symbol(const string& name) const
+Expression::Ptr Standard::symbol(const std::string& name) const
 {
     return Expression::Ptr(new Symbol(name));
 }
-Expression::Ptr Standard::symbol(const string& name, Expression::Ptr child) const
+Expression::Ptr Standard::symbol(const std::string& name, Expression::Ptr child) const
 {
-    vector<Expression::Ptr> children(1);
+    std::vector<Expression::Ptr> children(1);
     children[0] = child;
     return Expression::Ptr(new Symbol(name, children));
 }
-Expression::Ptr Standard::symbol(const string& name, Expression::Ptr ptr1, Expression::Ptr ptr2) const
+Expression::Ptr Standard::symbol(const std::string& name, Expression::Ptr ptr1, Expression::Ptr ptr2) const
 {
-    vector<Expression::Ptr> children(2);
+    std::vector<Expression::Ptr> children(2);
     children[0] = ptr1;
     children[1] = ptr2;
     return Expression::Ptr(new Symbol(name, children));
 }
-Expression::Ptr Standard::symbol(const string& name, const vector<Expression::Ptr>& children) const
+Expression::Ptr Standard::symbol(const std::string& name, const std::vector<Expression::Ptr>& children) const
 {
     return Expression::Ptr(new Symbol(name, children));
 }
@@ -53,32 +48,32 @@ Expression::Ptr Standard::literal(const Numbers::Number& number) const
 }
 Expression::Ptr Standard::add(Expression::Ptr ptr1, Expression::Ptr ptr2) const
 {
-    vector<pair<Sign, Expression::Ptr> > childPairs(2);
-    childPairs[0] = make_pair(p, ptr1);
-    childPairs[1] = make_pair(p, ptr2);
+    std::vector<std::pair<Sign, Expression::Ptr> > childPairs(2);
+    childPairs[0] = std::make_pair(p, ptr1);
+    childPairs[1] = std::make_pair(p, ptr2);
     return Expression::Ptr(new Add(childPairs));
 }
 Expression::Ptr Standard::subtract(Expression::Ptr ptr1, Expression::Ptr ptr2) const
 {
-    vector<pair<Sign, Expression::Ptr> > childPairs(2);
-    childPairs[0] = make_pair(p, ptr1);
-    childPairs[1] = make_pair(n, ptr2);
+    std::vector<std::pair<Sign, Expression::Ptr> > childPairs(2);
+    childPairs[0] = std::make_pair(p, ptr1);
+    childPairs[1] = std::make_pair(n, ptr2);
     return Expression::Ptr(new Add(childPairs));
 }
-Expression::Ptr Standard::add(const vector<Expression::Ptr>& children) const
+Expression::Ptr Standard::add(const std::vector<Expression::Ptr>& children) const
 {
-    vector<pair<Sign, Expression::Ptr> > childPairs(children.size());
+    std::vector<std::pair<Sign, Expression::Ptr> > childPairs(children.size());
     for (unsigned int i = 0; i < children.size(); i++)
-        childPairs[i] = make_pair(p, children[i]);
+        childPairs[i] = std::make_pair(p, children[i]);
     return Expression::Ptr(new Add(childPairs));
 }
-Expression::Ptr Standard::add(const vector<Expression::Ptr>& children, const vector<Sign>& signs) const
+Expression::Ptr Standard::add(const std::vector<Expression::Ptr>& children, const std::vector<Sign>& signs) const
 {
     if (children.size() != signs.size())
-        throw invalid_argument("children.size() != signs.size() in Builders::Standard::addArray");
-    vector<pair<Sign, Expression::Ptr> > childPairs(children.size());
+        throw std::invalid_argument("children.size() != signs.size() in Builders::Standard::addArray");
+    std::vector<std::pair<Sign, Expression::Ptr> > childPairs(children.size());
     for (unsigned int i = 0; i < children.size(); i++)
-        childPairs[i] = make_pair(signs[i], children[i]);
+        childPairs[i] = std::make_pair(signs[i], children[i]);
     return Expression::Ptr(new Add(childPairs));
 }
 Expression::Ptr Standard::negate(Expression::Ptr child) const
@@ -87,12 +82,12 @@ Expression::Ptr Standard::negate(Expression::Ptr child) const
 }
 Expression::Ptr Standard::multiply(Expression::Ptr ptr1, Expression::Ptr ptr2) const
 {
-    vector<Expression::Ptr> children(2);
+    std::vector<Expression::Ptr> children(2);
     children[0] = ptr1;
     children[1] = ptr2;
     return Expression::Ptr(new Multiply(children));
 }
-Expression::Ptr Standard::multiply(const vector<Expression::Ptr>& children) const
+Expression::Ptr Standard::multiply(const std::vector<Expression::Ptr>& children) const
 {
     return Expression::Ptr(new Multiply(children));
 }

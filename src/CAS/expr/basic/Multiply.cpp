@@ -1,15 +1,15 @@
 #include "Multiply.hpp"
-#include "visiting/Visitor.hpp"
+#include "../../visiting/Visitor.hpp"
 #include <stdexcept>
 
 namespace DS          {
 namespace CAS         {
 namespace Expressions {
 
-Multiply::Multiply(const vector<Expression::Ptr>& _children)
+Multiply::Multiply(const std::vector<Expression::Ptr>& _children)
 {
     if (_children.size() == 0)
-        throw invalid_argument("_children == 0 in Multiply::Multiply(vector)");
+        throw std::invalid_argument("_children == 0 in Multiply::Multiply(vector)");
     children = _children;
 }
 
@@ -25,7 +25,7 @@ Expression::Ptr Multiply::getChild(unsigned int i) const
 {
     if (i < children.size())
         return children[i];
-    throw out_of_range("i out of range in Multiply::getChild");
+    throw std::out_of_range("i out of range in Multiply::getChild");
 }
 
 } /* namespace Expression */

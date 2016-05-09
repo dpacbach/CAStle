@@ -1,5 +1,5 @@
 #include "Literal.hpp"
-#include "visiting/Visitor.hpp"
+#include "../../visiting/Visitor.hpp"
 
 using namespace DS::CAS::Numbers;
 using namespace DS::CAS::Numbers::Proxy;

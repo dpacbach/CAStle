@@ -1,15 +1,8 @@
-/*
- * Visitor.cpp
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
 #include <stdexcept>
-#include "Visitor.h"
+#include "Visitor.hpp"
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 bool Visitor::visitExpression(const Expression::Ptr ptr)

@@ -1,21 +1,11 @@
-/*
- * Expression.h
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
-#ifndef EXPRESSION_H_
-#define EXPRESSION_H_
+#pragma once
 
 #include <vector>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 
-using namespace std;
-
-namespace DS           {
-namespace CAS           {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 enum Sign
@@ -38,7 +28,7 @@ public:
 
     virtual unsigned int numberOfChildren(void) const = 0;
     virtual Ptr getChild(unsigned int i)        const = 0;
-    virtual vector<Ptr> getChildVector(void)    const;
+    virtual std::vector<Ptr> getChildVector(void)    const;
 
     virtual bool acceptVisitor(Visitor&) const = 0;
 
@@ -46,5 +36,3 @@ public:
 };
 
 } } }
-
-#endif /* EXPRESSION_H_ */

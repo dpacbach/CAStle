@@ -1,5 +1,5 @@
 #include "Modulus.hpp"
-#include "visiting/Visitor.hpp"
+#include "../../visiting/Visitor.hpp"
 #include <stdexcept>
 
 namespace DS          {
@@ -21,7 +21,7 @@ Expression::Ptr Modulus::getChild(unsigned int i) const
         return numerator;
     if (i == 1)
         return denominator;
-    throw out_of_range("i out of range in Modulus::getChild");
+    throw std::out_of_range("i out of range in Modulus::getChild");
 }
 
 } /* namespace Expression */

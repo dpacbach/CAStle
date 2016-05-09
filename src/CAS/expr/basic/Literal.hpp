@@ -27,7 +27,7 @@ public:
     }
     virtual Expression::Ptr getChild(unsigned int i) const
     {
-        throw out_of_range("getChild called in class Expressions::Literal");
+        throw std::out_of_range("getChild called in class Expressions::Literal");
     }
 
     const Numbers::Number& getNumber(void) const

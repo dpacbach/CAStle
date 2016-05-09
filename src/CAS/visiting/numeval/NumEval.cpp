@@ -1,25 +1,24 @@
-/*
- * NumEval.cpp
- *
- *  Created on: Feb 17, 2013
- *      Author: davidsicilia
- */
-
 #include <stdexcept>
-#include "NumEval.h"
+#include "NumEval.hpp"
+#include "NumberProxy.hpp"
+#include "AllBasic.hpp"
 
-namespace DS {
-namespace CAS {
+using namespace DS::CAS::Numbers::Proxy;
+
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
-namespace Visitors {
+namespace Visitors    {
 
-NumEval::NumEval() {
-    // TODO Auto-generated constructor stub
+NumEval::NumEval() { }
 
-}
+NumEval::~NumEval() { }
 
-NumEval::~NumEval() {
-    // TODO Auto-generated destructor stub
+NumberP NumEval::result(void)
+{
+    if (childResults.size() != 1)
+        throw std::logic_error("childResults.size() != 1 in Expressions::Visitors::Renderer::result");
+    return getPop(childResults);
 }
 
 bool NumEval::visitAdd(const Add& exp)
@@ -48,7 +47,7 @@ bool NumEval::visitDivide(const Divide& exp)
 }
 bool NumEval::visitFactorial(const Factorial& exp)
 {
-    throw invalid_argument("NumEval::visitFactorial not implemented");
+    throw std::invalid_argument("NumEval::visitFactorial not implemented");
     return true;
 }
 bool NumEval::visitLiteral(const Literal& exp)
@@ -58,7 +57,7 @@ bool NumEval::visitLiteral(const Literal& exp)
 }
 bool NumEval::visitModulus(const Modulus& exp)
 {
-    throw invalid_argument("NumEval::visitModulus not implemented");
+    throw std::invalid_argument("NumEval::visitModulus not implemented");
     return true;
 }
 bool NumEval::visitMultiply(const Multiply& exp)

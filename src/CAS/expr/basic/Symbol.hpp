@@ -1,19 +1,11 @@
-/*
- * ExpressionSymbol.h
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
-#ifndef EXPRESSIONSYMBOL_H_
-#define EXPRESSIONSYMBOL_H_
+#pragma once
 
 #include <vector>
 #include <string>
-#include "../Expression.h"
+#include "Expression.hpp"
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 class Symbol: public DS::CAS::Expressions::Expression
@@ -40,4 +32,3 @@ protected:
 } /* namespace Expression */
 } /* namespace CAS */
 } /* namespace DS */
-#endif /* EXPRESSIONSYMBOL_H_ */

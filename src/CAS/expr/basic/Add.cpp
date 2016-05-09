@@ -1,16 +1,9 @@
-/*
- * ExpressionAdd.cpp
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
-#include "Add.h"
-#include "../../ExpressionVisiting/Visitor.h"
+#include "Add.hpp"
+#include "visiting/Visitor.hpp"
 #include <stdexcept>
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 Add::Add(const vector<pair<Sign, Expression::Ptr> >& _childPairs)

@@ -1,18 +1,10 @@
-/*
- * ExpressionAdd.h
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
-#ifndef EXPRESSIONADD_H_
-#define EXPRESSIONADD_H_
+#pragma once
 
 #include <vector>
-#include "../Expression.h"
+#include "Expression.hpp"
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 class Add: public DS::CAS::Expressions::Expression
@@ -42,4 +34,3 @@ protected:
 } /* namespace Expression */
 } /* namespace CAS */
 } /* namespace DS */
-#endif /* EXPRESSIONADD_H_ */

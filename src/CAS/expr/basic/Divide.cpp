@@ -1,16 +1,9 @@
-/*
- * ExpressionDivide.cpp
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
-#include "Divide.h"
-#include "../../ExpressionVisiting/Visitor.h"
+#include "Divide.hpp"
+#include "visiting/Visitor.hpp"
 #include <stdexcept>
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 bool Divide::acceptVisitor(Visitor& visitor) const

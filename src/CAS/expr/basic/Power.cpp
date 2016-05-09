@@ -1,16 +1,9 @@
-/*
- * ExpressionPower.cpp
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
-#include "Power.h"
-#include "../../ExpressionVisiting/Visitor.h"
+#include "Power.hpp"
+#include "visiting/Visitor.hpp"
 #include <stdexcept>
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 bool Power::acceptVisitor(Visitor& visitor) const

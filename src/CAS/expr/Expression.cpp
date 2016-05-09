@@ -1,15 +1,7 @@
-/*
- * Expression.cpp
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
+#include "Expression.hpp"
 
-#include "Expression.h"
-#include "../ExpressionVisiting/Visitor.h"
-
-namespace DS {
-namespace CAS {
+namespace DS          { 
+namespace CAS         {
 namespace Expressions {
 
 int Expression::numberOfExpressions(0);

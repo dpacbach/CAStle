@@ -1,12 +1,5 @@
-/*
- * Builder.cpp
- *
- *  Created on: Jan 22, 2013
- *      Author: davidsicilia
- */
-
 #include <stdexcept>
-#include "Builder.h"
+#include "Builder.hpp"
 
 namespace DS {
 namespace CAS {
@@ -70,7 +63,7 @@ Expression::Ptr Builder::operator()(const string& name) const
 {
     if (name == "")
         throw invalid_argument("name == empty in Builder::operator()");
-    return Expression::Ptr(new Symbol(name));
+    return this->symbol(name);
 }
 Expression::Ptr Builder::operator()(const string& name, Expression::Ptr ptr) const
 {

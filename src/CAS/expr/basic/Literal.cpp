@@ -1,18 +1,11 @@
-/*
- * ExpressionLiteral.cpp
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
-#include "Literal.h"
-#include "../../ExpressionVisiting/Visitor.h"
+#include "Literal.hpp"
+#include "visiting/Visitor.hpp"
 
 using namespace DS::CAS::Numbers;
 using namespace DS::CAS::Numbers::Proxy;
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 bool Literal::acceptVisitor(Visitor& visitor) const

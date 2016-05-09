@@ -1,16 +1,9 @@
-/*
- * ExpressionNegate.cpp
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
 #include <stdexcept>
-#include "Negate.h"
-#include "../../ExpressionVisiting/Visitor.h"
+#include "Negate.hpp"
+#include "visiting/Visitor.hpp"
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 bool Negate::acceptVisitor(Visitor& visitor) const

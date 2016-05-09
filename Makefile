@@ -1,6 +1,6 @@
 TOPLEVELWD := $(dir $(lastword $(MAKEFILE_LIST)))
 
-makerules = $(TOPLEVELWD)../xtc/makerules
+makerules = $(TOPLEVELWD)makerules
 
 include $(makerules)/toplevel.mk
 

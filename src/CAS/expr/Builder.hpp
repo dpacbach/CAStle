@@ -1,19 +1,15 @@
-/*
- * Builder.h
- *
- *  Created on: Jan 22, 2013
- *      Author: davidsicilia
- */
-
-#ifndef EXPBUILDER_H_
-#define EXPBUILDER_H_
+#pragma once
 
 #include <string>
 #include <vector>
 #include <boost/noncopyable.hpp>
-#include "../Number/Numbers.h"
-#include "Expression.h"
-#include "Expressions/ExpressionTypes.h"
+#include "Expression.hpp"
+
+namespace Numbers {
+
+class Number;
+
+}
 
 namespace DS {
 namespace CAS {
@@ -51,4 +47,3 @@ public:
 } /* namespace Expressions */
 } /* namespace CAS */
 } /* namespace DS */
-#endif /* EXPBUILDER_H_ */

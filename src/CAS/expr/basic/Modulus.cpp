@@ -1,16 +1,9 @@
-/*
- * ExpressionModulus.cpp
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
-#include "Modulus.h"
-#include "../../ExpressionVisiting/Visitor.h"
+#include "Modulus.hpp"
+#include "visiting/Visitor.hpp"
 #include <stdexcept>
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 bool Modulus::acceptVisitor(Visitor& visitor) const

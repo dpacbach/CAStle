@@ -1,16 +1,9 @@
-/*
- * ExpressionFactorial.cpp
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
-#include "Factorial.h"
-#include "../../ExpressionVisiting/Visitor.h"
+#include "Factorial.hpp"
+#include "visiting/Visitor.hpp"
 #include <stdexcept>
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 bool Factorial::acceptVisitor(Visitor& visitor) const

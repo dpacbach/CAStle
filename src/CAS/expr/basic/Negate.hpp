@@ -1,17 +1,9 @@
-/*
- * ExpressionNegate.h
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
+#pragma once
 
-#ifndef EXPRESSIONNEGATE_H_
-#define EXPRESSIONNEGATE_H_
+#include "Expression.hpp"
 
-#include "../Expression.h"
-
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 class Negate: public DS::CAS::Expressions::Expression
@@ -37,4 +29,3 @@ protected:
 } /* namespace Expression */
 } /* namespace CAS */
 } /* namespace DS */
-#endif /* EXPRESSIONNEGATE_H_ */

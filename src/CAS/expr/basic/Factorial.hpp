@@ -1,17 +1,9 @@
-/*
- * ExpressionFactorial.h
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
+#pragma once
 
-#ifndef EXPRESSIONFACTORIAL_H_
-#define EXPRESSIONFACTORIAL_H_
+#include "Expression.hpp"
 
-#include "../Expression.h"
-
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 class Factorial: public DS::CAS::Expressions::Expression
@@ -34,4 +26,3 @@ protected:
 } /* namespace Expression */
 } /* namespace CAS */
 } /* namespace DS */
-#endif /* EXPRESSIONFACTORIAL_H_ */

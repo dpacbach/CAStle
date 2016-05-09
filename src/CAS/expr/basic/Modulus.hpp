@@ -1,17 +1,9 @@
-/*
- * ExpressionModulus.h
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
+#pragma once
 
-#ifndef EXPRESSIONMODULUS_H_
-#define EXPRESSIONMODULUS_H_
+#include "Expression.hpp"
 
-#include "../Expression.h"
-
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 class Modulus: public DS::CAS::Expressions::Expression {
@@ -33,4 +25,3 @@ protected:
 } /* namespace Expression */
 } /* namespace CAS */
 } /* namespace DS */
-#endif /* EXPRESSIONMODULUS_H_ */

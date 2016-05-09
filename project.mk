@@ -39,12 +39,14 @@ endif
 ###############################################################################
 # Dependency info
 
-PARSERSDEFAULT_deps := PARSERS
-PARSERS_deps := TOOLS
-CASNUMBERDEFAULT_deps := CASNUMBER PARSERS
-CASNUMBER_deps := PARSERS
+PARSERSDEFAULT.deps := PARSERS
+PARSERS.deps := TOOLS
+CASNUMBERDEFAULT.deps := CASNUMBER PARSERS
+CASNUMBER.deps := PARSERS
+CASEXPR.deps := CASNUMBER
+CASEXPRBASIC.deps := CASEXPR
 
-#LIB_deps  := LIB_INT
+#LIB.deps  := LIB_INT
 
 # This is the location holding the main runnable program
 #MAIN_PROGRAM := CMD

@@ -1,16 +1,9 @@
-/*
- * ExpressionMultiply.cpp
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
-#include "Multiply.h"
-#include "../../ExpressionVisiting/Visitor.h"
+#include "Multiply.hpp"
+#include "visiting/Visitor.hpp"
 #include <stdexcept>
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 Multiply::Multiply(const vector<Expression::Ptr>& _children)

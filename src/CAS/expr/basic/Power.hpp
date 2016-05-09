@@ -1,17 +1,9 @@
-/*
- * ExpressionPower.h
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
+#pragma once
 
-#ifndef EXPRESSIONPOWER_H_
-#define EXPRESSIONPOWER_H_
+#include "Expression.hpp"
 
-#include "../Expression.h"
-
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 class Power: public DS::CAS::Expressions::Expression {
@@ -33,4 +25,3 @@ protected:
 } /* namespace Expression */
 } /* namespace CAS */
 } /* namespace DS */
-#endif /* EXPRESSIONPOWER_H_ */

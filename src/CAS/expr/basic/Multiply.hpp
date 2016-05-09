@@ -1,18 +1,10 @@
-/*
- * ExpressionMultiply.h
- *
- *  Created on: Jan 11, 2013
- *      Author: davidsicilia
- */
-
-#ifndef EXPRESSIONMULTIPLY_H_
-#define EXPRESSIONMULTIPLY_H_
+#pragma once
 
 #include <vector>
-#include "../Expression.h"
+#include "Expression.hpp"
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
 class Multiply: public DS::CAS::Expressions::Expression {
@@ -34,4 +26,3 @@ protected:
 } /* namespace Expression */
 } /* namespace CAS */
 } /* namespace DS */
-#endif /* EXPRESSIONMULTIPLY_H_ */

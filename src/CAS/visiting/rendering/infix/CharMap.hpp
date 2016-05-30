@@ -1,23 +1,16 @@
-/*
- * CharMap.h
- *
- *  Created on: Feb 14, 2013
- *      Author: davidsicilia
- */
-
-#ifndef CHARMAP_H_
-#define CHARMAP_H_
+#pragma once
 
 #include <stdexcept>
-#include "../../../../Utilities/Matrix/Matrices.h"
-#include "../Infix.h"
+#include <memory>
+#include "matrix/Matrix.hpp"
+#include "Infix.hpp"
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
-namespace Visitors {
-namespace Render {
-namespace Infixs {
+namespace Visitors    {
+namespace Render      {
+namespace Infixs      {
 
 class CenteredCharMatrix
 {
@@ -88,7 +81,7 @@ protected:
 class CharMap: public DS::CAS::Expressions::Visitors::Render::Infix<CenteredCharMatrix>
 {
 public:
-    CharMap(boost::shared_ptr<Numbers::NumberFormatter> formatter) : Infix<CenteredCharMatrix>(formatter) {}
+    CharMap(std::shared_ptr<Numbers::NumberFormatter> formatter) : Infix<CenteredCharMatrix>(formatter) {}
     virtual ~CharMap() {}
 
 protected:
@@ -112,4 +105,3 @@ protected:
 } /* namespace Expressions */
 } /* namespace CAS */
 } /* namespace DS */
-#endif /* CHARMAP_H_ */

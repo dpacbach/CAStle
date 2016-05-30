@@ -1,27 +1,19 @@
-/*
- * String.h
- *
- *  Created on: Feb 14, 2013
- *      Author: davidsicilia
- */
-
-#ifndef VRI_STRING_H_
-#define VRI_STRING_H_
+#pragma once
 
 #include <string>
-#include "../Infix.h"
+#include "Infix.hpp"
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
-namespace Visitors {
-namespace Render {
-namespace Infixs {
+namespace Visitors    {
+namespace Render      {
+namespace Infixs      {
 
 class String: public DS::CAS::Expressions::Visitors::Render::Infix<string>
 {
 public:
-    String(boost::shared_ptr<Numbers::NumberFormatter> formatter) : Infix<string>(formatter) {}
+    String(std::shared_ptr<Numbers::NumberFormatter> formatter) : Infix<string>(formatter) {}
     virtual ~String() {}
 
 protected:
@@ -46,4 +38,3 @@ protected:
 } /* namespace Expressions */
 } /* namespace CAS */
 } /* namespace DS */
-#endif /* STRING_H_ */

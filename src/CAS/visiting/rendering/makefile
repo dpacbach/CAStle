@@ -4,6 +4,6 @@ ifndef TOPLEVELWD
 else
     $(call make_so,CASVISITINGRENDERING,castlecasvisitingrendering)
 
-    locations := #infix
+    locations := infix
     $(call enter_all,$(locations))
 endif

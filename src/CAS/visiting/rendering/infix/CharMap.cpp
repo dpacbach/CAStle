@@ -1,18 +1,12 @@
-/*
- * CharMap.cpp
- *
- *  Created on: Feb 14, 2013
- *      Author: davidsicilia
- */
+#include "CharMap.hpp"
+#include "AllBasic.hpp"
 
-#include "CharMap.h"
-
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
-namespace Visitors {
-namespace Render {
-namespace Infixs {
+namespace Visitors    {
+namespace Render      {
+namespace Infixs      {
 
 unsigned int max(unsigned int i, unsigned int j)
 {

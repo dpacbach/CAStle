@@ -1,18 +1,11 @@
-/*
- * String.cpp
- *
- *  Created on: Feb 14, 2013
- *      Author: davidsicilia
- */
+#include "String.hpp"
 
-#include "String.h"
-
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
-namespace Visitors {
-namespace Render {
-namespace Infixs {
+namespace Visitors    {
+namespace Render      {
+namespace Infixs      {
 
 string String::renderParenthesis(const string& arg)
 {
@@ -49,7 +42,6 @@ string String::renderFraction(const string& top, const string& bottom)
 {
     return top + "/" + bottom;
 }
-
 
 } /* namespace Infixs */
 } /* namespace Render */

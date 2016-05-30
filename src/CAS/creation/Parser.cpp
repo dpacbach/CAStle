@@ -1,21 +1,14 @@
-/*
- * Parser.cpp
- *
- *  Created on: Feb 11, 2013
- *      Author: davidsicilia
- */
-
 #include <stdexcept>
 #include <stack>
-#include "Parser.h"
-#include "../../Utilities/Templates.h"
+#include "Parser.hpp"
+#include "Templates.hpp"
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
 
-Parser::Parser(boost::shared_ptr<Tokens::ScannerBuilder> _sBuilder, boost::shared_ptr<Expressions::Builder> _eBuilder,
-               boost::shared_ptr<Numbers::NumberFormatter> _nFormatter, boost::shared_ptr<Tokens::Tokenizer> _tokenizer)
+Parser::Parser(std::shared_ptr<Tokens::ScannerBuilder> _sBuilder, std::shared_ptr<Expressions::Builder> _eBuilder,
+               std::shared_ptr<Numbers::NumberFormatter> _nFormatter, std::shared_ptr<Tokens::Tokenizer> _tokenizer)
 {
     eBuilder     = _eBuilder;
     nFormatter     = _nFormatter;
@@ -23,11 +16,11 @@ Parser::Parser(boost::shared_ptr<Tokens::ScannerBuilder> _sBuilder, boost::share
     tokenizer     = _tokenizer;
 }
 
-Expression::Ptr Parser::parse(const string& source)
+Expression::Ptr Parser::parse(const std::string& source)
 {
     if (scanners.empty())
         buildScanners(scanners, sBuilder);
-    vector<Token> tokens;
+    std::vector<Token> tokens;
     stopLocation = source.begin();
     bool success = tokenizer->tokenizePriority(source, scanners, tokens);
     if (!success)
@@ -35,24 +28,24 @@ Expression::Ptr Parser::parse(const string& source)
         stopLocation = tokenizer->getStopLocation();
         return Expression::Ptr();
     }
-    vector<Command> commands;
+    std::vector<Command> commands;
     if (!parseTokens(tokens, commands))
         return Expression::Ptr();
-    for (vector<Command>::const_iterator it = commands.begin(); it != commands.end(); ++it)
+    for (std::vector<Command>::const_iterator it = commands.begin(); it != commands.end(); ++it)
     {
         //cout << endl << (*it).getNodeName() << ",  " << (*it).getNodeType() << ",  " << (*it).getNumberOfChildren();
     }
     return buildExpression(commands);
 }
 
-Expression::Ptr Parser::buildExpression(const vector<Command>& commands)
+Expression::Ptr Parser::buildExpression(const std::vector<Command>& commands)
 {
     stack<Expression::Ptr> expStack;
     Expression::Ptr node, nullShared;
     Numbers::Number* number;
-    vector<Expression::Ptr> children;
+    std::vector<Expression::Ptr> children;
 
-    for (vector<Command>::const_iterator it = commands.begin(); it != commands.end(); ++it)
+    for (std::vector<Command>::const_iterator it = commands.begin(); it != commands.end(); ++it)
     {
         switch ((*it).getNodeType())
         {
@@ -77,7 +70,7 @@ Expression::Ptr Parser::buildExpression(const vector<Command>& commands)
             children.resize(0);
             break;
         default:
-            throw invalid_argument("invalid node type in Expressions::Parser::buildExpressions(vector<Command>)");
+            throw std::invalid_argument("invalid node type in Expressions::Parser::buildExpressions(std::vector<Command>)");
         }
     }
     if (expStack.size() != 1)

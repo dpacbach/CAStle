@@ -4,6 +4,6 @@ ifndef TOPLEVELWD
 else
     $(call set_location,CAS)
     # In general, must enter in order of dependencies.
-    locations := number expr visiting
+    locations := number expr creation visiting
     $(call enter_all,$(locations))
 endif

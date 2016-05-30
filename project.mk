@@ -50,6 +50,8 @@ CASVISITINGNUMEVAL.deps        := CASVISITING
 CASVISITINGRENDERING.deps      := CASVISITING
 CASVISITINGRENDERINGINFIX.deps := CASVISITINGRENDERING
 
+CASCREATION.deps := CASEXPR
+
 #LIB.deps  := LIB_INT
 
 # This is the location holding the main runnable program

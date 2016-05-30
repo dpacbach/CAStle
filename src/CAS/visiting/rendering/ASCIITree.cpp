@@ -1,21 +1,13 @@
-/*
- * ASCIITree.cpp
- *
- *  Created on: Jan 21, 2013
- *      Author: davidsicilia
- */
+#include "ASCIITree.hpp"
+#include "AllBasic.hpp"
 
-#include "ASCIITree.h"
-
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
-namespace Visitors {
-namespace Render {
+namespace Visitors    {
+namespace Render      {
 
-void prependSpaces(vector<string>& vec)
-{
-}
+void prependSpaces(vector<string>& vec) { }
 
 bool ASCIITree::handleNode(const string& name, const Expression& exp)
 {

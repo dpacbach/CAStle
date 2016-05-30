@@ -1,26 +1,18 @@
-/*
- * Infix.h
- *
- *  Created on: Feb 13, 2013
- *      Author: davidsicilia
- */
+#pragma once
 
-#ifndef RDRINFIX_H_
-#define RDRINFIX_H_
+#include "Renderer.hpp"
 
-#include "Renderer.h"
-
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
-namespace Visitors {
-namespace Render {
+namespace Visitors    {
+namespace Render      {
 
 template<typename T>
 class Infix : public DS::CAS::Expressions::Visitors::Renderer<T>
 {
 public:
-    Infix(boost::shared_ptr<Numbers::NumberFormatter> formatter) : Renderer<T>(formatter) {}
+    Infix(std::shared_ptr<Numbers::NumberFormatter> formatter) : Renderer<T>(formatter) {}
     virtual ~Infix() {}
 
     virtual bool visitAdd(const Add&);
@@ -218,4 +210,3 @@ bool Infix<T>::visitSymbol(const Symbol& exp)
 } /* namespace Expressions */
 } /* namespace CAS */
 } /* namespace DS */
-#endif /* INFIX_H_ */

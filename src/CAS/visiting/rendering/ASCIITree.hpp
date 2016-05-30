@@ -1,30 +1,23 @@
-/*
- * ASCIITree.h
- *
- *  Created on: Jan 21, 2013
- *      Author: davidsicilia
- */
-
-#ifndef ASCIITREE_H_
-#define ASCIITREE_H_
+#pragma once
 
 #include <stdexcept>
 #include <stack>
 #include <vector>
 #include <string>
-#include "Renderer.h"
-#include "../../../Utilities/Templates.h"
+#include <memory>
+#include "Renderer.hpp"
+#include "Templates.hpp"
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
-namespace Visitors {
-namespace Render {
+namespace Visitors    {
+namespace Render      {
 
-class ASCIITree: public Renderer<vector<string> >
+class ASCIITree : public Renderer<vector<string> >
 {
 public:
-    ASCIITree(boost::shared_ptr<Numbers::NumberFormatter> _formatter) : Renderer<vector<string> >(_formatter) {}
+    ASCIITree(std::shared_ptr<Numbers::NumberFormatter> _formatter) : Renderer<vector<string> >(_formatter) {}
     virtual ~ASCIITree() {}
 
     virtual Visitor* create(void) const;
@@ -50,4 +43,3 @@ protected:
 } /* namespace Expressions */
 } /* namespace CAS */
 } /* namespace DS */
-#endif /* ASCIITREE_H_ */

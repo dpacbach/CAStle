@@ -1,9 +1,9 @@
 ifndef TOPLEVELWD
     include $(dir $(lastword $(MAKEFILE_LIST)))../makefile
-    $(call set_default_goal,CASVISITING)
+    $(call set_default_goal,CASVISITINGRENDERING)
 else
-    $(call make_so,CASVISITING,castlecasvisiting)
+    $(call make_so,CASVISITINGRENDERING,castlecasvisitingrendering)
 
-    locations := numeval rendering restructuring
+    locations := #infix
     $(call enter_all,$(locations))
 endif

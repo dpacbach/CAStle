@@ -32,25 +32,22 @@ else
     CFLAGS          += -DOS_LINUX
 endif
 
-# This variable controls whether rule commands are echoed
-# or suppressed infavor of more terse log output.
-#V ?= YES
-
 ###############################################################################
 # Dependency info
 
-PARSERSDEFAULT.deps := PARSERS
-PARSERS.deps        := TOOLS
+PARSERS.deps              := TOOLS
+PARSERSDEFAULT.deps       := PARSERS
 
-CASNUMBERDEFAULT.deps := CASNUMBER PARSERS
-CASNUMBER.deps        := PARSERS
+CASNUMBER.deps            := PARSERS
+CASNUMBERDEFAULT.deps     := CASNUMBER
 
-CASEXPR.deps         := CASNUMBER
-CASEXPRBASIC.deps    := CASEXPR
-CASEXPRBUILDERS.deps := CASEXPR CASEXPRBASIC
+CASEXPR.deps              := CASNUMBER
+CASEXPRBASIC.deps         := CASEXPR
+CASEXPRBUILDERS.deps      := CASEXPRBASIC
 
-CASVISITING.deps        := CASEXPRBASIC
-CASVISITINGNUMEVAL.deps := CASVISITING
+CASVISITING.deps          := CASEXPRBASIC
+CASVISITINGNUMEVAL.deps   := CASVISITING
+CASVISITINGRENDERING.deps := CASVISITING
 
 #LIB.deps  := LIB_INT
 

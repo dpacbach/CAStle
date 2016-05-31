@@ -1,15 +1,7 @@
-/*
- * Basic.h
- *
- *  Created on: Mar 10, 2013
- *      Author: davidsicilia
- */
+#pragma once
 
-#ifndef REDUCBASIC_H_
-#define REDUCBASIC_H_
-
-#include "../ExpressionVisiting/Restructuring/Restructurer.h"
-#include "Overhead.h"
+#include "Restructurer.hpp"
+#include "Overhead.hpp"
 
 namespace  DS            {
 namespace  CAS           {
@@ -31,4 +23,3 @@ ALGORITHM  (FirstOrderBasic,    DIVIDE MULTIPLY POWER NEGATE)
 ALGORITHM  (NumberReducerBasic, ADD DIVIDE MULTIPLY NEGATE POWER)
 
 }}}}}}
-#endif

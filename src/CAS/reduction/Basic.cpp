@@ -1,21 +1,16 @@
-/*
- * Basic.cpp
- *
- *  Created on: Mar 10, 2013
- *      Author: davidsicilia
- */
-
-#include "Basic.h"
-#include "../../Utilities/Templates.h"
+#include "NumberFactory.hpp"
+#include "NumberProxy.hpp"
+#include "Basic.hpp"
+#include "Templates.hpp"
 
 using namespace DS::CAS::Numbers;
 
-namespace DS {
-namespace CAS {
-namespace Expressions {
-namespace Visitors {
+namespace DS            {
+namespace CAS           {
+namespace Expressions   {
+namespace Visitors      {
 namespace Restructurers {
-namespace Reduction {
+namespace Reduction     {
 
 // == Support Functions =========================================================================================
 
@@ -39,10 +34,10 @@ void GCDReduce(Proxy::NumberP& litNum, Proxy::NumberP& litDen)
     }
     if (!litNum.isRealPartInteger() || !litNum.isImaginaryPartInteger() ||
         !litDen.isRealPartInteger() || !litDen.isImaginaryPartInteger())
-        throw logic_error("parameters not integer in CAS::Expressions::Visitors::Restructurers::Reduction::GCDReduce()");
+        throw std::logic_error("parameters not integer in CAS::Expressions::Visitors::Restructurers::Reduction::GCDReduce()");
     Proxy::NumberP gcd = litDen;
     if (gcd.isComplex())
-        throw logic_error("gcd is complex in CAS::Expressions::Visitors::Restructurers::Reduction::GCDReduce()");
+        throw std::logic_error("gcd is complex in CAS::Expressions::Visitors::Restructurers::Reduction::GCDReduce()");
     if (gcd.isImaginary())
         gcd.exchangeRealAndImaginary();
     if (gcd.isNegativeReal())
@@ -75,10 +70,10 @@ Sign flipSign(Sign sign)
     return p;
 }
 
-vector<Sign> flipSigns(const vector<Sign>& signs)
+std::vector<Sign> flipSigns(const std::vector<Sign>& signs)
 {
-    vector<Sign> result = signs;
-    for (vector<Sign>::iterator it = result.begin(); it != result.end(); ++it)
+    std::vector<Sign> result = signs;
+    for (std::vector<Sign>::iterator it = result.begin(); it != result.end(); ++it)
         *it = flipSign(*it);
     return result;
 }
@@ -92,7 +87,7 @@ bool isRealPartEvenInteger(const Numbers::Number& number)
 
 // == Basic Symbols =============================================================================================
 
-EP BasicSymbols::symbol(const Symbol& exp, const vector<EP>& children)
+EP BasicSymbols::symbol(const Symbol& exp, const std::vector<EP>& children)
 {
     if (exp.getName() == "i" && children.size() == 0)
         return eB.literal(nF.i());
@@ -101,7 +96,7 @@ EP BasicSymbols::symbol(const Symbol& exp, const vector<EP>& children)
 
 // == Complex Splitter ==========================================================================================
 
-EP ComplexSplitter::literal(const Literal& exp, const vector<EP>& children)
+EP ComplexSplitter::literal(const Literal& exp, const std::vector<EP>& children)
 {
     Proxy::NumberP number = exp.getNumber();
     if (number.isComplex())
@@ -116,7 +111,7 @@ EP ComplexSplitter::literal(const Literal& exp, const vector<EP>& children)
 
 // == Rationalizer ==============================================================================================
 
-EP Rationalizer::literal(const Literal& exp, const vector<EP>& children)
+EP Rationalizer::literal(const Literal& exp, const std::vector<EP>& children)
 {
     Proxy::NumberP number = exp.getNumber();
     if (number.isComplex())
@@ -146,7 +141,7 @@ EP Rationalizer::literal(const Literal& exp, const vector<EP>& children)
 
 // == Complex Normalizer ========================================================================================
 
-EP ComplexNormalizer::divide(const Divide& exp, const vector<EP>& children)
+EP ComplexNormalizer::divide(const Divide& exp, const std::vector<EP>& children)
 {
     if (eID(children[1]) == Expression::literal)
     {
@@ -164,7 +159,7 @@ EP ComplexNormalizer::divide(const Divide& exp, const vector<EP>& children)
 
 // == Complex Expander ==========================================================================================
 
-EP ComplexExpander::divide(const Divide& exp, const vector<EP>& children)
+EP ComplexExpander::divide(const Divide& exp, const std::vector<EP>& children)
 {
     if (eID(children[0]) == Expression::literal)
     {
@@ -182,7 +177,7 @@ EP ComplexExpander::divide(const Divide& exp, const vector<EP>& children)
 
 // == GCD Literal ===============================================================================================
 
-EP GCDLiteral::divide(const Divide& exp, const vector<EP>& children)
+EP GCDLiteral::divide(const Divide& exp, const std::vector<EP>& children)
 {
     if (eID(children[0]) != Expression::literal || eID(children[1]) != Expression::literal)
         return Restructurer::divide(exp,children);
@@ -202,13 +197,13 @@ EP GCDLiteral::divide(const Divide& exp, const vector<EP>& children)
 
 // == Size One Array ============================================================================================
 
-EP SizeOneArray::add(const Add& exp, const vector<EP>& children)
+EP SizeOneArray::add(const Add& exp, const std::vector<EP>& children)
 {
     if (children.size() == 1)
         return (exp.getSignForChild(0) == p) ? children[0] : eB.negate(children[0]);
     return Restructurer::add(exp,children);
 }
-EP SizeOneArray::multiply(const Multiply& exp, const vector<EP>& children)
+EP SizeOneArray::multiply(const Multiply& exp, const std::vector<EP>& children)
 {
     if (children.size() == 1)
         return children[0];
@@ -217,10 +212,10 @@ EP SizeOneArray::multiply(const Multiply& exp, const vector<EP>& children)
 
 // == Self Nesting ==============================================================================================
 
-EP SelfNesting::add(const Add& exp, const vector<EP>& children)
+EP SelfNesting::add(const Add& exp, const std::vector<EP>& children)
 {
-    vector<EP> newExps;
-    vector<Sign> newSigns;
+    std::vector<EP> newExps;
+    std::vector<Sign> newSigns;
     for (unsigned int i = 0; i < exp.numberOfChildren(); i++)
     {
         if (eID(children[i]) == Expression::add)
@@ -239,7 +234,7 @@ EP SelfNesting::add(const Add& exp, const vector<EP>& children)
     }
     return eB.add(newExps, newSigns);
 }
-EP SelfNesting::divide(const Divide& exp, const vector<EP>& children)
+EP SelfNesting::divide(const Divide& exp, const std::vector<EP>& children)
 {
     Expression::ID idN = children[0]->id();
     Expression::ID idD = children[1]->id();
@@ -265,9 +260,9 @@ EP SelfNesting::divide(const Divide& exp, const vector<EP>& children)
     else
         return Restructurer::divide(exp,children);
 }
-EP SelfNesting::multiply(const Multiply& exp, const vector<EP>& children)
+EP SelfNesting::multiply(const Multiply& exp, const std::vector<EP>& children)
 {
-    vector<EP> newExps;
+    std::vector<EP> newExps;
     for (unsigned int i = 0; i < exp.numberOfChildren(); i++)
     {
         if (eID(children[i]) == Expression::multiply)
@@ -278,13 +273,13 @@ EP SelfNesting::multiply(const Multiply& exp, const vector<EP>& children)
     }
     return eB.multiply(newExps);
 }
-EP SelfNesting::negate(const Negate& exp, const vector<EP>& children)
+EP SelfNesting::negate(const Negate& exp, const std::vector<EP>& children)
 {
     if (eID(children[0]) == Expression::negate)
         return children[0]->getChild(0);
     return Restructurer::negate(exp,children);
 }
-EP SelfNesting::power(const Power& exp, const vector<EP>& children)
+EP SelfNesting::power(const Power& exp, const std::vector<EP>& children)
 {
     // tests for (a^b)^c and will turn it into a^(b*c) if a is positive real and
     //   either (b is real) || (c is a real integer)
@@ -320,10 +315,10 @@ EP SelfNesting::power(const Power& exp, const vector<EP>& children)
 
 // == Negatives =================================================================================================
 
-EP Negatives::add(const Add& exp, const vector<EP>& children)
+EP Negatives::add(const Add& exp, const std::vector<EP>& children)
 {
-    vector<EP> newTerms;
-    vector<Sign> newSigns;
+    std::vector<EP> newTerms;
+    std::vector<Sign> newSigns;
     int firstPositiveIndex = -1;
     for (unsigned int i = 0; i < children.size(); i++)
     {
@@ -341,13 +336,13 @@ EP Negatives::add(const Add& exp, const vector<EP>& children)
 
     if (firstPositiveIndex >= 0)
     {
-        swap(newTerms[firstPositiveIndex], newTerms[0]);
-        swap(newSigns[firstPositiveIndex], newSigns[0]);
+        std::swap(newTerms[firstPositiveIndex], newTerms[0]);
+        std::swap(newSigns[firstPositiveIndex], newSigns[0]);
         return eB.add(newTerms, newSigns);
     }
-    return eB.negate(eB.add(newTerms, vector<Sign>(newSigns.size(), p)));
+    return eB.negate(eB.add(newTerms, std::vector<Sign>(newSigns.size(), p)));
 }
-EP Negatives::divide(const Divide& exp, const vector<EP>& children)
+EP Negatives::divide(const Divide& exp, const std::vector<EP>& children)
 {
     bool negate = false;
     EP newNum = children[0];
@@ -367,11 +362,11 @@ EP Negatives::divide(const Divide& exp, const vector<EP>& children)
         result = eB.negate(result);
     return result;
 }
-EP Negatives::multiply(const Multiply& exp, const vector<EP>& children)
+EP Negatives::multiply(const Multiply& exp, const std::vector<EP>& children)
 {
     bool negativeSign = false;
-    vector<EP> newChildren;
-    for (vector<EP>::const_iterator it = children.begin(); it != children.end(); ++it)
+    std::vector<EP> newChildren;
+    for (std::vector<EP>::const_iterator it = children.begin(); it != children.end(); ++it)
     {
         if (eID(*it) == Expression::negate)
         {
@@ -385,7 +380,7 @@ EP Negatives::multiply(const Multiply& exp, const vector<EP>& children)
         return eB.negate(eB.multiply(newChildren));
     return eB.multiply(newChildren);
 }
-EP Negatives::power(const Power& exp, const vector<EP>& children)
+EP Negatives::power(const Power& exp, const std::vector<EP>& children)
 {
     // if the base has a negate in front of it and the exponent is a real integer then
     // the negative will be factored out
@@ -405,7 +400,7 @@ EP Negatives::power(const Power& exp, const vector<EP>& children)
     }
     return eB.power(newBase, children[1]);
 }
-EP Negatives::literal(const Literal& exp, const vector<EP>& children)
+EP Negatives::literal(const Literal& exp, const std::vector<EP>& children)
 {
     Proxy::NumberP number = exp.getNumber(), zero(nF.zero());
     if (number.isLessReals(Proxy::NumberP(zero)) || (number.isImaginary() && number.isLessImaginaries(zero)))
@@ -415,15 +410,15 @@ EP Negatives::literal(const Literal& exp, const vector<EP>& children)
 
 // == First Order Basic =========================================================================================
 
-EP FirstOrderBasic::divide(const Divide& exp, const vector<EP>& children)
+EP FirstOrderBasic::divide(const Divide& exp, const std::vector<EP>& children)
 {
     if (eID(children[1]) == Expression::power)
         return eB.multiply(children[0], eB.power(children[1]->getChild(0), eB.negate(children[1]->getChild(1))));
     return Restructurer::divide(exp,children);
 }
-EP FirstOrderBasic::multiply(const Multiply& exp, const vector<EP>& children)
+EP FirstOrderBasic::multiply(const Multiply& exp, const std::vector<EP>& children)
 {
-    vector<EP> numerator, denominator;
+    std::vector<EP> numerator, denominator;
     for (unsigned int i = 0; i < children.size(); i++)
     {
         if (eID(children[i]) == Expression::divide)
@@ -438,7 +433,7 @@ EP FirstOrderBasic::multiply(const Multiply& exp, const vector<EP>& children)
         return Restructurer::multiply(exp,children);
     return eB.divide(eB.multiply(numerator), eB.multiply(denominator));
 }
-EP FirstOrderBasic::negate(const Negate& exp, const vector<EP>& children)
+EP FirstOrderBasic::negate(const Negate& exp, const std::vector<EP>& children)
 {
     // Distributes a negative into an Add if there are minus signs in it
     if (eID(children[0]) == Expression::add)
@@ -450,7 +445,7 @@ EP FirstOrderBasic::negate(const Negate& exp, const vector<EP>& children)
     }
     return Restructurer::negate(exp,children);
 }
-EP FirstOrderBasic::power(const Power& exp, const vector<EP>& children)
+EP FirstOrderBasic::power(const Power& exp, const std::vector<EP>& children)
 {
     if (eID(children[0]) == Expression::divide)
     {
@@ -463,10 +458,10 @@ EP FirstOrderBasic::power(const Power& exp, const vector<EP>& children)
 
 // == Number Reducer Basic ======================================================================================
 
-EP NumberReducerBasic::add(const Add& exp, const vector<EP>& children)
+EP NumberReducerBasic::add(const Add& exp, const std::vector<EP>& children)
 {
-    vector<EP> newTerms, fractions;
-    vector<Sign> newSigns, fractionSigns;
+    std::vector<EP> newTerms, fractions;
+    std::vector<Sign> newSigns, fractionSigns;
     Proxy::NumberP sum = nF.zero(), one = nF.one();
 
     for (unsigned int i = 0; i < children.size(); i++)
@@ -513,7 +508,7 @@ EP NumberReducerBasic::add(const Add& exp, const vector<EP>& children)
         return eB.literal(nF.zero());
     return eB.add(newTerms, newSigns);
 }
-EP NumberReducerBasic::divide(const Divide& exp, const vector<EP>& children)
+EP NumberReducerBasic::divide(const Divide& exp, const std::vector<EP>& children)
 {
     if (eID(children[0]) == Expression::literal)
         if (getLiteralNumber(children[0]).isZero())
@@ -525,9 +520,9 @@ EP NumberReducerBasic::divide(const Divide& exp, const vector<EP>& children)
 
     return Restructurer::divide(exp,children);
 }
-EP NumberReducerBasic::multiply(const Multiply& exp, const vector<EP>& children)
+EP NumberReducerBasic::multiply(const Multiply& exp, const std::vector<EP>& children)
 {
-    vector<EP> newFactors;
+    std::vector<EP> newFactors;
     Proxy::NumberP product = nF.one();
     for (unsigned int i = 0; i < children.size(); i++)
     {
@@ -544,14 +539,14 @@ EP NumberReducerBasic::multiply(const Multiply& exp, const vector<EP>& children)
         newFactors.push_back(eB.literal(product));
     return eB.multiply(newFactors);
 }
-EP NumberReducerBasic::negate(const Negate& exp, const vector<EP>& children)
+EP NumberReducerBasic::negate(const Negate& exp, const std::vector<EP>& children)
 {
     if (eID(children[0]) == Expression::literal)
         if (getLiteralNumber(children[0]).isZero())
             return children[0];
     return Restructurer::negate(exp,children);
 }
-EP NumberReducerBasic::power(const Power& exp, const vector<EP>& children)
+EP NumberReducerBasic::power(const Power& exp, const std::vector<EP>& children)
 {
     if (eID(children[1]) == Expression::literal)
     {
@@ -602,15 +597,15 @@ EP NumberReducerBasic::power(const Power& exp, const vector<EP>& children)
 // == Templates =================================================================================================
 
 /*
-EP X::add(const Add& exp, const vector<EP>& children) { return Restructurer::add(exp,children); }
-EP X::divide(const Divide& exp, const vector<EP>& children) { return Restructurer::divide(exp,children); }
-EP X::factorial(const Factorial& exp, const vector<EP>& children) { return Restructurer::factorial(exp,children); }
-EP X::literal(const Literal& exp, const vector<EP>& children) { return Restructurer::literal(exp,children); }
-EP X::modulus(const Modulus& exp, const vector<EP>& children) { return Restructurer::modulus(exp,children); }
-EP X::multiply(const Multiply& exp, const vector<EP>& children) { return Restructurer::multiply(exp,children); }
-EP X::negate(const Negate& exp, const vector<EP>& children) { return Restructurer::negate(exp,children); }
-EP X::power(const Power& exp, const vector<EP>& children) { return Restructurer::power(exp,children); }
-EP X::symbol(const Symbol& exp, const vector<EP>& children) { return Restructurer::symbol(exp,children); }
+EP X::add(const Add& exp, const std::vector<EP>& children) { return Restructurer::add(exp,children); }
+EP X::divide(const Divide& exp, const std::vector<EP>& children) { return Restructurer::divide(exp,children); }
+EP X::factorial(const Factorial& exp, const std::vector<EP>& children) { return Restructurer::factorial(exp,children); }
+EP X::literal(const Literal& exp, const std::vector<EP>& children) { return Restructurer::literal(exp,children); }
+EP X::modulus(const Modulus& exp, const std::vector<EP>& children) { return Restructurer::modulus(exp,children); }
+EP X::multiply(const Multiply& exp, const std::vector<EP>& children) { return Restructurer::multiply(exp,children); }
+EP X::negate(const Negate& exp, const std::vector<EP>& children) { return Restructurer::negate(exp,children); }
+EP X::power(const Power& exp, const std::vector<EP>& children) { return Restructurer::power(exp,children); }
+EP X::symbol(const Symbol& exp, const std::vector<EP>& children) { return Restructurer::symbol(exp,children); }
 */
 
 }}}}}}

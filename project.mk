@@ -55,6 +55,8 @@ CASVISITINGRENDERINGINFIX.deps := CASVISITINGRENDERING
 
 CASVISITINGRESTRUCTURING.deps  := CASVISITING
 
+CASREDUCTION.deps              := CASVISITINGRESTRUCTURING
+
 #LIB.deps  := LIB_INT
 
 # This is the location holding the main runnable program

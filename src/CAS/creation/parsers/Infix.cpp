@@ -1,20 +1,14 @@
-/*
- * Infix.cpp
- *
- *  Created on: Feb 11, 2013
- *      Author: davidsicilia
- */
-
 #include <stdexcept>
 #include <stack>
-#include "Infix.h"
+#include "Infix.hpp"
+#include "ScannerBuilder.hpp"
 
-namespace DS {
-namespace CAS {
+namespace DS          {
+namespace CAS         {
 namespace Expressions {
-namespace Parsers {
+namespace Parsers     {
 
-void Infix::buildScanners(vector<Tokens::Scanner::Ptr>& scanners, boost::shared_ptr<Tokens::ScannerBuilder> sBuilder)
+void Infix::buildScanners(std::vector<Tokens::Scanner::Ptr>& scanners, std::shared_ptr<Tokens::ScannerBuilder> sBuilder)
 {
     sBuilder->spaces();
     scanners.push_back(sBuilder->pop());
@@ -46,7 +40,7 @@ void Infix::buildScanners(vector<Tokens::Scanner::Ptr>& scanners, boost::shared_
     scanners.push_back(sBuilder->pop());
 }
 
-int getOperatorPrecedence(const string& str)
+int getOperatorPrecedence(const std::string& str)
 {
     if (str == "!")
         return 5;
@@ -58,19 +52,19 @@ int getOperatorPrecedence(const string& str)
           return 4;
     if (str == "+" || str == "-")
         return 2;
-    throw invalid_argument("invalid operator in getOperatorPrecedence()");
+    throw std::invalid_argument("invalid operator in getOperatorPrecedence()");
 }
 
-int getOperatorChildren(const string& str)
+int getOperatorChildren(const std::string& str)
 {
     if (str == "!" || str == "ng")
         return 1;
     if (str == "^" || str == "*" || str == "/" || str == "+" || str == "-" || str == "%")
         return 2;
-    throw invalid_argument("invalid operator in getOperatorChildren()");
+    throw std::invalid_argument("invalid operator in getOperatorChildren()");
 }
 
-bool isLeftAssociative(const string& str)
+bool isLeftAssociative(const std::string& str)
 {
     if (str == "!")
         return true;
@@ -82,15 +76,15 @@ bool isLeftAssociative(const string& str)
         return true;
     if (str == "+" || str == "-")
         return true;
-    throw invalid_argument("invalid operator in isLeftAssociative()");
+    throw std::invalid_argument("invalid operator in isLeftAssociative()");
 }
 
-bool Infix::parseTokens(const vector<Token>& tokens, vector<Command>& commands)
+bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& commands)
 {
     enum { spaces, minus, binaryOp, factorial, number, leftP, rightP, comma, var };
-    stack<Token> operatorStack;
-    stack<int> functionArgStack;
-    vector<Token>::const_iterator it = tokens.begin();
+    std::stack<Token> operatorStack;
+    std::stack<int> functionArgStack;
+    std::vector<Token>::const_iterator it = tokens.begin();
     bool lookingForValue = true;
 
       //While there are tokens to be read:
@@ -111,7 +105,7 @@ bool Infix::parseTokens(const vector<Token>& tokens, vector<Command>& commands)
         if (it == tokens.end())
             break;
         int id = (*it).getId();
-        string str = (*it).getString();
+        std::string str = (*it).getString();
 
         if (lookingForValue)
         {
@@ -167,7 +161,7 @@ bool Infix::parseTokens(const vector<Token>& tokens, vector<Command>& commands)
                 {
                     Token o2 = operatorStack.top();
                     int o2Id = o2.getId();
-                    string o2Str = o2.getString();
+                    std::string o2Str = o2.getString();
                     if (o2Id != minus && o2Id != binaryOp && o2Id != factorial)
                         break;
                     int ngPrecedence = getOperatorPrecedence("ng");
@@ -215,7 +209,7 @@ bool Infix::parseTokens(const vector<Token>& tokens, vector<Command>& commands)
                 {
                     Token o2 = operatorStack.top();
                     int o2Id = o2.getId();
-                    string o2Str = o2.getString();
+                    std::string o2Str = o2.getString();
                     if (o2Id != minus && o2Id != binaryOp && o2Id != factorial)
                         break;
                     int o1Precedence = getOperatorPrecedence(str);
@@ -331,7 +325,7 @@ bool Infix::parseTokens(const vector<Token>& tokens, vector<Command>& commands)
         Token token = operatorStack.top();
         operatorStack.pop();
         int id = token.getId();
-        string str = token.getString();
+        std::string str = token.getString();
 
         if (id != minus && id != binaryOp && id != factorial)
         {

@@ -4,6 +4,6 @@ ifndef TOPLEVELWD
 else
     $(call make_so,CASCREATION,castlecascreation)
 
-    locations := #parsers
+    locations := parsers
     $(call enter_all,$(locations))
 endif

@@ -11,7 +11,7 @@ namespace Numbers {
 class NumberFactory
 {
 public:
-    NumberFactory();
+    NumberFactory() {}
     NumberFactory(const NumberFactory&)            = delete;
     NumberFactory& operator=(const NumberFactory&) = delete;
 

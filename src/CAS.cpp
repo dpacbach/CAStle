@@ -9,14 +9,38 @@
 #include <map>
 #include <stdexcept>
 #include <cstdlib>
-#include <boost/shared_ptr.hpp>
 
-#include "Utilities/Utilities.h"
-#include "CAS/CAS.h"
+#include "Float.hpp"
+#include "Expression.hpp"
+#include "Visitor.hpp"
+#include "Restructurer.hpp"
+#include "Substitution.hpp"
+#include "Composite.hpp"
+#include "Renderer.hpp"
+#include "ASCIITree.hpp"
+#include "Basic.hpp"
+#include "String.hpp"
+#include "CharMap.hpp"
+#include "ScannerBuilder.hpp"
+#include "Simple.hpp"
+#include "Tokenizer.hpp"
+#include "Token.hpp"
+#include "NumberFactory.hpp"
+#include "NumberFactoryPrototype.hpp"
+#include "NumberFormatter.hpp"
+#include "NumberFormatterStandard.hpp"
+#include "NumberProxy.hpp"
+#include "NumberDouble.hpp"
+#include "Standard.hpp"
+#include "Parser.hpp"
+#include "parsers/Infix.hpp"
+#include "rendering/Infix.hpp"
+#include "NumEval.hpp"
 
 using namespace std;
 using namespace DS;
 using namespace DS::CAS;
+using namespace DS::CAS::Numbers;
 using namespace DS::CAS::Expressions;
 using namespace DS::CAS::Expressions::Visitors;
 using namespace DS::CAS::Expressions::Visitors::Restructurers::Reduction;
@@ -31,12 +55,12 @@ const int sigFigs = 100;
 typedef DS::Numbers::Float                        FloatType;
 typedef CAS::Numbers::NumberDouble<FloatType>     NumberImp;
 
-boost::shared_ptr<Tokens::ScannerBuilder> scannerBuilder_ptr  (new Tokens::ScannerBuilders::Simple);
-boost::shared_ptr<Tokens::Tokenizer>      tokenizer_ptr       (new Tokens::Tokenizer);
-boost::shared_ptr<NumberFactory>          nFactory_ptr        (new NumberFactoryPrototype(NumberP(new NumberImp())));
-boost::shared_ptr<NumberFormatter>        nFormatter_ptr      (new NumberFormatterStandard(nFactory_ptr, scannerBuilder_ptr, sigFigs));
-boost::shared_ptr<Builder>                eBuilder_ptr        (new Builders::Standard);
-boost::shared_ptr<Parser>                 parser_ptr          (new Parsers::Infix(scannerBuilder_ptr, eBuilder_ptr, nFormatter_ptr, tokenizer_ptr));
+std::shared_ptr<Tokens::ScannerBuilder> scannerBuilder_ptr  (new Tokens::ScannerBuilders::Simple);
+std::shared_ptr<Tokens::Tokenizer>      tokenizer_ptr       (new Tokens::Tokenizer);
+std::shared_ptr<NumberFactory>          nFactory_ptr        (new NumberFactoryPrototype(Proxy::NumberP(new NumberImp())));
+std::shared_ptr<NumberFormatter>        nFormatter_ptr      (new NumberFormatterStandard(nFactory_ptr, scannerBuilder_ptr, sigFigs));
+std::shared_ptr<Builder>                eBuilder_ptr        (new Builders::Standard);
+std::shared_ptr<Parser>                 parser_ptr          (new Parsers::Infix(scannerBuilder_ptr, eBuilder_ptr, nFormatter_ptr, tokenizer_ptr));
 
 int main()
 {
@@ -60,7 +84,7 @@ int main()
 
     //=======================================================================
 
-    string expString = "";
+    std::string expString = "";
 
     Expression::Ptr exp, previous;
     bool loop = false;
@@ -96,7 +120,7 @@ int main()
         if (!exp)
         {
             cout << "  ";
-            for (string::const_iterator it = expString.begin(); it != parser_ptr->getStopLocation(); ++it)
+            for (std::string::const_iterator it = expString.begin(); it != parser_ptr->getStopLocation(); ++it)
                 cout << " ";
             cout << "^---Syntax Error!" << endl;
             continue;
@@ -106,7 +130,7 @@ int main()
 
         if (previous)
         {
-            map<string, Expression::Ptr> dictionary;
+            std::map<std::string, Expression::Ptr> dictionary;
             dictionary["r"] = previous;
             Restructurers::Substitution prevSub(nFactory_ptr, eBuilder_ptr, dictionary);
             prevSub.visitExpression(exp);
@@ -160,17 +184,17 @@ int main()
         Render::ASCIITree logger(nFormatter_ptr);
         map.visitExpression(exp);
         logger.visitExpression(exp);
-        vector<string> strings = map.result().vectorOfStrings();
-        for (vector<string>::const_iterator it = strings.begin(); it != strings.end(); ++it)
+        std::vector<std::string> strings = map.result().vectorOfStrings();
+        for (std::vector<std::string>::const_iterator it = strings.begin(); it != strings.end(); ++it)
             cout << endl << setw(176) << *it;
         /*
         cout << endl;
         strings = logger.result();
         unsigned int maxLength = 0;
-        for (vector<string>::iterator it = strings.begin(); it != strings.end(); ++it)
+        for (std::vector<std::string>::iterator it = strings.begin(); it != strings.end(); ++it)
             if (it->length() > maxLength)
                 maxLength = it->length();
-        for (vector<string>::iterator it = strings.begin(); it != strings.end(); ++it)
+        for (std::vector<std::string>::iterator it = strings.begin(); it != strings.end(); ++it)
         {
             ostringstream o;
             o << *it;
@@ -196,11 +220,11 @@ int main()
         NumEval eval;
         if (eval.visitExpression(exp))
         {
-            NumberP result = eval.result();
+            Proxy::NumberP result = eval.result();
             if (!(result.isRealPartInteger() && result.isImaginaryPartInteger()))
             {
                 cout << endl << endl;
-                string realPart, imaginaryPart;
+                std::string realPart, imaginaryPart;
                 realPart = nFormatter_ptr->formatRealPart(result);
                 imaginaryPart = nFormatter_ptr->formatImaginaryPart(result);
                 if (imaginaryPart == "1")
@@ -212,24 +236,24 @@ int main()
 
                 if (imaginaryPart == "0")
                 {
-                    string value = "~ " + realPart;
+                    std::string value = "~ " + realPart;
                     cout << setw(176) << value;
                 }
                 else if (realPart == "0")
                 {
-                    string value = "~ " + imaginaryPart;
+                    std::string value = "~ " + imaginaryPart;
                     cout << setw(176) << value;
                 }
                 else
                 {
                     if (realPart.length() + imaginaryPart.length() + 10 > 176)
                     {
-                        string signString = "";
+                        std::string signString = "";
                         result.exchangeRealAndImaginary();
                         result.makeRealPart();
                         if (result.isPositiveReal())
                             signString = "+";
-                        string value = "~ " + realPart;
+                        std::string value = "~ " + realPart;
                         cout << setw(176) << value;
                         value = signString + imaginaryPart;
                         cout << endl << setw(176) << value;
@@ -237,11 +261,11 @@ int main()
                     else
                     {
                         result.exchangeRealAndImaginary();
-                        string signString = "";
+                        std::string signString = "";
                         result.makeRealPart();
                         if (result.isPositiveReal())
                             signString = "+";
-                        string value = "~ " + realPart + signString + imaginaryPart;
+                        std::string value = "~ " + realPart + signString + imaginaryPart;
                         cout << setw(176) << value;
                     }
                 }
@@ -271,8 +295,8 @@ ostream& operator<< (ostream& out, Expression::Ptr exp)
     Render::Infixs::CenteredCharMatrix matResult = map.result();
     if (matResult.xSize() <= 98)
     {
-        vector<string> strings = matResult.vectorOfStrings();
-        for (vector<string>::const_iterator it = strings.begin(); it != strings.end(); ++it)
+        std::vector<std::string> strings = matResult.vectorOfStrings();
+        for (std::vector<std::string>::const_iterator it = strings.begin(); it != strings.end(); ++it)
             cout << endl << "  " << *it;
     }
     else
@@ -290,7 +314,7 @@ void reduce(Expression::Ptr& exp)
     T* visitor = new T(nFactory_ptr, eBuilder_ptr);
     bool success = visitor->visitExpression(exp);
     if (!success)
-        throw logic_error("success == false in reduce()");
+        throw std::logic_error("success == false in reduce()");
     exp = visitor->result();
     delete visitor;
 }

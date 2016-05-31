@@ -57,6 +57,23 @@ CASVISITINGRESTRUCTURING.deps  := CASVISITING
 
 CASREDUCTION.deps              := CASVISITINGRESTRUCTURING
 
+CLI.deps := NBRS \
+            CASNUMBER \
+            CASNUMBERDEFAULT \
+            CASEXPRBUILDERS \
+            PARSERSDEFAULT \
+            CASREDUCTION \
+            CASVISITINGNUMEVAL \
+            CASVISITINGRESTRUCTURING \
+            CASVISITINGRENDERINGINFIX \
+            CASCREATION \
+            CASCREATIONPARSERS \
+            CASEXPR \
+            CASEXPRBASIC \
+            PARSERS \
+            CASVISITING \
+            CASVISITINGRENDERING
+
 #LIB.deps  := LIB_INT
 
 # This is the location holding the main runnable program

@@ -1,8 +1,7 @@
 #pragma once
 
+#include <memory>
 #include <vector>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
 
 namespace DS          {
 namespace CAS         {
@@ -15,14 +14,17 @@ enum Sign
 
 class Visitor;
 
-class Expression : private boost::noncopyable
+class Expression
 {
 public:
     typedef enum { add, divide, factorial, literal, modulus, multiply, negate, power, symbol } ID;
-    typedef boost::shared_ptr<const Expression> Ptr; // use only this to reference Expression objects
+    typedef std::shared_ptr<const Expression> Ptr; // use only this to reference Expression objects
 
     Expression();
     virtual ~Expression();
+
+    Expression(Expression const&) = delete;
+    Expression const& operator= (Expression const&) = delete;
 
     virtual ID id(void) const = 0;
 

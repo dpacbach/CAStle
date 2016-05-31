@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <boost/noncopyable.hpp>
 #include "Expression.hpp"
 
 namespace DS {
@@ -14,10 +13,14 @@ namespace Numbers {
 
 namespace Expressions {
 
-class Builder : private boost::noncopyable
+class Builder
 {
 public:
+    Builder() {}
     virtual ~Builder() {}
+
+    Builder(Builder const&) = delete;
+    Builder const& operator= (Builder const&) = delete;
 
     virtual Expression::Ptr operator()(const std::string& name) const;
     virtual Expression::Ptr operator()(const std::string& name, const std::vector<Expression::Ptr>& children) const;

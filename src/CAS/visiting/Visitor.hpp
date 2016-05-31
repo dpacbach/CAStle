@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/noncopyable.hpp>
 #include "Expression.hpp"
 #include "AllBasicFwd.hpp"
 
@@ -8,10 +7,13 @@ namespace DS          {
 namespace CAS         {
 namespace Expressions {
 
-class Visitor : private boost::noncopyable
+class Visitor
 {
 public:
     virtual ~Visitor() {}
+
+    Visitor(Visitor const&) = delete;
+    Visitor const& operator= (Visitor const&) = delete;
 
     virtual void reset(void) {}
 

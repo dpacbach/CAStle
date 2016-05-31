@@ -7,7 +7,7 @@ namespace Numbers {
 class Number
 {
 public:
-    Number();
+    Number() {}
     Number(const Number&) = delete;
 
     virtual Number* create(double realPart = 0, double imaginaryPart = 0) const = 0;

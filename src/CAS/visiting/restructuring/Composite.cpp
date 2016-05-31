@@ -1,16 +1,10 @@
-/*
- * Composite.cpp
- *
- *  Created on: Mar 16, 2013
- *      Author: davidsicilia
- */
+#include "Composite.hpp"
+#include "AllBasic.hpp"
 
-#include "Composite.h"
-
-namespace DS {
-namespace CAS {
-namespace Expressions {
-namespace Visitors {
+namespace DS            {
+namespace CAS           {
+namespace Expressions   {
+namespace Visitors      {
 namespace Restructurers {
 
 bool Composite::visitExpression(const Expression::Ptr exp)

@@ -64,10 +64,10 @@ std::shared_ptr<Parser>                 parser_ptr          (new Parsers::Infix(
 
 int main()
 {
-    cout << endl;
+//    cout << endl;
 
-    typedef DS::Numbers::Integer intType;
-
+//    typedef DS::Numbers::Integer intType;
+/*
     intType x(798675);
     intType y = x*x*x;
     cout << endl;
@@ -76,7 +76,7 @@ int main()
     cout << endl;
     y.output(cout);
     cout << endl;
-
+*/
     //return 0;
 
 
@@ -131,7 +131,7 @@ int main()
         if (previous)
         {
             std::map<std::string, Expression::Ptr> dictionary;
-            dictionary["r"] = previous;
+            dictionary["_"] = previous;
             Restructurers::Substitution prevSub(nFactory_ptr, eBuilder_ptr, dictionary);
             prevSub.visitExpression(exp);
             exp = prevSub.result();

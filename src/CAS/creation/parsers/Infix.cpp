@@ -37,6 +37,8 @@ void Infix::buildScanners(std::vector<Tokens::Scanner::Ptr>& scanners, std::shar
     scanners.push_back(sBuilder->pop());
 
     sBuilder->alphaNumString();
+    sBuilder->orCharString("_");
+    sBuilder->orList(2);
     scanners.push_back(sBuilder->pop());
 }
 

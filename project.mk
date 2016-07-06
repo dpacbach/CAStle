@@ -4,7 +4,7 @@
 CFLAGS         += -MMD -MP -m64 -Wall -Wpedantic
 CXXFLAGS       += $(CFLAGS) -std=c++1y
 
-CFLAGS_DEBUG   += $(CXXFLAGS) -g -ggdb -gstabs
+CFLAGS_DEBUG   += $(CXXFLAGS) -g -ggdb
 CFLAGS_RELEASE += $(CXXFLAGS) -Ofast -march=corei7 -mtune=corei7
 
 CFLAGS_LIB     += -fPIC
@@ -25,11 +25,10 @@ LDFLAGS_LIB := -shared
 INSTALL_PREFIX := $(HOME)/tmp
 
 ifeq ($(OS),OSX)
-    #LIBXML2_INCLUDE := /opt/local/include/libxml2
-    CFLAGS          += -DOS_OSX
+    CFLAGS += -DOS_OSX
 else
-    #LIBXML2_INCLUDE := /usr/include/libxml2
-    CFLAGS          += -DOS_LINUX
+    CFLAGS += -DOS_LINUX
+    CFLAGS_DEBUG += -gstabs
 endif
 
 ###############################################################################

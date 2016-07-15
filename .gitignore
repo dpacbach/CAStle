@@ -31,3 +31,4 @@
 .location
 makerules
 src/castle
+bin-*

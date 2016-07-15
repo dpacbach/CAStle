@@ -26,13 +26,6 @@ LDFLAGS_LIB := $(LDFLAGS) -shared
 
 INSTALL_PREFIX := $(HOME)/tmp
 
-ifeq ($(OS),OSX)
-    CFLAGS += -DOS_OSX
-else
-    CFLAGS += -DOS_LINUX
-    CFLAGS_DEBUG += -gstabs
-endif
-
 ###############################################################################
 # Dependency info
 

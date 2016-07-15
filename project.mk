@@ -15,20 +15,20 @@ else
     CXXFLAGS_TO_USE = $(CFLAGS_DEBUG)
 endif
 
-CC  := g++
-CXX := g++
-LD  := g++
+GCC_HOME = /usr/local/bin
 
-LDFLAGS :=
-LDFLAGS_LIB := -shared
+CC  := $(GCC_HOME)/g++
+CXX := $(CC)
+LD  := $(CC)
+
+LDFLAGS     :=
+LDFLAGS_LIB := $(LDFLAGS) -shared
 
 INSTALL_PREFIX := $(HOME)/tmp
 
 ifeq ($(OS),OSX)
-    #LIBXML2_INCLUDE := /opt/local/include/libxml2
     CFLAGS          += -DOS_OSX
 else
-    #LIBXML2_INCLUDE := /usr/include/libxml2
     CFLAGS          += -DOS_LINUX
 endif
 

@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <memory>
 #include <vector>
+#include <string.h>
 
 #include "Float.hpp"
 #include "Expression.hpp"
@@ -191,11 +192,12 @@ struct MaybeNumber {
     MaybeNumber( JustType just ) : nothing( false )
                                  , data( just )
     { }
+    operator bool() { return !nothing; }
     bool nothing;
     JustType data;
 };
 
-auto evalutate( Expression::Ptr exp ) -> MaybeNumber
+auto evaluate( Expression::Ptr exp ) -> MaybeNumber
 {
     NumEval eval;
     if ( !eval.visitExpression( exp ) )
@@ -210,18 +212,56 @@ auto evalutate( Expression::Ptr exp ) -> MaybeNumber
 
 extern "C" {
 
-void CL_init( CI_Config* ) { }
+void CI_init( CI_Config* ) { }
 
-void CL_config( CI_Config* ) { }
+void CI_config( CI_Config* ) { }
 
-CI_Result* CI_submit( char const* )
+CI_Result* CI_submit( char const* _input )
 {
-    return nullptr;
+    CI_Result* res = new CI_Result;
+
+    Expression::Ptr input = parse( std::string( _input ) );
+    if( !input )
+        return NULL;
+    Expression::Ptr output = simplify( input );
+    MaybeNumber n_may = evaluate( output );
+
+    Rendered r_input  = render( input );
+    Rendered r_output = render( output );
+    Rendered r_num    = n_may ? render( n_may.data )
+                              : Rendered();
+
+    res->input_one_line  = strdup( r_input.one_line.c_str() );
+    res->output_one_line = strdup( r_output.one_line.c_str() );
+
+    res->input_grid_rows  = r_input.grid.size();
+    res->output_grid_rows = r_output.grid.size();
+
+    res->input_grid  = new char*[res->input_grid_rows];
+    res->output_grid = new char*[res->output_grid_rows];
+
+    for( int i = 0; i < res->input_grid_rows; ++i )
+        res->input_grid[i] = strdup( r_input.grid[i].c_str() );
+    for( int i = 0; i < res->output_grid_rows; ++i )
+        res->output_grid[i] = strdup( r_output.grid[i].c_str() );
+
+    return res;
 }
 
 void CI_result_free( CI_Result* result )
 {
+    free( result->input_one_line );
+    free( result->output_one_line );
 
+    for( int i = 0; i < result->input_grid_rows; ++i )
+        free( result->input_grid[i] );
+    for( int i = 0; i < result->output_grid_rows; ++i )
+        free( result->output_grid[i] );
+
+    delete[] result->input_grid;
+    delete[] result->output_grid;
+
+    delete result;
 }
 
 } // extern "C"

@@ -31,6 +31,8 @@
 #include "rendering/Infix.hpp"
 #include "NumEval.hpp"
 
+#include "icalcterm/icalcterm.h"
+
 using namespace DS;
 using namespace DS::CAS;
 using namespace DS::CAS::Numbers;
@@ -44,7 +46,9 @@ void reduce(Expression::Ptr&);
 ostream& operator<< (ostream& out, Expression::Ptr);
 */
 
-//== CAS Machinery =====================================================
+// ===============================================================
+// Configuration
+// ===============================================================
 
 const int sigFigs = 100;
 typedef DS::Numbers::Float                        FloatType;
@@ -56,6 +60,10 @@ std::shared_ptr<NumberFactory>          nFactory_ptr        (new NumberFactoryPr
 std::shared_ptr<NumberFormatter>        nFormatter_ptr      (new NumberFormatterStandard(nFactory_ptr, scannerBuilder_ptr, sigFigs));
 std::shared_ptr<Builder>                eBuilder_ptr        (new Builders::Standard);
 std::shared_ptr<Parser>                 parser_ptr          (new Parsers::Infix(scannerBuilder_ptr, eBuilder_ptr, nFormatter_ptr, tokenizer_ptr));
+
+// ===============================================================
+// Reduction
+// ===============================================================
 
 template<typename T>
 auto reduce( Expression::Ptr& exp ) -> Expression::Ptr
@@ -96,53 +104,124 @@ auto simplify( Expression::Ptr exp ) -> Expression::Ptr
     return res;
 }
 
-auto input( std::string const& expString ) -> std::string
+// ===============================================================
+// Rendering
+// ===============================================================
+
+struct Rendered {
+    Rendered() { }
+    Rendered( std::string const& s )
+        : one_line( s )
+        , grid( {s} )
+    { }
+    std::string one_line;
+    std::vector<std::string> grid;
+    Rendered(Rendered const& rendered) {
+        throw std::logic_error("Inside Rendered copy constructor!");
+    }
+    Rendered const& operator=( Rendered const& rendered ) {
+        throw std::logic_error("Inside Rendered assignment operator!");
+    }
+};
+
+auto render( Expression::Ptr exp ) -> Rendered
+{
+    Rendered res;
+
+    Render::Infixs::CharMap map(nFormatter_ptr);
+    map.visitExpression(exp);
+    res.grid = map.result().vectorOfStrings();
+
+    Render::Infixs::String s(nFormatter_ptr);
+    s.visitExpression(exp);
+    res.one_line = s.result();
+
+    return res;
+}
+
+auto render( Proxy::NumberP const& _n ) -> Rendered
+{
+    Proxy::NumberP n = _n;
+    //if ( result.isRealPartInteger() && result.isImaginaryPartInteger() )
+    //    return MaybeNumber();
+
+    auto realPart      = nFormatter_ptr->formatRealPart(n);
+    auto imaginaryPart = nFormatter_ptr->formatImaginaryPart(n);
+
+    if (imaginaryPart ==  "1") imaginaryPart =   "i";
+    if (imaginaryPart == "-1") imaginaryPart =  "-i";
+    if (imaginaryPart !=  "0") imaginaryPart +=  "i";
+
+    if (imaginaryPart == "0") return Rendered( realPart );
+    if (realPart      == "0") return Rendered( imaginaryPart );
+
+    n.exchangeRealAndImaginary();
+    n.makeRealPart();
+    return Rendered( realPart + ( n.isPositiveReal() ? "+" : "" ) + imaginaryPart );
+}
+
+// ===============================================================
+// Parsing
+// ===============================================================
+
+auto parse( std::string const& expString ) -> Expression::Ptr
 {
     Expression::Ptr exp = parser_ptr->parse(expString);
     if (!exp)
     {
-        return std::string();
+        return Expression::Ptr();
         /*cout << "  ";
         for (std::string::const_iterator it = expString.begin(); it != parser_ptr->getStopLocation(); ++it)
             cout << " ";
         cout << "^---Syntax Error!" << endl;
         continue;*/
     }
-
-    auto exp_simp = simplify( exp );
-
-    Render::Infixs::CharMap map(nFormatter_ptr);
-    map.visitExpression(exp);
-    std::vector<std::string> grid = map.result().vectorOfStrings();
-
-    Render::Infixs::String s(nFormatter_ptr);
-    s.visitExpression(exp);
-    std::string infix = s.result();
-
-    return std::string();
+    return exp;
 }
 
-auto evalutate( Expression::Ptr exp ) -> std::string
+// ===============================================================
+// Numerical Evaluation
+// ===============================================================
+
+struct MaybeNumber {
+    typedef Proxy::NumberP JustType;
+    MaybeNumber() : nothing( true )
+                  , data( nFactory_ptr->zero() )
+    { }
+    MaybeNumber( JustType just ) : nothing( false )
+                                 , data( just )
+    { }
+    bool nothing;
+    JustType data;
+};
+
+auto evalutate( Expression::Ptr exp ) -> MaybeNumber
 {
     NumEval eval;
     if ( !eval.visitExpression( exp ) )
-        return std::string();
+        return MaybeNumber();
 
-    Proxy::NumberP result = eval.result();
-    if ( result.isRealPartInteger() && result.isImaginaryPartInteger() )
-        return std::string();
-
-    auto realPart      = nFormatter_ptr->formatRealPart(result);
-    auto imaginaryPart = nFormatter_ptr->formatImaginaryPart(result);
-
-    if (imaginaryPart ==  "1") imaginaryPart =   "i";
-    if (imaginaryPart == "-1") imaginaryPart =  "-i";
-    if (imaginaryPart !=  "0") imaginaryPart +=  "i";
-
-    if (imaginaryPart == "0") return realPart;
-    if (realPart      == "0") return imaginaryPart;
-
-    result.exchangeRealAndImaginary();
-    result.makeRealPart();
-    return realPart + ( result.isPositiveReal() ? "+" : "" ) + imaginaryPart;
+    return MaybeNumber( eval.result() );
 }
+
+// ===============================================================
+// icalcterm interface
+// ===============================================================
+
+extern "C" {
+
+void CL_init( CI_Config* ) { }
+
+void CL_config( CI_Config* ) { }
+
+CI_Result* CI_submit( char const* )
+{
+    return nullptr;
+}
+
+void CI_result_free( CI_Result* result )
+{
+
+}
+
+} // extern "C"

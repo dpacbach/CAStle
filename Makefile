@@ -8,6 +8,3 @@ CWD := $(TOPLEVELWD)
 $(call enter,src)
 
 include $(makerules)/postsrc.mk
-
-all: $(BINARIES)
-.DEFAULT_GOAL := all

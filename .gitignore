@@ -29,6 +29,6 @@
 *.app
 
 .location
-makerules
 src/castle
 bin-*
+/Makefile

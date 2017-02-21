@@ -11,19 +11,19 @@ LD  := $(CC)
 
 PARSERS.deps                    :=  TOOLS
 PARSERSDEFAULT.deps             :=  PARSERS
-CASNUMBER.deps                  :=  PARSERS
+CASNUMBER.deps                  :=  PARSERS CASUTILS
 CASNUMBERDEFAULT.deps           :=  CASNUMBER
 CASEXPR.deps                    :=  CASNUMBER
-CASEXPRBASIC.deps               :=  CASEXPR
-CASEXPRBUILDERS.deps            :=  CASEXPRBASIC
+CASEXPRS.deps                   :=  CASEXPR CASVISITING
+CASEXPRBUILDERS.deps            :=  CASEXPRS
 CASCREATION.deps                :=  CASEXPR
 CASCREATIONPARSERS.deps         :=  CASCREATION
-CASVISITING.deps                :=  CASEXPRBASIC
-CASVISITINGNUMEVAL.deps         :=  CASVISITING
-CASVISITINGRENDERING.deps       :=  CASVISITING
-CASVISITINGRENDERINGINFIX.deps  :=  CASVISITINGRENDERING
-CASVISITINGRESTRUCTURING.deps   :=  CASVISITING
-CASREDUCTION.deps               :=  CASVISITINGRESTRUCTURING
+CASVISITING.deps                :=  CASEXPR
+CASVISITORSNUMEVAL.deps         :=  CASVISITING CASEXPRS
+CASVISITORSRENDERING.deps       :=  CASVISITING CASEXPRS
+CASVISITORSRENDERINGINFIX.deps  :=  CASVISITORSRENDERING CASEXPRS
+CASVISITORSRESTRUCTURING.deps   :=  CASVISITING CASEXPRS
+CASREDUCTION.deps               :=  CASVISITORSRESTRUCTURING
 
 CLI.deps   := NBRS                       \
               CASNUMBER                  \
@@ -31,16 +31,16 @@ CLI.deps   := NBRS                       \
               CASEXPRBUILDERS            \
               PARSERSDEFAULT             \
               CASREDUCTION               \
-              CASVISITINGNUMEVAL         \
-              CASVISITINGRESTRUCTURING   \
-              CASVISITINGRENDERINGINFIX  \
+              CASVISITORSNUMEVAL         \
+              CASVISITORSRESTRUCTURING   \
+              CASVISITORSRENDERINGINFIX  \
               CASCREATION                \
               CASCREATIONPARSERS         \
               CASEXPR                    \
-              CASEXPRBASIC               \
+              CASEXPRS                   \
               PARSERS                    \
               CASVISITING                \
-              CASVISITINGRENDERING
+              CASVISITORSRENDERING
 
 IFACE.deps := NBRS                       \
               CASNUMBER                  \
@@ -48,16 +48,16 @@ IFACE.deps := NBRS                       \
               CASEXPRBUILDERS            \
               PARSERSDEFAULT             \
               CASREDUCTION               \
-              CASVISITINGNUMEVAL         \
-              CASVISITINGRESTRUCTURING   \
-              CASVISITINGRENDERINGINFIX  \
+              CASVISITORSNUMEVAL         \
+              CASVISITORSRESTRUCTURING   \
+              CASVISITORSRENDERINGINFIX  \
               CASCREATION                \
               CASCREATIONPARSERS         \
               CASEXPR                    \
-              CASEXPRBASIC               \
+              CASEXPRS                   \
               PARSERS                    \
               CASVISITING                \
-              CASVISITINGRENDERING
+              CASVISITORSRENDERING
 
 #LIB.deps  := LIB_INT
 

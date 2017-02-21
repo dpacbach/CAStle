@@ -5,7 +5,7 @@ namespace DS          {
 namespace CAS         {
 namespace Expressions {
 
-bool Visitor::visitExpression(const Expression::Ptr ptr)
+bool Visitor::visitExpression(ExprConstSP ptr)
 {
     unsigned int numberOfChildren = ptr->numberOfChildren();
     for (unsigned int index = 0; index < numberOfChildren; index++)
@@ -24,6 +24,6 @@ bool Visitor::visitExpression(const Expression::Ptr ptr)
     return true;
 }
 
-} /* namespace Expression */
+} /* namespace Expressions */
 } /* namespace CAS */
 } /* namespace DS */

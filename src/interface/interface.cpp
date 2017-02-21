@@ -28,8 +28,8 @@
 #include "NumberDouble.hpp"
 #include "Standard.hpp"
 #include "Parser.hpp"
-#include "parsers/Infix.hpp"
-#include "rendering/Infix.hpp"
+#include "InfixParse.hpp"
+#include "InfixRender.hpp"
 #include "NumEval.hpp"
 
 #include "icalcterm/icalcterm.h"
@@ -43,8 +43,8 @@ using namespace DS::CAS::Expressions::Visitors::Restructurers::Reduction;
 
 /*
 template<typename T>
-void reduce(Expression::Ptr&);
-ostream& operator<< (ostream& out, Expression::Ptr);
+void reduce(ExprConstSP&);
+ostream& operator<< (ostream& out, ExprConstSP);
 */
 
 // ===============================================================
@@ -67,7 +67,7 @@ std::shared_ptr<Parser>                 parser_ptr          (new Parsers::Infix(
 // ===============================================================
 
 template<typename T>
-auto reduce( Expression::Ptr& exp ) -> Expression::Ptr
+auto reduce( ExprConstSP& exp ) -> ExprConstSP
 {
     auto visitor = std::make_unique<T>( nFactory_ptr, eBuilder_ptr );
     auto success = visitor->visitExpression(exp);
@@ -76,9 +76,9 @@ auto reduce( Expression::Ptr& exp ) -> Expression::Ptr
     return visitor->result();
 }
 
-auto simplify( Expression::Ptr exp ) -> Expression::Ptr
+auto simplify( ExprConstSP exp ) -> ExprConstSP
 {
-    Expression::Ptr res;
+    ExprConstSP res;
     res = reduce<BasicSymbols>(exp);
     res = reduce<ComplexSplitter>(res);
     res = reduce<Rationalizer>(res);
@@ -125,7 +125,7 @@ struct Rendered {
     }
 };
 
-auto render( Expression::Ptr exp ) -> Rendered
+auto render( ExprConstSP exp ) -> Rendered
 {
     Rendered res;
 
@@ -165,12 +165,12 @@ auto render( Proxy::NumberP const& _n ) -> Rendered
 // Parsing
 // ===============================================================
 
-auto parse( std::string const& expString ) -> Expression::Ptr
+auto parse( std::string const& expString ) -> ExprConstSP
 {
-    Expression::Ptr exp = parser_ptr->parse(expString);
+    ExprConstSP exp = parser_ptr->parse(expString);
     if (!exp)
     {
-        return Expression::Ptr();
+        return ExprConstSP();
         /*cout << "  ";
         for (std::string::const_iterator it = expString.begin(); it != parser_ptr->getStopLocation(); ++it)
             cout << " ";
@@ -197,7 +197,7 @@ struct MaybeNumber {
     JustType data;
 };
 
-auto evaluate( Expression::Ptr exp ) -> MaybeNumber
+auto evaluate( ExprConstSP exp ) -> MaybeNumber
 {
     NumEval eval;
     if ( !eval.visitExpression( exp ) )
@@ -231,10 +231,10 @@ CI_Result* CI_submit( char const* _input )
 {
     CI_Result* res = new CI_Result;
 
-    Expression::Ptr input = parse( std::string( _input ) );
+    ExprConstSP input = parse( std::string( _input ) );
     if( !input )
         return NULL;
-    Expression::Ptr output = simplify( input );
+    ExprConstSP output = simplify( input );
     MaybeNumber n_may = evaluate( output );
 
     Rendered r_input  = render( input );

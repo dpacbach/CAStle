@@ -18,7 +18,7 @@ class Composite : public DS::CAS::Expressions::Visitors::Restructurer
     Composite(std::shared_ptr<Numbers::NumberFactory> _nFactory,
               std::shared_ptr<Expressions::Builder> _eBuilder) : Restructurer(_nFactory, _eBuilder) {}
 
-    virtual bool visitExpression(const Expression::Ptr exp);
+    virtual bool visitExpression(ExprConstSP exp);
 
     void addChildToEnd(std::shared_ptr<Restructurer> child)
     {

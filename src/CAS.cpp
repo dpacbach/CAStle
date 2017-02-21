@@ -33,8 +33,8 @@
 #include "NumberDouble.hpp"
 #include "Standard.hpp"
 #include "Parser.hpp"
-#include "parsers/Infix.hpp"
-#include "rendering/Infix.hpp"
+#include "InfixParse.hpp"
+#include "InfixRender.hpp"
 #include "NumEval.hpp"
 
 using namespace std;
@@ -46,8 +46,8 @@ using namespace DS::CAS::Expressions::Visitors;
 using namespace DS::CAS::Expressions::Visitors::Restructurers::Reduction;
 
 template<typename T>
-void reduce(Expression::Ptr&);
-ostream& operator<< (ostream& out, Expression::Ptr);
+void reduce(ExprConstSP&);
+ostream& operator<< (ostream& out, ExprConstSP);
 
 //== CAS Machinery =====================================================
 
@@ -86,7 +86,7 @@ int main()
 
     std::string expString = "";
 
-    Expression::Ptr exp, previous;
+    ExprConstSP exp, previous;
     bool loop = false;
     do
     {
@@ -130,7 +130,7 @@ int main()
 
         if (previous)
         {
-            std::map<std::string, Expression::Ptr> dictionary;
+            std::map<std::string, ExprConstSP> dictionary;
             dictionary["_"] = previous;
             Restructurers::Substitution prevSub(nFactory_ptr, eBuilder_ptr, dictionary);
             prevSub.visitExpression(exp);
@@ -215,7 +215,7 @@ int main()
         //    cout << endl << "Error in substitution of constants dictionary!";
         //    continue;
         //}
-        //Expression::Ptr constantsExp = constantsSub.result();
+        //ExprConstSP constantsExp = constantsSub.result();
 
         NumEval eval;
         if (eval.visitExpression(exp))
@@ -287,7 +287,7 @@ int main()
     return 0;
 }
 
-ostream& operator<< (ostream& out, Expression::Ptr exp)
+ostream& operator<< (ostream& out, ExprConstSP exp)
 {
     //out << endl;
     Render::Infixs::CharMap map(nFormatter_ptr);
@@ -309,7 +309,7 @@ ostream& operator<< (ostream& out, Expression::Ptr exp)
 }
 
 template<typename T>
-void reduce(Expression::Ptr& exp)
+void reduce(ExprConstSP& exp)
 {
     T* visitor = new T(nFactory_ptr, eBuilder_ptr);
     bool success = visitor->visitExpression(exp);

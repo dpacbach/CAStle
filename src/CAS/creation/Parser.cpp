@@ -16,7 +16,7 @@ Parser::Parser(std::shared_ptr<Tokens::ScannerBuilder> _sBuilder, std::shared_pt
     tokenizer     = _tokenizer;
 }
 
-Expression::Ptr Parser::parse(const std::string& source)
+ExprConstSP Parser::parse(const std::string& source)
 {
     if (scanners.empty())
         buildScanners(scanners, sBuilder);
@@ -26,11 +26,11 @@ Expression::Ptr Parser::parse(const std::string& source)
     if (!success)
     {
         stopLocation = tokenizer->getStopLocation();
-        return Expression::Ptr();
+        return ExprConstSP();
     }
     std::vector<Command> commands;
     if (!parseTokens(tokens, commands))
-        return Expression::Ptr();
+        return ExprConstSP();
     for (std::vector<Command>::const_iterator it = commands.begin(); it != commands.end(); ++it)
     {
         //cout << endl << (*it).getNodeName() << ",  " << (*it).getNodeType() << ",  " << (*it).getNumberOfChildren();
@@ -38,12 +38,12 @@ Expression::Ptr Parser::parse(const std::string& source)
     return buildExpression(commands);
 }
 
-Expression::Ptr Parser::buildExpression(const std::vector<Command>& commands)
+ExprConstSP Parser::buildExpression(const std::vector<Command>& commands)
 {
-    stack<Expression::Ptr> expStack;
-    Expression::Ptr node, nullShared;
+    stack<ExprConstSP> expStack;
+    ExprConstSP node, nullShared;
     Numbers::Number* number;
-    std::vector<Expression::Ptr> children;
+    std::vector<ExprConstSP> children;
 
     for (std::vector<Command>::const_iterator it = commands.begin(); it != commands.end(); ++it)
     {
@@ -60,7 +60,7 @@ Expression::Ptr Parser::buildExpression(const std::vector<Command>& commands)
             for (unsigned int i = 0; i < (*it).getNumberOfChildren(); i++)
             {
                 if (expStack.size() == 0)
-                    return Expression::Ptr();
+                    return ExprConstSP();
                 children.insert(children.begin(), getPop(expStack));
             }
             node = eBuilder->operator()((*it).getNodeName(), children);

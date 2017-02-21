@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include "NumEval.hpp"
 #include "NumberProxy.hpp"
-#include "AllBasic.hpp"
+#include "exprs.hpp"
 
 using namespace DS::CAS::Numbers::Proxy;
 
@@ -25,12 +25,12 @@ bool NumEval::visitAdd(const Add& exp)
 {
     NumberP sum = getPop(childResults);
     unsigned int nc = exp.numberOfChildren();
-    if (exp.getSignForChild(nc-1) == Expressions::n)
+    if (exp.getSignForChild(nc-1) == Expressions::Sign::n)
         sum.negate();
     for (int i = static_cast<int>(nc)-2; i >= 0; i--)
     {
         NumberP term = getPop(childResults);
-        if (exp.getSignForChild(static_cast<unsigned int>(i)) == Expressions::n)
+        if (exp.getSignForChild(static_cast<unsigned int>(i)) == Expressions::Sign::n)
             term.negate();
         sum += term;
     }

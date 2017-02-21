@@ -1,5 +1,7 @@
 #pragma once
 
+#include "macros.hpp"
+
 #include <memory>
 #include <vector>
 
@@ -7,34 +9,46 @@ namespace DS          {
 namespace CAS         {
 namespace Expressions {
 
-enum Sign
-{
-    p = true, n = false
+enum class Sign { p = true, n = false };
+
+enum class ID {
+    add,      divide, factorial, literal, modulus,
+    multiply, negate, power,     symbol
 };
 
 class Visitor;
 
-class Expression
-{
+DECLARE_SHARED( Expr )
+
+class Expr {
+
 public:
-    typedef enum { add, divide, factorial, literal, modulus, multiply, negate, power, symbol } ID;
-    typedef std::shared_ptr<const Expression> Ptr; // use only this to reference Expression objects
+    Expr();
+    Expr(std::vector<ExprConstSP> children) : children( children ) {}
+    virtual ~Expr();
 
-    Expression();
-    virtual ~Expression();
-
-    Expression(Expression const&) = delete;
-    Expression const& operator= (Expression const&) = delete;
+    Expr(Expr const&)                   = delete;
+    Expr const& operator= (Expr const&) = delete;
 
     virtual ID id(void) const = 0;
 
-    virtual unsigned int numberOfChildren(void) const = 0;
-    virtual Ptr getChild(unsigned int i)        const = 0;
-    virtual std::vector<Ptr> getChildVector(void)    const;
+    size_t numberOfChildren(void) const { return children.size(); }
+
+    ExprConstSP getChild(size_t i) const {
+        ASSERT( i < children.size() );
+        return children[i];
+    }
 
     virtual bool acceptVisitor(Visitor&) const = 0;
 
+    std::vector<ExprConstSP> const& getChildVector() const {
+        return children;
+    }
+
     static int numberOfExpressions;
+
+protected:
+    std::vector<ExprConstSP> children;
 };
 
 } } }

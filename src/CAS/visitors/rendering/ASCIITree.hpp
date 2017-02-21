@@ -35,7 +35,7 @@ public:
     virtual bool visitSymbol(const Symbol&);
 
 protected:
-    bool handleNode(const string&, const Expression&);
+    bool handleNode(const string&, const Expr&);
 };
 
 } /* namespace Render */

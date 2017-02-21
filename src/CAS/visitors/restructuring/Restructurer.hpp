@@ -5,7 +5,7 @@
 #include "Visitor.hpp"
 #include "Builder.hpp"
 #include "Templates.hpp"
-#include "AllBasic.hpp"
+#include "exprs.hpp"
 
 namespace DS { namespace CAS { namespace Numbers {
     class NumberFactory;
@@ -18,6 +18,16 @@ namespace Visitors    {
 
 class Restructurer : public DS::CAS::Expressions::Visitor
 {
+protected:
+    std::vector<ExprConstSP> getChildren(const Expr& exp)
+    {
+        unsigned int nc = exp.numberOfChildren();
+        std::vector<ExprConstSP> children(nc);
+        for (unsigned int i = 0; i < nc; i++)
+            children[nc-i-1] = getPop(childResults);
+        return children;
+    }
+
 public:
     Restructurer(std::shared_ptr<Numbers::NumberFactory> _nFactory,
                  std::shared_ptr<Expressions::Builder> _eBuilder)
@@ -75,7 +85,7 @@ public:
         clearStack(childResults);
     }
 
-    virtual Expression::Ptr result(void)
+    virtual ExprConstSP result(void)
     {
         if (childResults.size() != 1)
             throw std::logic_error("childResults.size() != 1 in Expressions::Visitors::Restructurer::result");
@@ -83,39 +93,39 @@ public:
     }
 
 protected:
-    virtual Expression::Ptr add(const Add& exp, const std::vector<Expression::Ptr>& children)
+    virtual ExprConstSP add(const Add& exp, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->add(children, exp.getSignVector());
     }
-    virtual Expression::Ptr divide(const Divide& exp, const std::vector<Expression::Ptr>& children)
+    virtual ExprConstSP divide(const Divide& exp, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()("/",children);
     }
-    virtual Expression::Ptr factorial(const Factorial& exp, const std::vector<Expression::Ptr>& children)
+    virtual ExprConstSP factorial(const Factorial& exp, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()("!",children);
     }
-    virtual Expression::Ptr literal(const Literal& exp, const std::vector<Expression::Ptr>& children)
+    virtual ExprConstSP literal(const Literal& exp, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->literal(exp.getNumber());
     }
-    virtual Expression::Ptr modulus(const Modulus& exp, const std::vector<Expression::Ptr>& children)
+    virtual ExprConstSP modulus(const Modulus& exp, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()("%",children);
     }
-    virtual Expression::Ptr multiply(const Multiply& exp, const std::vector<Expression::Ptr>& children)
+    virtual ExprConstSP multiply(const Multiply& exp, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()("*",children);
     }
-    virtual Expression::Ptr negate(const Negate& exp, const std::vector<Expression::Ptr>& children)
+    virtual ExprConstSP negate(const Negate& exp, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()("ng",children);
     }
-    virtual Expression::Ptr power(const Power& exp, const std::vector<Expression::Ptr>& children)
+    virtual ExprConstSP power(const Power& exp, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()("^",children);
     }
-    virtual Expression::Ptr symbol(const Symbol& exp, const std::vector<Expression::Ptr>& children)
+    virtual ExprConstSP symbol(const Symbol& exp, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()(exp.getName(),children);
     }
@@ -127,15 +137,7 @@ protected:
     Numbers::NumberFactory& nF;
     Expressions::Builder& eB;
 
-    std::stack<Expression::Ptr> childResults;
-    std::vector<Expression::Ptr> getChildren(const Expression& exp)
-    {
-        unsigned int nc = exp.numberOfChildren();
-        std::vector<Expression::Ptr> children(nc);
-        for (unsigned int i = 0; i < nc; i++)
-            children[nc-i-1] = getPop(childResults);
-        return children;
-    }
+    std::stack<ExprConstSP> childResults;
 };
 
 } /* namespace Visitors */

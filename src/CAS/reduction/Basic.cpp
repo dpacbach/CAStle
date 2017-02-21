@@ -19,7 +19,7 @@ const Number& getLiteralNumber(EP exp)
     return (dynamic_cast<const Literal&>(*exp)).getNumber();
 }
 
-Expression::ID eID(EP exp)
+Expressions::ID eID(EP exp)
 {
     return exp->id();
 }
@@ -65,9 +65,9 @@ void GCDReduce(Proxy::NumberP& litNum, Proxy::NumberP& litDen)
 
 Sign flipSign(Sign sign)
 {
-    if (sign == p)
-        return n;
-    return p;
+    if (sign == Sign::p)
+        return Sign::n;
+    return Sign::p;
 }
 
 std::vector<Sign> flipSigns(const std::vector<Sign>& signs)
@@ -143,7 +143,7 @@ EP Rationalizer::literal(const Literal& exp, const std::vector<EP>& children)
 
 EP ComplexNormalizer::divide(const Divide& exp, const std::vector<EP>& children)
 {
-    if (eID(children[1]) == Expression::literal)
+    if (eID(children[1]) == Expressions::ID::literal)
     {
         Proxy::NumberP number = getLiteralNumber(children[1]);
         if (!number.isReal())
@@ -161,7 +161,7 @@ EP ComplexNormalizer::divide(const Divide& exp, const std::vector<EP>& children)
 
 EP ComplexExpander::divide(const Divide& exp, const std::vector<EP>& children)
 {
-    if (eID(children[0]) == Expression::literal)
+    if (eID(children[0]) == Expressions::ID::literal)
     {
         Proxy::NumberP number = getLiteralNumber(children[0]);
         if (number.isComplex())
@@ -179,7 +179,7 @@ EP ComplexExpander::divide(const Divide& exp, const std::vector<EP>& children)
 
 EP GCDLiteral::divide(const Divide& exp, const std::vector<EP>& children)
 {
-    if (eID(children[0]) != Expression::literal || eID(children[1]) != Expression::literal)
+    if (eID(children[0]) != Expressions::ID::literal || eID(children[1]) != Expressions::ID::literal)
         return Restructurer::divide(exp,children);
     Proxy::NumberP litNum = getLiteralNumber(children[0]);
     Proxy::NumberP litDen = getLiteralNumber(children[1]);
@@ -200,7 +200,7 @@ EP GCDLiteral::divide(const Divide& exp, const std::vector<EP>& children)
 EP SizeOneArray::add(const Add& exp, const std::vector<EP>& children)
 {
     if (children.size() == 1)
-        return (exp.getSignForChild(0) == p) ? children[0] : eB.negate(children[0]);
+        return (exp.getSignForChild(0) == Sign::p) ? children[0] : eB.negate(children[0]);
     return Restructurer::add(exp,children);
 }
 EP SizeOneArray::multiply(const Multiply& exp, const std::vector<EP>& children)
@@ -218,10 +218,10 @@ EP SelfNesting::add(const Add& exp, const std::vector<EP>& children)
     std::vector<Sign> newSigns;
     for (unsigned int i = 0; i < exp.numberOfChildren(); i++)
     {
-        if (eID(children[i]) == Expression::add)
+        if (eID(children[i]) == Expressions::ID::add)
         {
             const Add& childRef = dynamic_cast<const Add&>(*children[i]);
-            bool flipSign = (exp.getSignForChild(i) == n) ? true : false;
+            bool flipSign = (exp.getSignForChild(i) == Sign::n) ? true : false;
             for (unsigned int j = 0; j < childRef.numberOfChildren(); j++)
             {
                 newExps.push_back(childRef.getChild(j));
@@ -236,22 +236,22 @@ EP SelfNesting::add(const Add& exp, const std::vector<EP>& children)
 }
 EP SelfNesting::divide(const Divide& exp, const std::vector<EP>& children)
 {
-    Expression::ID idN = children[0]->id();
-    Expression::ID idD = children[1]->id();
+    Expressions::ID idN = children[0]->id();
+    Expressions::ID idD = children[1]->id();
     EP newN, newD;
-    if (idN == Expression::divide && idD == Expression::divide)
+    if (idN == Expressions::ID::divide && idD == Expressions::ID::divide)
     {
         newN = eB.multiply(children[0]->getChild(0), children[1]->getChild(1));
         newD = eB.multiply(children[0]->getChild(1), children[1]->getChild(0));
         return eB.divide(newN, newD);
     }
-    else if (idN == Expression::divide)
+    else if (idN == Expressions::ID::divide)
     {
         newN = children[0]->getChild(0);
         newD = eB.multiply(children[0]->getChild(1), children[1]);
         return eB.divide(newN, newD);
     }
-    else if (idD == Expression::divide)
+    else if (idD == Expressions::ID::divide)
     {
         newD = children[1]->getChild(0);
         newN = eB.multiply(children[0], children[1]->getChild(1));
@@ -265,7 +265,7 @@ EP SelfNesting::multiply(const Multiply& exp, const std::vector<EP>& children)
     std::vector<EP> newExps;
     for (unsigned int i = 0; i < exp.numberOfChildren(); i++)
     {
-        if (eID(children[i]) == Expression::multiply)
+        if (eID(children[i]) == Expressions::ID::multiply)
             for (unsigned int j = 0; j < children[i]->numberOfChildren(); j++)
                 newExps.push_back(children[i]->getChild(j));
         else
@@ -275,7 +275,7 @@ EP SelfNesting::multiply(const Multiply& exp, const std::vector<EP>& children)
 }
 EP SelfNesting::negate(const Negate& exp, const std::vector<EP>& children)
 {
-    if (eID(children[0]) == Expression::negate)
+    if (eID(children[0]) == Expressions::ID::negate)
         return children[0]->getChild(0);
     return Restructurer::negate(exp,children);
 }
@@ -283,10 +283,10 @@ EP SelfNesting::power(const Power& exp, const std::vector<EP>& children)
 {
     // tests for (a^b)^c and will turn it into a^(b*c) if a is positive real and
     //   either (b is real) || (c is a real integer)
-    if (eID(children[0]) != Expression::power)
+    if (eID(children[0]) != Expressions::ID::power)
         return Restructurer::power(exp,children);
 
-    if (eID(children[0]->getChild(0)) != Expression::literal)
+    if (eID(children[0]->getChild(0)) != Expressions::ID::literal)
         return Restructurer::power(exp,children);
 
     const Proxy::NumberP& base = getLiteralNumber(children[0]->getChild(0));
@@ -297,16 +297,16 @@ EP SelfNesting::power(const Power& exp, const std::vector<EP>& children)
     EP firstExp  = children[0]->getChild(1);
     EP secondExp = children[1];
 
-    if (eID(firstExp) == Expression::negate)
+    if (eID(firstExp) == Expressions::ID::negate)
         firstExp = firstExp->getChild(0);
-    if (eID(secondExp) == Expression::negate)
+    if (eID(secondExp) == Expressions::ID::negate)
         secondExp = secondExp->getChild(0);
 
-    if (eID(firstExp) == Expression::literal)
+    if (eID(firstExp) == Expressions::ID::literal)
         if (getLiteralNumber(firstExp).isReal())
             return eB.power(children[0]->getChild(0), eB.multiply(children[0]->getChild(1), children[1]));
 
-    if (eID(secondExp) == Expression::literal)
+    if (eID(secondExp) == Expressions::ID::literal)
         if (getLiteralNumber(secondExp).isReal() && getLiteralNumber(secondExp).isIntegral())
             return eB.power(children[0]->getChild(0), eB.multiply(children[0]->getChild(1), children[1]));
 
@@ -322,16 +322,16 @@ EP Negatives::add(const Add& exp, const std::vector<EP>& children)
     int firstPositiveIndex = -1;
     for (unsigned int i = 0; i < children.size(); i++)
     {
-        bool isNegate = (eID(children[i]) == Expression::negate);
+        bool isNegate = (eID(children[i]) == Expressions::ID::negate);
         Sign sign     = exp.getSignForChild(i);
 
         newTerms.push_back(isNegate ? children[i]->getChild(0) : children[i]);
         newSigns.push_back(isNegate ? flipSign(sign)           : sign);
 
-        if (newSigns[i] == p && firstPositiveIndex < 0)
+        if (newSigns[i] == Sign::p && firstPositiveIndex < 0)
             firstPositiveIndex = int(i);
     }
-    if (newSigns[0] == p)
+    if (newSigns[0] == Sign::p)
         return eB.add(newTerms, newSigns);
 
     if (firstPositiveIndex >= 0)
@@ -340,19 +340,19 @@ EP Negatives::add(const Add& exp, const std::vector<EP>& children)
         std::swap(newSigns[firstPositiveIndex], newSigns[0]);
         return eB.add(newTerms, newSigns);
     }
-    return eB.negate(eB.add(newTerms, std::vector<Sign>(newSigns.size(), p)));
+    return eB.negate(eB.add(newTerms, std::vector<Sign>(newSigns.size(), Sign::p)));
 }
 EP Negatives::divide(const Divide& exp, const std::vector<EP>& children)
 {
     bool negate = false;
     EP newNum = children[0];
     EP newDen = children[1];
-    if (eID(children[0]) == Expression::negate)
+    if (eID(children[0]) == Expressions::ID::negate)
     {
         negate ^= true;
         newNum = children[0]->getChild(0);
     }
-    if (eID(children[1]) == Expression::negate)
+    if (eID(children[1]) == Expressions::ID::negate)
     {
         negate ^= true;
         newDen = children[1]->getChild(0);
@@ -368,7 +368,7 @@ EP Negatives::multiply(const Multiply& exp, const std::vector<EP>& children)
     std::vector<EP> newChildren;
     for (std::vector<EP>::const_iterator it = children.begin(); it != children.end(); ++it)
     {
-        if (eID(*it) == Expression::negate)
+        if (eID(*it) == Expressions::ID::negate)
         {
             negativeSign ^= true;
             newChildren.push_back((*it)->getChild(0));
@@ -386,9 +386,9 @@ EP Negatives::power(const Power& exp, const std::vector<EP>& children)
     // the negative will be factored out
     EP newBase = children[0];
     EP absExpo = children[1];
-    if (eID(absExpo) == Expression::negate)
+    if (eID(absExpo) == Expressions::ID::negate)
         absExpo = absExpo->getChild(0);
-    if (eID(newBase) == Expression::negate && eID(absExpo) == Expression::literal)
+    if (eID(newBase) == Expressions::ID::negate && eID(absExpo) == Expressions::ID::literal)
     {
         Proxy::NumberP expo = getLiteralNumber(absExpo);
         if (expo.isReal() && expo.isRealPartInteger())
@@ -412,7 +412,7 @@ EP Negatives::literal(const Literal& exp, const std::vector<EP>& children)
 
 EP FirstOrderBasic::divide(const Divide& exp, const std::vector<EP>& children)
 {
-    if (eID(children[1]) == Expression::power)
+    if (eID(children[1]) == Expressions::ID::power)
         return eB.multiply(children[0], eB.power(children[1]->getChild(0), eB.negate(children[1]->getChild(1))));
     return Restructurer::divide(exp,children);
 }
@@ -421,7 +421,7 @@ EP FirstOrderBasic::multiply(const Multiply& exp, const std::vector<EP>& childre
     std::vector<EP> numerator, denominator;
     for (unsigned int i = 0; i < children.size(); i++)
     {
-        if (eID(children[i]) == Expression::divide)
+        if (eID(children[i]) == Expressions::ID::divide)
         {
             numerator.push_back(children[i]->getChild(0));
             denominator.push_back(children[i]->getChild(1));
@@ -436,21 +436,21 @@ EP FirstOrderBasic::multiply(const Multiply& exp, const std::vector<EP>& childre
 EP FirstOrderBasic::negate(const Negate& exp, const std::vector<EP>& children)
 {
     // Distributes a negative into an Add if there are minus signs in it
-    if (eID(children[0]) == Expression::add)
+    if (eID(children[0]) == Expressions::ID::add)
     {
         const Add& add = dynamic_cast<const Add&>(*(children[0]));
         for (unsigned int i = 0; i < add.numberOfChildren(); i++)
-            if (add.getSignForChild(i) == n)
+            if (add.getSignForChild(i) == Sign::n)
                 return eB.add(add.getChildVector(), flipSigns(add.getSignVector()));
     }
     return Restructurer::negate(exp,children);
 }
 EP FirstOrderBasic::power(const Power& exp, const std::vector<EP>& children)
 {
-    if (eID(children[0]) == Expression::divide)
+    if (eID(children[0]) == Expressions::ID::divide)
     {
         EP div = children[0];
-        if (eID(div->getChild(0)) == Expression::literal || eID(div->getChild(1)) == Expression::literal)
+        if (eID(div->getChild(0)) == Expressions::ID::literal || eID(div->getChild(1)) == Expressions::ID::literal)
             return eB.divide(eB.power(children[0]->getChild(0), children[1]), eB.power(children[0]->getChild(1), children[1]));
     }
     return Restructurer::power(exp,children);
@@ -466,16 +466,16 @@ EP NumberReducerBasic::add(const Add& exp, const std::vector<EP>& children)
 
     for (unsigned int i = 0; i < children.size(); i++)
     {
-        if (eID(children[i]) == Expression::literal)
+        if (eID(children[i]) == Expressions::ID::literal)
         {
             fractions.push_back(eB.divide(children[i], eB.literal(one)));
             fractionSigns.push_back(exp.getSignForChild(i));
             continue;
         }
-        else if (eID(children[i]) == Expression::divide)
+        else if (eID(children[i]) == Expressions::ID::divide)
         {
-            if (eID(children[i]->getChild(0)) == Expression::literal &&
-                eID(children[i]->getChild(1)) == Expression::literal)
+            if (eID(children[i]->getChild(0)) == Expressions::ID::literal &&
+                eID(children[i]->getChild(1)) == Expressions::ID::literal)
             {
                 fractions.push_back(children[i]);
                 fractionSigns.push_back(exp.getSignForChild(i));
@@ -491,7 +491,7 @@ EP NumberReducerBasic::add(const Add& exp, const std::vector<EP>& children)
     {
         Proxy::NumberP num2 = getLiteralNumber(fractions[i]->getChild(0));
         Proxy::NumberP den2 = getLiteralNumber(fractions[i]->getChild(1));
-        if (fractionSigns[i] == n)
+        if (fractionSigns[i] == Sign::n)
             num2.negate();
         num = num*den2 + num2*den;
         den *= den2;
@@ -502,7 +502,7 @@ EP NumberReducerBasic::add(const Add& exp, const std::vector<EP>& children)
             newTerms.push_back(eB.divide(eB.literal(num), eB.literal(den)));
         else
             newTerms.push_back(eB.literal(num));
-        newSigns.push_back(p);
+        newSigns.push_back(Sign::p);
     }
     if (newTerms.size() == 0)
         return eB.literal(nF.zero());
@@ -510,11 +510,11 @@ EP NumberReducerBasic::add(const Add& exp, const std::vector<EP>& children)
 }
 EP NumberReducerBasic::divide(const Divide& exp, const std::vector<EP>& children)
 {
-    if (eID(children[0]) == Expression::literal)
+    if (eID(children[0]) == Expressions::ID::literal)
         if (getLiteralNumber(children[0]).isZero())
             return children[0];
 
-    if (eID(children[1]) == Expression::literal)
+    if (eID(children[1]) == Expressions::ID::literal)
         if (getLiteralNumber(children[1]).isOne())
             return children[0];
 
@@ -526,7 +526,7 @@ EP NumberReducerBasic::multiply(const Multiply& exp, const std::vector<EP>& chil
     Proxy::NumberP product = nF.one();
     for (unsigned int i = 0; i < children.size(); i++)
     {
-        if (eID(children[i]) == Expression::literal)
+        if (eID(children[i]) == Expressions::ID::literal)
         {
             if (getLiteralNumber(children[i]).isZero())
                 return children[i];
@@ -541,29 +541,29 @@ EP NumberReducerBasic::multiply(const Multiply& exp, const std::vector<EP>& chil
 }
 EP NumberReducerBasic::negate(const Negate& exp, const std::vector<EP>& children)
 {
-    if (eID(children[0]) == Expression::literal)
+    if (eID(children[0]) == Expressions::ID::literal)
         if (getLiteralNumber(children[0]).isZero())
             return children[0];
     return Restructurer::negate(exp,children);
 }
 EP NumberReducerBasic::power(const Power& exp, const std::vector<EP>& children)
 {
-    if (eID(children[1]) == Expression::literal)
+    if (eID(children[1]) == Expressions::ID::literal)
     {
         if (getLiteralNumber(children[1]).isZero())
             return eB.literal(nF.one());
         if (getLiteralNumber(children[1]).isOne())
             return children[0];
     }
-    if (eID(children[0]) == Expression::literal)
+    if (eID(children[0]) == Expressions::ID::literal)
         if (getLiteralNumber(children[0]).isZero() || getLiteralNumber(children[0]).isOne())
             return children[0];
 
     EP exponent = children[1];
-    if (eID(exponent) == Expression::negate)
+    if (eID(exponent) == Expressions::ID::negate)
         exponent = exponent->getChild(0);
 
-    if (eID(children[0]) == Expression::literal && eID(exponent) == Expression::literal)
+    if (eID(children[0]) == Expressions::ID::literal && eID(exponent) == Expressions::ID::literal)
     {
         Proxy::NumberP baseNum = getLiteralNumber(children[0]);
         Proxy::NumberP expNum  = getLiteralNumber(exponent);
@@ -577,7 +577,7 @@ EP NumberReducerBasic::power(const Power& exp, const std::vector<EP>& children)
         baseNum.roundUsingMode(Number::RoundClosest);
 
         EP result = eB.literal(baseNum);
-        if (eID(children[1]) == Expression::negate)
+        if (eID(children[1]) == Expressions::ID::negate)
         {
             result = eB.divide(eB.literal(nF.one()), result);
             imgExpNum.negate();

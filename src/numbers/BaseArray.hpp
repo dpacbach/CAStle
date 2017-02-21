@@ -1,3 +1,6 @@
+// Consider using the SmallVector idea from:
+// https://youtu.be/vElZc6zSIXM?list=PLHTh1InhhwT7J5jl4vAhO1WvGHUUFgUQH
+
 #pragma once
 
 #include <iostream>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Expression.hpp"
-#include "AllBasicFwd.hpp"
+#include "exprfwd.hpp"
 
 namespace DS          {
 namespace CAS         {
@@ -17,7 +17,7 @@ public:
 
     virtual void reset(void) {}
 
-    virtual bool visitExpression(const Expression::Ptr); // default visits children then node
+    virtual bool visitExpression(ExprConstSP); // default visits children then node
 
     virtual bool visitAdd(const Add&)                = 0;
     virtual bool visitDivide(const Divide&)          = 0;

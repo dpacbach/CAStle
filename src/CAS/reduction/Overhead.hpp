@@ -7,7 +7,7 @@ namespace  Visitors      {
 namespace  Restructurers {
 namespace  Reduction     {
 
-typedef    Expression::Ptr      EP;
+typedef    ExprConstSP EP;
 
 #define    CSTR(a)              public: a(std::shared_ptr<Numbers::NumberFactory> _nFactory, \
                                 std::shared_ptr<Expressions::Builder> _eBuilder) \

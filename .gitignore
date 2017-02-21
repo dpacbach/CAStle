@@ -31,4 +31,5 @@
 .location
 src/castle
 bin-*
+.lib-*
 /Makefile

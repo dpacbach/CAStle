@@ -1,5 +1,4 @@
 #include "Composite.hpp"
-#include "AllBasic.hpp"
 
 namespace DS            {
 namespace CAS           {
@@ -7,11 +6,11 @@ namespace Expressions   {
 namespace Visitors      {
 namespace Restructurers {
 
-bool Composite::visitExpression(const Expression::Ptr exp)
+bool Composite::visitExpression(ExprConstSP exp)
 {
     if (children.size() == 0)
         return false;
-    Expression::Ptr result;
+    ExprConstSP result;
     if (!children[0]->visitExpression(exp))
         return false;
     result = children[0]->result();

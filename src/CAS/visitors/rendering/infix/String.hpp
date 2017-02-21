@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "Infix.hpp"
+#include "InfixRender.hpp"
 
 namespace DS          {
 namespace CAS         {

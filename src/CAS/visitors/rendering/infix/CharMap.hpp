@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <memory>
 #include "matrix/Matrix.hpp"
-#include "Infix.hpp"
+#include "InfixRender.hpp"
 
 namespace DS          {
 namespace CAS         {

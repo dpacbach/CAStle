@@ -1,5 +1,5 @@
 #include "Substitution.hpp"
-#include "AllBasic.hpp"
+#include "exprs.hpp"
 
 namespace DS            {
 namespace CAS           {
@@ -7,12 +7,12 @@ namespace Expressions   {
 namespace Visitors      {
 namespace Restructurers {
 
-Expression::Ptr Substitution::symbol(const Symbol& exp, const std::vector<Expression::Ptr>& children)
+ExprConstSP Substitution::symbol(const Symbol& exp, const std::vector<ExprConstSP>& children)
 {
     if (exp.numberOfChildren())
         return Visitors::Restructurer::symbol(exp, children);
 
-    std::map<std::string, Expression::Ptr>::const_iterator it = dictionary.find(exp.getName());
+    std::map<std::string, ExprConstSP>::const_iterator it = dictionary.find(exp.getName());
 
     if (it == dictionary.end())
         return Visitors::Restructurer::symbol(exp, children);

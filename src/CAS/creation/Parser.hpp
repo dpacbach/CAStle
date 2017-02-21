@@ -36,15 +36,15 @@ public:
            std::shared_ptr<Numbers::NumberFormatter>, std::shared_ptr<Tokens::Tokenizer>);
     virtual ~Parser() {}
 
-    Expression::Ptr parse(const std::string&);
-    Expression::Ptr operator() (const std::string& aString) { return parse(aString); }
+    ExprConstSP parse(const std::string&);
+    ExprConstSP operator() (const std::string& aString) { return parse(aString); }
 
     std::string::const_iterator getStopLocation(void) const { return stopLocation; }
 
 protected:
     virtual void buildScanners(std::vector<Tokens::Scanner::Ptr>&, std::shared_ptr<Tokens::ScannerBuilder>) = 0;
     virtual bool parseTokens(const std::vector<Token>&, std::vector<Command>&) = 0;
-    virtual Expression::Ptr buildExpression(const std::vector<Command>&);
+    virtual ExprConstSP buildExpression(const std::vector<Command>&);
 
     std::shared_ptr<Expressions::Builder>     eBuilder;
     std::shared_ptr<Numbers::NumberFormatter> nFormatter;

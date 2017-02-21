@@ -1,5 +1,5 @@
 #include "ASCIITree.hpp"
-#include "AllBasic.hpp"
+#include "exprs.hpp"
 
 namespace DS          {
 namespace CAS         {
@@ -9,7 +9,7 @@ namespace Render      {
 
 void prependSpaces(vector<string>& vec) { }
 
-bool ASCIITree::handleNode(const string& name, const Expression& exp)
+bool ASCIITree::handleNode(const string& name, const Expr& exp)
 {
     string padding;
     for (unsigned int k = 0; k < name.length()/2; k++)
@@ -66,7 +66,7 @@ bool ASCIITree::visitAdd(const Add& exp)
     for (unsigned int i = 0; i < exp.numberOfChildren(); i++)
     {
         Sign sign = exp.getSignForChild(i);
-        if (sign == n)
+        if (sign == Sign::n)
         {
             foundNegative = true;
             signs += "-";

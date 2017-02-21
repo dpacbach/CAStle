@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Renderer.hpp"
-#include "AllBasic.hpp"
+#include "exprs.hpp"
 
 namespace DS          {
 namespace CAS         {
@@ -49,12 +49,12 @@ bool Infix<T>::visitAdd(const Add& exp)
     for (unsigned int currentChild = nc-1; (currentChild+1) >= 1; currentChild--)
     {
         resultLeft = getPop(this->childResults);
-        if (exp.getSignForChild(currentChild) == Expressions::n &&
-            exp.getChild(currentChild)->id()  == Expression::add)
+        if (exp.getSignForChild(currentChild) == Expressions::Sign::n &&
+            exp.getChild(currentChild)->id()  == ID::add)
             resultLeft = renderParenthesis(resultLeft);
         if (currentChild != nc-1)
         {
-            if (exp.getSignForChild(currentChild+1) == Expressions::p)
+            if (exp.getSignForChild(currentChild+1) == Expressions::Sign::p)
                 resultRight = renderBinaryOp("+", resultLeft, resultRight, true);
             else
                 resultRight = renderBinaryOp("-", resultLeft, resultRight, true);
@@ -62,7 +62,7 @@ bool Infix<T>::visitAdd(const Add& exp)
         else
             resultRight = resultLeft;
     }
-    if (exp.getSignForChild(0) == Expressions::n)
+    if (exp.getSignForChild(0) == Expressions::Sign::n)
         resultRight = renderUnaryOp("-", resultRight, false);
 
     this->childResults.push(resultRight);
@@ -75,12 +75,12 @@ bool Infix<T>::visitDivide(const Divide& exp)
     T numerator = getPop(this->childResults);
     if (!noParenthesisInDivision())
     {
-        Expression::ID numID = exp.getChild(0)->id();
-        Expression::ID denID = exp.getChild(1)->id();
-        if (numID == Expression::add)
+        Expressions::ID numID = exp.getChild(0)->id();
+        Expressions::ID denID = exp.getChild(1)->id();
+        if (numID == Expressions::ID::add)
             numerator = renderParenthesis(numerator);
-        if (denID == Expression::add || denID == Expression::divide ||
-            denID == Expression::modulus || denID == Expression::multiply)
+        if (denID == Expressions::ID::add || denID == Expressions::ID::divide ||
+            denID == Expressions::ID::modulus || denID == Expressions::ID::multiply)
             denominator = renderParenthesis(denominator);
     }
     this->childResults.push(renderFraction(numerator, denominator));
@@ -90,9 +90,9 @@ template<typename T>
 bool Infix<T>::visitFactorial(const Factorial& exp)
 {
     T arg = getPop(this->childResults);
-    Expression::ID id = exp.getChild(0)->id();
-    if (id == Expression::add || id == Expression::divide || id == Expression::modulus ||
-        id == Expression::multiply || id == Expression::negate || id == Expression::power)
+    Expressions::ID id = exp.getChild(0)->id();
+    if (id == Expressions::ID::add || id == Expressions::ID::divide || id == Expressions::ID::modulus ||
+        id == Expressions::ID::multiply || id == Expressions::ID::negate || id == Expressions::ID::power)
         arg = renderParenthesis(arg);
     this->childResults.push(renderUnaryOp("!", arg, true));
     return true;
@@ -122,12 +122,12 @@ bool Infix<T>::visitModulus(const Modulus& exp)
     T denominator = getPop(this->childResults);
     T numerator = getPop(this->childResults);
 
-    Expression::ID numID = exp.getChild(0)->id();
-    Expression::ID denID = exp.getChild(1)->id();
-    if (numID == Expression::add || numID == Expression::negate)
+    Expressions::ID numID = exp.getChild(0)->id();
+    Expressions::ID denID = exp.getChild(1)->id();
+    if (numID == Expressions::ID::add || numID == Expressions::ID::negate)
         numerator = renderParenthesis(numerator);
-    if (denID == Expression::add || denID == Expression::divide ||
-        denID == Expression::modulus || denID == Expression::multiply)
+    if (denID == Expressions::ID::add || denID == Expressions::ID::divide ||
+        denID == Expressions::ID::modulus || denID == Expressions::ID::multiply)
         denominator = renderParenthesis(denominator);
 
     this->childResults.push(renderBinaryOp("%", numerator, denominator, false));
@@ -141,8 +141,8 @@ bool Infix<T>::visitMultiply(const Multiply& exp)
     for (unsigned int currentChild = nc-1; (currentChild+1) >= 1; currentChild--)
     {
         resultLeft = getPop(this->childResults);
-        Expression::ID id = exp.getChild(currentChild)->id();
-        if (id == Expression::add || id == Expression::modulus)
+        Expressions::ID id = exp.getChild(currentChild)->id();
+        if (id == Expressions::ID::add || id == Expressions::ID::modulus)
             resultLeft = renderParenthesis(resultLeft);
         if (currentChild != nc-1)
             resultRight = renderBinaryOp("*", resultLeft, resultRight, false);
@@ -156,8 +156,8 @@ template<typename T>
 bool Infix<T>::visitNegate(const Negate& exp)
 {
     T arg = getPop(this->childResults);
-    Expression::ID id = exp.getChild(0)->id();
-    if (id == Expression::add || (id == Expression::divide && parenthesisInNegateDivision()))
+    Expressions::ID id = exp.getChild(0)->id();
+    if (id == Expressions::ID::add || (id == Expressions::ID::divide && parenthesisInNegateDivision()))
         arg = renderParenthesis(arg);
     this->childResults.push(renderUnaryOp("-", arg, false));
     return true;
@@ -168,15 +168,15 @@ bool Infix<T>::visitPower(const Power& exp)
     T exponent = getPop(this->childResults);
     T base = getPop(this->childResults);
 
-    Expression::ID id = exp.getChild(0)->id(); // base
-    if (id == Expression::add || id == Expression::divide || id == Expression::modulus ||
-        id == Expression::multiply || id == Expression::negate || id == Expression::power)
+    Expressions::ID id = exp.getChild(0)->id(); // base
+    if (id == Expressions::ID::add || id == Expressions::ID::divide || id == Expressions::ID::modulus ||
+        id == Expressions::ID::multiply || id == Expressions::ID::negate || id == Expressions::ID::power)
         base = renderParenthesis(base);
     if (!noParenthesisInExponent())
     {
         id = exp.getChild(1)->id();
-        if (id == Expression::add || id == Expression::divide ||
-            id == Expression::modulus || id == Expression::multiply)
+        if (id == Expressions::ID::add || id == Expressions::ID::divide ||
+            id == Expressions::ID::modulus || id == Expressions::ID::multiply)
             exponent = renderParenthesis(exponent);
     }
     this->childResults.push(renderSuperscript(base, exponent));

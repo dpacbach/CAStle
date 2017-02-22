@@ -156,7 +156,7 @@ class Symbol: public DS::CAS::Expressions::Expr
 public:
     Symbol(const std::string& _name) : name(_name) {}
     Symbol(const std::string& _name, const std::vector<ExprConstSP>& _children)
-        : Expr( children ), name(_name) {}
+        : Expr( _children ), name(_name) {}
 
     virtual ~Symbol() {}
 

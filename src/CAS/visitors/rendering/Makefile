@@ -1,6 +1,5 @@
 ifndef root
     include $(dir $(lastword $(MAKEFILE_LIST)))../Makefile
-    $(call set_default_goal,CASVISITORSRENDERING)
 else
     $(call make_so,CASVISITORSRENDERING,castlecasvisitorsrendering)
 

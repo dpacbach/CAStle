@@ -1,6 +1,5 @@
 ifndef root
     include $(dir $(lastword $(MAKEFILE_LIST)))../Makefile
-    $(call set_default_goal,CLI)
 else
     # Must enter in order of dependencies.
     locations := numbers tools CAS interface

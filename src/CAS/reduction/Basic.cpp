@@ -342,7 +342,7 @@ EP Negatives::add(const Add& exp, const std::vector<EP>& children)
     }
     return eB.negate(eB.add(newTerms, std::vector<Sign>(newSigns.size(), Sign::p)));
 }
-EP Negatives::divide(const Divide& exp, const std::vector<EP>& children)
+EP Negatives::divide(const Divide&, const std::vector<EP>& children)
 {
     bool negate = false;
     EP newNum = children[0];
@@ -362,7 +362,7 @@ EP Negatives::divide(const Divide& exp, const std::vector<EP>& children)
         result = eB.negate(result);
     return result;
 }
-EP Negatives::multiply(const Multiply& exp, const std::vector<EP>& children)
+EP Negatives::multiply(const Multiply&, const std::vector<EP>& children)
 {
     bool negativeSign = false;
     std::vector<EP> newChildren;
@@ -380,7 +380,7 @@ EP Negatives::multiply(const Multiply& exp, const std::vector<EP>& children)
         return eB.negate(eB.multiply(newChildren));
     return eB.multiply(newChildren);
 }
-EP Negatives::power(const Power& exp, const std::vector<EP>& children)
+EP Negatives::power(const Power&, const std::vector<EP>& children)
 {
     // if the base has a negate in front of it and the exponent is a real integer then
     // the negative will be factored out
@@ -520,7 +520,7 @@ EP NumberReducerBasic::divide(const Divide& exp, const std::vector<EP>& children
 
     return Restructurer::divide(exp,children);
 }
-EP NumberReducerBasic::multiply(const Multiply& exp, const std::vector<EP>& children)
+EP NumberReducerBasic::multiply(const Multiply&, const std::vector<EP>& children)
 {
     std::vector<EP> newFactors;
     Proxy::NumberP product = nF.one();

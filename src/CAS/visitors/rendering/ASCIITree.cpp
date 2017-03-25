@@ -7,7 +7,7 @@ namespace Expressions {
 namespace Visitors    {
 namespace Render      {
 
-void prependSpaces(vector<string>& vec) { }
+void prependSpaces(vector<string>&) { }
 
 bool ASCIITree::handleNode(const string& name, const Expr& exp)
 {

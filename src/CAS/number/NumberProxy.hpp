@@ -12,6 +12,7 @@ class NumberProxy : public Number {
 public:
     // NumberProxy owns the number that you give it and will free on destruction
     NumberProxy(const NumberProxy& aNumberProxy) // need this otherwise compiler generates a default version
+        : Number()
     {
         number = aNumberProxy.clone();
     }

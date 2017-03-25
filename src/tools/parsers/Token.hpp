@@ -16,7 +16,7 @@ public:
     Token& operator= (const Token& _token) { tokenString = _token.tokenString; id = _token.id; return *this; }
 
     const string& getString(void) const { return tokenString; }
-    const int getId(void) const { return id; }
+    int getId(void) const { return id; }
 
 protected:
     string tokenString;

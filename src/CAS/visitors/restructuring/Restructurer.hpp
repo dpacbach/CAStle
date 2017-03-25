@@ -97,31 +97,31 @@ protected:
     {
         return eBuilder->add(children, exp.getSignVector());
     }
-    virtual ExprConstSP divide(const Divide& exp, const std::vector<ExprConstSP>& children)
+    virtual ExprConstSP divide(const Divide&, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()("/",children);
     }
-    virtual ExprConstSP factorial(const Factorial& exp, const std::vector<ExprConstSP>& children)
+    virtual ExprConstSP factorial(const Factorial&, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()("!",children);
     }
-    virtual ExprConstSP literal(const Literal& exp, const std::vector<ExprConstSP>& children)
+    virtual ExprConstSP literal(const Literal& exp, const std::vector<ExprConstSP>&)
     {
         return eBuilder->literal(exp.getNumber());
     }
-    virtual ExprConstSP modulus(const Modulus& exp, const std::vector<ExprConstSP>& children)
+    virtual ExprConstSP modulus(const Modulus&, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()("%",children);
     }
-    virtual ExprConstSP multiply(const Multiply& exp, const std::vector<ExprConstSP>& children)
+    virtual ExprConstSP multiply(const Multiply&, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()("*",children);
     }
-    virtual ExprConstSP negate(const Negate& exp, const std::vector<ExprConstSP>& children)
+    virtual ExprConstSP negate(const Negate&, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()("ng",children);
     }
-    virtual ExprConstSP power(const Power& exp, const std::vector<ExprConstSP>& children)
+    virtual ExprConstSP power(const Power&, const std::vector<ExprConstSP>& children)
     {
         return eBuilder->operator()("^",children);
     }

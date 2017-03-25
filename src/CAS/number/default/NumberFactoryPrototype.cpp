@@ -8,6 +8,7 @@ namespace CAS {
 namespace Numbers {
 
 NumberFactoryPrototype::NumberFactoryPrototype(const NumberFactoryPrototype& factory)
+    : NumberFactory()
 {
     prototype = factory.prototype->create();
 }

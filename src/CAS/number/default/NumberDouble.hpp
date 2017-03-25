@@ -17,7 +17,7 @@ class NumberDouble : public Number
 public:
     NumberDouble() {}
     NumberDouble(const T& _real, const T& _imaginary = 0) : realPart(_real), imaginaryPart(_imaginary) { }
-    NumberDouble(const NumberDouble<T>& number) : realPart(number.realPart), imaginaryPart(number.imaginaryPart) { }
+    NumberDouble(const NumberDouble<T>& number) : Number(), realPart(number.realPart), imaginaryPart(number.imaginaryPart) { }
 
     virtual ~NumberDouble() { }
 

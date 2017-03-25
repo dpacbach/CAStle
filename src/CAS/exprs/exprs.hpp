@@ -30,8 +30,6 @@ public:
 
     virtual bool acceptVisitor( Visitor& ) const;
 
-    virtual SignedExprVec const& getPairVector() const;
-
     Sign getSignForChild( size_t ) const;
     std::vector<Sign> const& getSignVector() const;
 

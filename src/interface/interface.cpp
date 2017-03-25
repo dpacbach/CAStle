@@ -117,10 +117,10 @@ struct Rendered {
     { }
     std::string one_line;
     std::vector<std::string> grid;
-    Rendered(Rendered const& rendered) {
+    Rendered(Rendered const&) {
         throw std::logic_error("Inside Rendered copy constructor!");
     }
-    Rendered const& operator=( Rendered const& rendered ) {
+    Rendered const& operator=( Rendered const& ) {
         throw std::logic_error("Inside Rendered assignment operator!");
     }
 };

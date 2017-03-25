@@ -32,14 +32,6 @@ std::vector<Sign> const& Add::getSignVector(void) const
     return signs;
 }
 
-Expressions::Add::SignedExprVec const& Add::getPairVector(void) const
-{
-    SignedExprVec res; // reserve?
-    for( size_t i = 0; i < children.size(); ++i )
-        res.push_back( make_pair( signs[i], children[i] ) );
-    return res;
-}
-
 bool Divide::acceptVisitor(Visitor& visitor) const
 {
     return visitor.visitDivide(*this);

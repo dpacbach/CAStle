@@ -37,7 +37,7 @@ bool NumEval::visitAdd(const Add& exp)
     childResults.push(sum);
     return true;
 }
-bool NumEval::visitDivide(const Divide& exp)
+bool NumEval::visitDivide(const Divide&)
 {
     NumberP right = getPop(childResults);
     NumberP left  = getPop(childResults);
@@ -45,7 +45,7 @@ bool NumEval::visitDivide(const Divide& exp)
     childResults.push(left);
     return true;
 }
-bool NumEval::visitFactorial(const Factorial& exp)
+bool NumEval::visitFactorial(const Factorial&)
 {
     throw std::invalid_argument("NumEval::visitFactorial not implemented");
     return true;
@@ -55,7 +55,7 @@ bool NumEval::visitLiteral(const Literal& exp)
     childResults.push(exp.getNumber());
     return true;
 }
-bool NumEval::visitModulus(const Modulus& exp)
+bool NumEval::visitModulus(const Modulus&)
 {
     throw std::invalid_argument("NumEval::visitModulus not implemented");
     return true;
@@ -72,14 +72,14 @@ bool NumEval::visitMultiply(const Multiply& exp)
     childResults.push(product);
     return true;
 }
-bool NumEval::visitNegate(const Negate& exp)
+bool NumEval::visitNegate(const Negate&)
 {
     NumberP result = getPop(childResults);
     result.negate();
     childResults.push(result);
     return true;
 }
-bool NumEval::visitPower(const Power& exp)
+bool NumEval::visitPower(const Power&)
 {
     NumberP exponent = getPop(childResults);
     NumberP base = getPop(childResults);
@@ -87,7 +87,7 @@ bool NumEval::visitPower(const Power& exp)
     childResults.push(base);
     return true;
 }
-bool NumEval::visitSymbol(const Symbol& exp)
+bool NumEval::visitSymbol(const Symbol&)
 {
     return false;
 }

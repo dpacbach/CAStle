@@ -51,7 +51,7 @@ ostream& operator<< (ostream& out, ExprConstSP);
 // Configuration
 // ===============================================================
 
-const int sigFigs = 100;
+const int sigFigs = 30;
 typedef DS::Numbers::Float                        FloatType;
 typedef CAS::Numbers::NumberDouble<FloatType>     NumberImp;
 

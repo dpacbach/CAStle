@@ -175,8 +175,9 @@ bool Infix<T>::visitPower(const Power& exp)
     if (!noParenthesisInExponent())
     {
         id = exp.getChild(1)->id();
-        if (id == Expressions::ID::add || id == Expressions::ID::divide ||
-            id == Expressions::ID::modulus || id == Expressions::ID::multiply)
+        if (id == Expressions::ID::add     || id == Expressions::ID::divide   ||
+            id == Expressions::ID::modulus || id == Expressions::ID::multiply ||
+            id == Expressions::ID::negate)
             exponent = renderParenthesis(exponent);
     }
     this->childResults.push(renderSuperscript(base, exponent));

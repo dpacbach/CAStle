@@ -67,7 +67,7 @@ IFACE.deps := NBRS                       \
 #LIB.deps  := LIB_INT
 
 # This is the location holding the main runnable program
-#MAIN_PROGRAM := CMD
+main_is := CLI
 
 ################################
 $(call enter,src)

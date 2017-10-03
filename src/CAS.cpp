@@ -51,6 +51,7 @@ ostream& operator<< (ostream& out, ExprConstSP);
 
 //== CAS Machinery =====================================================
 
+int const columns = 65;
 const int sigFigs = 100;
 typedef DS::Numbers::Float                        FloatType;
 typedef CAS::Numbers::NumberDouble<FloatType>     NumberImp;
@@ -186,7 +187,7 @@ int main()
         logger.visitExpression(exp);
         std::vector<std::string> strings = map.result().vectorOfStrings();
         for (std::vector<std::string>::const_iterator it = strings.begin(); it != strings.end(); ++it)
-            cout << endl << setw(176) << *it;
+            cout << endl << setw(columns) << *it;
         /*
         cout << endl;
         strings = logger.result();
@@ -237,16 +238,16 @@ int main()
                 if (imaginaryPart == "0")
                 {
                     std::string value = "~ " + realPart;
-                    cout << setw(176) << value;
+                    cout << setw(columns) << value;
                 }
                 else if (realPart == "0")
                 {
                     std::string value = "~ " + imaginaryPart;
-                    cout << setw(176) << value;
+                    cout << setw(columns) << value;
                 }
                 else
                 {
-                    if (realPart.length() + imaginaryPart.length() + 10 > 176)
+                    if (realPart.length() + imaginaryPart.length() + 10 > columns)
                     {
                         std::string signString = "";
                         result.exchangeRealAndImaginary();
@@ -254,9 +255,9 @@ int main()
                         if (result.isPositiveReal())
                             signString = "+";
                         std::string value = "~ " + realPart;
-                        cout << setw(176) << value;
+                        cout << setw(columns) << value;
                         value = signString + imaginaryPart;
-                        cout << endl << setw(176) << value;
+                        cout << endl << setw(columns) << value;
                     }
                     else
                     {
@@ -266,7 +267,7 @@ int main()
                         if (result.isPositiveReal())
                             signString = "+";
                         std::string value = "~ " + realPart + signString + imaginaryPart;
-                        cout << setw(176) << value;
+                        cout << setw(columns) << value;
                     }
                 }
             }
@@ -275,7 +276,7 @@ int main()
         //    cout << setw(120) << "(Can't Evaluate)";
 
         cout << endl;
-        for (unsigned int i = 0; i < 176; i++)
+        for (unsigned int i = 0; i < columns; i++)
             cout << "_";
         cout << endl;
 

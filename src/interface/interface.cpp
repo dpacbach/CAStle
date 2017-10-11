@@ -17,7 +17,7 @@
 #include "String.hpp"
 #include "CharMap.hpp"
 #include "ScannerBuilder.hpp"
-#include "Simple.hpp"
+#include "DefaultParsers.hpp"
 #include "Tokenizer.hpp"
 #include "Token.hpp"
 #include "NumberFactory.hpp"

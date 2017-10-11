@@ -15,7 +15,6 @@ endif
 # Dependency info
 
 PARSERS.deps                    :=  TOOLS
-PARSERSDEFAULT.deps             :=  PARSERS
 CASNUMBER.deps                  :=  PARSERS CASUTILS
 CASNUMBERDEFAULT.deps           :=  CASNUMBER
 CASEXPR.deps                    :=  CASNUMBER
@@ -30,7 +29,6 @@ CASREDUCTION.deps               :=  CASVISITORSRESTRUCTURING
 CLI.deps   := NBRS                       \
               CASNUMBER                  \
               CASNUMBERDEFAULT           \
-              PARSERSDEFAULT             \
               CASREDUCTION               \
               CASVISITORSNUMEVAL         \
               CASVISITORSRESTRUCTURING   \
@@ -45,7 +43,6 @@ CLI.deps   := NBRS                       \
 IFACE.deps := NBRS                       \
               CASNUMBER                  \
               CASNUMBERDEFAULT           \
-              PARSERSDEFAULT             \
               CASREDUCTION               \
               CASVISITORSNUMEVAL         \
               CASVISITORSRESTRUCTURING   \

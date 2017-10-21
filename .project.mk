@@ -1,4 +1,4 @@
-CXXFLAGS += -std=c++1y
+CXXFLAGS += -std=c++1z
 
 GPLUSPLUS ?= /usr/bin/g++
 

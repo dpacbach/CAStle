@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdexcept>
-#include "Postfix.hpp"
+
+#include "postfix-parser.hpp"
 #include "ScannerBuilder.hpp"
 
 namespace DS          {

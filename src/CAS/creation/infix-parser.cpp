@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include <stack>
-#include "InfixParse.hpp"
+
+#include "infix-parser.hpp"
 #include "ScannerBuilder.hpp"
 
 namespace DS          {

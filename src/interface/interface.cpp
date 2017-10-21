@@ -28,7 +28,7 @@
 #include "NumberDouble.hpp"
 #include "Standard.hpp"
 #include "Parser.hpp"
-#include "InfixParse.hpp"
+#include "infix-parser.hpp"
 #include "InfixRender.hpp"
 #include "NumEval.hpp"
 

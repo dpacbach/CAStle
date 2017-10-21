@@ -20,7 +20,6 @@ CASEXPR.deps                    :=  CASNUMBER
 CASCREATION.deps                :=  CASEXPR
 CASVISITORSNUMEVAL.deps         :=  CASEXPR
 CASVISITORSRENDERING.deps       :=  CASEXPR
-CASVISITORSRENDERINGINFIX.deps  :=  CASVISITORSRENDERING
 CASVISITORSRESTRUCTURING.deps   :=  CASEXPR
 CASREDUCTION.deps               :=  CASVISITORSRESTRUCTURING
 
@@ -29,7 +28,6 @@ CLI.deps   := NBRS                       \
               CASREDUCTION               \
               CASVISITORSNUMEVAL         \
               CASVISITORSRESTRUCTURING   \
-              CASVISITORSRENDERINGINFIX  \
               CASCREATION                \
               CASEXPR                    \
               PARSERS                    \
@@ -41,7 +39,6 @@ IFACE.deps := NBRS                       \
               CASREDUCTION               \
               CASVISITORSNUMEVAL         \
               CASVISITORSRESTRUCTURING   \
-              CASVISITORSRENDERINGINFIX  \
               CASCREATION                \
               CASEXPR                    \
               PARSERS                    \

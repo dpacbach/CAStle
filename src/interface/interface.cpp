@@ -27,7 +27,7 @@
 #include "NumberProxy.hpp"
 #include "NumberDouble.hpp"
 #include "Standard.hpp"
-#include "Parser.hpp"
+#include "parser.hpp"
 #include "infix-parser.hpp"
 #include "InfixRender.hpp"
 #include "NumEval.hpp"

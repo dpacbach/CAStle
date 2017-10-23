@@ -17,7 +17,6 @@ endif
 PARSERS.deps                    :=  TOOLS
 CASNUMBER.deps                  :=  PARSERS CASUTILS
 CASEXPR.deps                    :=  CASNUMBER
-CASVISITORSNUMEVAL.deps         :=  CASEXPR
 CASVISITORSRENDERING.deps       :=  CASEXPR
 CASVISITORSRESTRUCTURING.deps   :=  CASEXPR
 CASREDUCTION.deps               :=  CASVISITORSRESTRUCTURING
@@ -25,7 +24,6 @@ CASREDUCTION.deps               :=  CASVISITORSRESTRUCTURING
 CLI.deps   := NBRS                       \
               CASNUMBER                  \
               CASREDUCTION               \
-              CASVISITORSNUMEVAL         \
               CASVISITORSRESTRUCTURING   \
               CASEXPR                    \
               PARSERS                    \
@@ -35,7 +33,6 @@ CLI.deps   := NBRS                       \
 IFACE.deps := NBRS                       \
               CASNUMBER                  \
               CASREDUCTION               \
-              CASVISITORSNUMEVAL         \
               CASVISITORSRESTRUCTURING   \
               CASEXPR                    \
               PARSERS                    \

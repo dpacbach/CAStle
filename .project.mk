@@ -14,10 +14,10 @@ endif
 ###############################################################################
 # Dependency info
 
-PARSERS.deps          := TOOLS
+PARSERS.deps          := TOOLS UTILS
 CASNUMBER.deps        := PARSERS UTILS
 CASEXPR.deps          := CASNUMBER
-CASRENDERING.deps     := CASEXPR
+CASRENDERING.deps     := CASEXPR UTILS
 CASREDUCTION.deps     := CASEXPR
 
 CLI.deps   := NBRS             \
@@ -25,7 +25,6 @@ CLI.deps   := NBRS             \
               CASREDUCTION     \
               CASEXPR          \
               PARSERS          \
-              CASEXPR          \
               CASRENDERING
 
 IFACE.deps := NBRS             \
@@ -33,7 +32,6 @@ IFACE.deps := NBRS             \
               CASREDUCTION     \
               CASEXPR          \
               PARSERS          \
-              CASEXPR          \
               CASRENDERING
 
 #LIB.deps  := LIB_INT

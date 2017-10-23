@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 #include <memory>
-#include "matrix/Matrix.hpp"
+#include "Matrix.hpp"
 #include "InfixRender.hpp"
 
 namespace DS          {

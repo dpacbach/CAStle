@@ -3,6 +3,6 @@ ifndef root
 else
     $(call set_location,TOOLS)
     # In general, must enter in order of dependencies.
-    locations := matrix parsers
+    locations := parsers
     $(call enter_all,$(locations))
 endif

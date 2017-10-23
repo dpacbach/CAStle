@@ -18,13 +18,11 @@ PARSERS.deps          := TOOLS
 CASNUMBER.deps        := PARSERS UTILS
 CASEXPR.deps          := CASNUMBER
 CASRENDERING.deps     := CASEXPR
-CASRESTRUCTURING.deps := CASEXPR
-CASREDUCTION.deps     := CASRESTRUCTURING
+CASREDUCTION.deps     := CASEXPR
 
 CLI.deps   := NBRS             \
               CASNUMBER        \
               CASREDUCTION     \
-              CASRESTRUCTURING \
               CASEXPR          \
               PARSERS          \
               CASEXPR          \
@@ -33,7 +31,6 @@ CLI.deps   := NBRS             \
 IFACE.deps := NBRS             \
               CASNUMBER        \
               CASREDUCTION     \
-              CASRESTRUCTURING \
               CASEXPR          \
               PARSERS          \
               CASEXPR          \

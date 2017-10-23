@@ -14,7 +14,7 @@ endif
 ###############################################################################
 # Dependency info
 
-PARSERS.deps          := TOOLS UTILS
+PARSERS.deps          := UTILS
 CASNUMBER.deps        := PARSERS UTILS
 CASEXPR.deps          := CASNUMBER
 CASRENDERING.deps     := CASEXPR UTILS

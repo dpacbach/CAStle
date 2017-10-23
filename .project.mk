@@ -14,30 +14,30 @@ endif
 ###############################################################################
 # Dependency info
 
-PARSERS.deps                    :=  TOOLS
-CASNUMBER.deps                  :=  PARSERS UTILS
-CASEXPR.deps                    :=  CASNUMBER
-CASVISITORSRENDERING.deps       :=  CASEXPR
-CASVISITORSRESTRUCTURING.deps   :=  CASEXPR
-CASREDUCTION.deps               :=  CASVISITORSRESTRUCTURING
+PARSERS.deps          := TOOLS
+CASNUMBER.deps        := PARSERS UTILS
+CASEXPR.deps          := CASNUMBER
+CASRENDERING.deps     := CASEXPR
+CASRESTRUCTURING.deps := CASEXPR
+CASREDUCTION.deps     := CASRESTRUCTURING
 
-CLI.deps   := NBRS                       \
-              CASNUMBER                  \
-              CASREDUCTION               \
-              CASVISITORSRESTRUCTURING   \
-              CASEXPR                    \
-              PARSERS                    \
-              CASEXPR                    \
-              CASVISITORSRENDERING
+CLI.deps   := NBRS             \
+              CASNUMBER        \
+              CASREDUCTION     \
+              CASRESTRUCTURING \
+              CASEXPR          \
+              PARSERS          \
+              CASEXPR          \
+              CASRENDERING
 
-IFACE.deps := NBRS                       \
-              CASNUMBER                  \
-              CASREDUCTION               \
-              CASVISITORSRESTRUCTURING   \
-              CASEXPR                    \
-              PARSERS                    \
-              CASEXPR                    \
-              CASVISITORSRENDERING
+IFACE.deps := NBRS             \
+              CASNUMBER        \
+              CASREDUCTION     \
+              CASRESTRUCTURING \
+              CASEXPR          \
+              PARSERS          \
+              CASEXPR          \
+              CASRENDERING
 
 #LIB.deps  := LIB_INT
 

@@ -3,6 +3,6 @@ ifndef root
 else
     $(call set_location,CAS)
     # Must enter in order of dependencies.
-    locations := number expr visitors reduction
+    locations := number expr rendering restructuring reduction
     $(call enter_all,$(locations))
 endif

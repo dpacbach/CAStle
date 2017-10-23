@@ -15,7 +15,7 @@ endif
 # Dependency info
 
 PARSERS.deps                    :=  TOOLS
-CASNUMBER.deps                  :=  PARSERS CASUTILS
+CASNUMBER.deps                  :=  PARSERS UTILS
 CASEXPR.deps                    :=  CASNUMBER
 CASVISITORSRENDERING.deps       :=  CASEXPR
 CASVISITORSRESTRUCTURING.deps   :=  CASEXPR

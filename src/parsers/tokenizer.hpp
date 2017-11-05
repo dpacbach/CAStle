@@ -18,17 +18,15 @@ public:
     tokenizer( tokenizer const& )            = delete;
     tokenizer& operator=( tokenizer const& ) = delete;
 
-    virtual ~tokenizer() {}
+    bool tokenize_priority( string const& source,
+                            vector<scanner::ptr> const& scanners,
+                            vector<token>& destination );
 
-    virtual bool tokenize_priority( string const& source,
-                                    vector<scanner::ptr> const& scanners,
-                                    vector<token>& destination );
-
-    virtual bool tokenize_ordered( string const&               source,
-                                   vector<scanner::ptr> const& scanners,
-                                   vector<bool> const&         optionalFlags,
-                                   vector<token>&              destination,
-                                   bool                        dummies = false );
+    bool tokenize_ordered( string const&               source,
+                           vector<scanner::ptr> const& scanners,
+                           vector<bool> const&         optionalFlags,
+                           vector<token>&              destination,
+                           bool                        dummies = false );
 
     string::const_iterator stop_location() const {
         return m_stop_loc;

@@ -2,67 +2,69 @@
 #include <stdexcept>
 
 #include "postfix-parser.hpp"
-#include "ScannerBuilder.hpp"
+#include "scanner-builder.hpp"
+
+using namespace castle;
 
 namespace DS          {
 namespace CAS         {
 namespace Expressions {
 namespace Parsers     {
 
-Postfix::Postfix(std::shared_ptr<Tokens::ScannerBuilder> _sBuilder, std::shared_ptr<Expressions::Builder> _eBuilder,
-        std::shared_ptr<Numbers::NumberFormatter> _nFormatter, std::shared_ptr<Tokens::Tokenizer> _tokenizer)
+Postfix::Postfix(std::shared_ptr<scanner_builder> _sBuilder, std::shared_ptr<Expressions::Builder> _eBuilder,
+        std::shared_ptr<Numbers::NumberFormatter> _nFormatter, std::shared_ptr<tokenizer> _tokenizer)
      : Parser(_sBuilder, _eBuilder, _nFormatter, _tokenizer)
 {
-    sBuilder->alphaNumString();
-    sBuilder->orCharString("+-/*!^%");
-    sBuilder->orList(2);
+    sBuilder->alpha_num_string();
+    sBuilder->or_char_string("+-/*!^%");
+    sBuilder->or_list(2);
     sBuilder->repeat();
-    Tokens::Scanner::Ptr symbol = sBuilder->pop();
-    Tokens::Scanner::Ptr scnr;
+    scanner::ptr symbol = sBuilder->pop();
+    scanner::ptr scnr;
 
     childNumberScanners.push_back(symbol);
-    sBuilder->charString("(");
+    sBuilder->char_string("(");
     scnr = sBuilder->pop();
     childNumberScanners.push_back(scnr);
-    sBuilder->posInteger();
+    sBuilder->pos_integer();
     scnr = sBuilder->pop();
     childNumberScanners.push_back(scnr);
-    sBuilder->charString(")");
+    sBuilder->char_string(")");
     scnr = sBuilder->pop();
     childNumberScanners.push_back(scnr);
 }
 
-void Postfix::buildScanners(std::vector<Tokens::Scanner::Ptr>& scanners, std::shared_ptr<Tokens::ScannerBuilder> sBuilder)
+void Postfix::buildScanners(std::vector<scanner::ptr>& scanners, std::shared_ptr<scanner_builder> sBuilder)
 {
     sBuilder->spaces();
     scanners.push_back(sBuilder->pop());
 
-    sBuilder->imgScientific();
-    sBuilder->imgFloat();
-    sBuilder->floatScientific();
-    sBuilder->floatNumber();
-    sBuilder->orList(4);
+    sBuilder->img_scientific();
+    sBuilder->img_float();
+    sBuilder->float_scientific();
+    sBuilder->float_number();
+    sBuilder->or_list(4);
     scanners.push_back(sBuilder->pop());
 
-    sBuilder->alphaNumString();
-    sBuilder->orCharString("+-/*!^%");
-    sBuilder->orList(2);
+    sBuilder->alpha_num_string();
+    sBuilder->or_char_string("+-/*!^%");
+    sBuilder->or_list(2);
     sBuilder->repeat();
-    Tokens::Scanner::Ptr symbol = sBuilder->pop();
+    scanner::ptr symbol = sBuilder->pop();
 
     sBuilder->push(symbol);
-    sBuilder->pushFlag(false);
-    sBuilder->charString("(");
-    sBuilder->pushFlag(false);
+    sBuilder->push_flag(false);
+    sBuilder->char_string("(");
+    sBuilder->push_flag(false);
     sBuilder->spaces();
-    sBuilder->pushFlag(true);
-    sBuilder->posInteger();
-    sBuilder->pushFlag(false);
+    sBuilder->push_flag(true);
+    sBuilder->pos_integer();
+    sBuilder->push_flag(false);
     sBuilder->spaces();
-    sBuilder->pushFlag(true);
-    sBuilder->charString(")");
-    sBuilder->pushFlag(false);
-    sBuilder->optionalList(6);
+    sBuilder->push_flag(true);
+    sBuilder->char_string(")");
+    sBuilder->push_flag(false);
+    sBuilder->optional_list(6);
     scanners.push_back(sBuilder->pop());
 
     scanners.push_back(symbol);
@@ -70,14 +72,14 @@ void Postfix::buildScanners(std::vector<Tokens::Scanner::Ptr>& scanners, std::sh
 
 unsigned int Postfix::extractNumberOfChildren(std::string& token) // token = abc123def(123)
 {
-    std::vector<Token> tokens;
-    bool success = tokenizer->tokenizeOrdered(token, childNumberScanners, std::vector<bool>(childNumberScanners.size(), false), tokens);
+    std::vector<castle::token> tokens;
+    bool success = m_tokenizer->tokenize_ordered(token, childNumberScanners, std::vector<bool>(childNumberScanners.size(), false), tokens);
     if (!success)
     {
         throw std::logic_error("failure of tokenizer in Postfix::extractNumberOfChildren");
     }
-    token = (tokens[0]).getString();
-    std::string intString = (tokens[2]).getString();
+    token = (tokens[0]).string();
+    std::string intString = (tokens[2]).string();
 
     unsigned int children = atoi(intString.c_str());
 
@@ -94,7 +96,7 @@ unsigned int Postfix::defaultChildrenForSymbol(const std::string& symbol)
     return 0;
 }
 
-bool Postfix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& commands)
+bool Postfix::parseTokens(const std::vector<token>& tokens, std::vector<Command>& commands)
 {
     if (tokens.empty())
         return false;
@@ -102,30 +104,30 @@ bool Postfix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>
     enum { spaces, number, symbolChildren, symbolNoChildren };
     std::string newToken;
     unsigned int numberOfChildren;
-    std::vector<Token>::const_iterator it = tokens.begin();
+    std::vector<token>::const_iterator it = tokens.begin();
 
     if (it != tokens.end())
     {
-        if ((*it).getId() == spaces)
+        if ((*it).id() == spaces)
         {
-            stopLocation += (*it).getString().length();
+            stopLocation += (*it).string().length();
             ++it;
         }
     }
 
     while (it != tokens.end())
     {
-        switch ((*it).getId())
+        switch ((*it).id())
         {
         case number:
-            commands.push_back(Command(Command::literal, (*it).getString(), 0));
+            commands.push_back(Command(Command::literal, (*it).string(), 0));
             break;
         case symbolNoChildren:
-            numberOfChildren = defaultChildrenForSymbol((*it).getString());
-            commands.push_back(Command(Command::symbol, (*it).getString(), numberOfChildren));
+            numberOfChildren = defaultChildrenForSymbol((*it).string());
+            commands.push_back(Command(Command::symbol, (*it).string(), numberOfChildren));
             break;
         case symbolChildren:
-            newToken = (*it).getString();
+            newToken = (*it).string();
             numberOfChildren = extractNumberOfChildren(newToken);
             commands.push_back(Command(Command::symbol, newToken, numberOfChildren));
             break;
@@ -134,16 +136,16 @@ bool Postfix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>
             throw std::invalid_argument("invalid token type in Postfix::parseTokens()");
         }
 
-        stopLocation += (*it).getString().length();
+        stopLocation += (*it).string().length();
         ++it;
         if (it != tokens.end())
         {
-            if ((*it).getId() != spaces)
+            if ((*it).id() != spaces)
             {
                 commands.clear();
                 return false;
             }
-            stopLocation += (*it).getString().length();
+            stopLocation += (*it).string().length();
             ++it;
         }
     }

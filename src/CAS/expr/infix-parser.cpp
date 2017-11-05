@@ -2,44 +2,46 @@
 #include <stack>
 
 #include "infix-parser.hpp"
-#include "ScannerBuilder.hpp"
+#include "scanner-builder.hpp"
+
+using namespace castle;
 
 namespace DS          {
 namespace CAS         {
 namespace Expressions {
 namespace Parsers     {
 
-void Infix::buildScanners(std::vector<Tokens::Scanner::Ptr>& scanners, std::shared_ptr<Tokens::ScannerBuilder> sBuilder)
+void Infix::buildScanners(std::vector<scanner::ptr>& scanners, std::shared_ptr<scanner_builder> sBuilder)
 {
     sBuilder->spaces();
     scanners.push_back(sBuilder->pop());
 
-    sBuilder->orCharString("-");
+    sBuilder->or_char_string("-");
     scanners.push_back(sBuilder->pop());
 
-    sBuilder->orCharString("+*/%^");
+    sBuilder->or_char_string("+*/%^");
     scanners.push_back(sBuilder->pop());
 
-    sBuilder->orCharString("!");
+    sBuilder->or_char_string("!");
     scanners.push_back(sBuilder->pop());
 
-    sBuilder->imgScientific();
-    sBuilder->imgFloat();
-    sBuilder->floatScientific();
-    sBuilder->floatNumber();
-    sBuilder->orList(4);
+    sBuilder->img_scientific();
+    sBuilder->img_float();
+    sBuilder->float_scientific();
+    sBuilder->float_number();
+    sBuilder->or_list(4);
     scanners.push_back(sBuilder->pop());
 
-    sBuilder->charString("(");
+    sBuilder->char_string("(");
     scanners.push_back(sBuilder->pop());
-    sBuilder->charString(")");
+    sBuilder->char_string(")");
     scanners.push_back(sBuilder->pop());
-    sBuilder->charString(",");
+    sBuilder->char_string(",");
     scanners.push_back(sBuilder->pop());
 
-    sBuilder->alphaNumString();
-    sBuilder->orCharString("_");
-    sBuilder->orList(2);
+    sBuilder->alpha_num_string();
+    sBuilder->or_char_string("_");
+    sBuilder->or_list(2);
     scanners.push_back(sBuilder->pop());
 }
 
@@ -82,12 +84,12 @@ bool isLeftAssociative(const std::string& str)
     throw std::invalid_argument("invalid operator in isLeftAssociative()");
 }
 
-bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& commands)
+bool Infix::parseTokens(const std::vector<token>& tokens, std::vector<Command>& commands)
 {
     enum { spaces, minus, binaryOp, factorial, number, leftP, rightP, comma, var };
-    std::stack<Token> operatorStack;
+    std::stack<token> operatorStack;
     std::stack<int> functionArgStack;
-    std::vector<Token>::const_iterator it = tokens.begin();
+    std::vector<token>::const_iterator it = tokens.begin();
     bool lookingForValue = true;
 
       //While there are tokens to be read:
@@ -97,9 +99,9 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
     {
         while (it != tokens.end())
         {
-            if ((*it).getId() == spaces)
+            if ((*it).id() == spaces)
             {
-                stopLocation += (*it).getString().length();
+                stopLocation += (*it).string().length();
                 ++it;
             }
             else
@@ -107,8 +109,8 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
         }
         if (it == tokens.end())
             break;
-        int id = (*it).getId();
-        std::string str = (*it).getString();
+        int id = (*it).id();
+        std::string str = (*it).string();
 
         if (lookingForValue)
         {
@@ -116,7 +118,7 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
             if (id == number)
             {
                 commands.push_back(Command(Command::literal, str, 0));
-                stopLocation += (*it).getString().length();
+                stopLocation += (*it).string().length();
                 ++it;
                 lookingForValue = false;
             }
@@ -127,7 +129,7 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
                 if ((it+1) == tokens.end())
                 {
                     commands.push_back(Command(Command::symbol, str, 0));
-                    stopLocation += (*it).getString().length();
+                    stopLocation += (*it).string().length();
                     ++it;
                     lookingForValue = false;
                 }
@@ -135,10 +137,10 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
                 else
                 {
                     // if next token is not '(' then it's a variable, add it to output
-                    if ((*(it+1)).getId() != leftP)
+                    if ((*(it+1)).id() != leftP)
                     {
                         commands.push_back(Command(Command::symbol, str, 0));
-                        stopLocation += (*it).getString().length();
+                        stopLocation += (*it).string().length();
                         ++it;
                         lookingForValue = false;
                     }
@@ -147,9 +149,9 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
                     {
                         operatorStack.push(*it);
                         operatorStack.push(*(it+1));
-                        stopLocation += (*it).getString().length();
+                        stopLocation += (*it).string().length();
                         ++it;
-                        stopLocation += (*it).getString().length();
+                        stopLocation += (*it).string().length();
                         ++it;
                         functionArgStack.push(1);
                         lookingForValue = true;
@@ -162,9 +164,9 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
                 // remove operators from stack with higher precedence
                 while (!operatorStack.empty())
                 {
-                    Token o2 = operatorStack.top();
-                    int o2Id = o2.getId();
-                    std::string o2Str = o2.getString();
+                    token o2 = operatorStack.top();
+                    int o2Id = o2.id();
+                    std::string o2Str = o2.string();
                     if (o2Id != minus && o2Id != binaryOp && o2Id != factorial)
                         break;
                     int ngPrecedence = getOperatorPrecedence("ng");
@@ -178,9 +180,9 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
                         break;
                 }
                 // add it to stack
-                Token newToken("ng", minus);
+                token newToken("ng", minus);
                 operatorStack.push(newToken);
-                stopLocation += (*it).getString().length();
+                stopLocation += (*it).string().length();
                 ++it;
                 lookingForValue = true;
             }
@@ -188,7 +190,7 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
             else if (id == leftP)
             {
                 operatorStack.push(*it);
-                stopLocation += (*it).getString().length();
+                stopLocation += (*it).string().length();
                 ++it;
                 lookingForValue = true;
             }
@@ -210,9 +212,9 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
             {
                 while (!operatorStack.empty())
                 {
-                    Token o2 = operatorStack.top();
-                    int o2Id = o2.getId();
-                    std::string o2Str = o2.getString();
+                    token o2 = operatorStack.top();
+                    int o2Id = o2.id();
+                    std::string o2Str = o2.string();
                     if (o2Id != minus && o2Id != binaryOp && o2Id != factorial)
                         break;
                     int o1Precedence = getOperatorPrecedence(str);
@@ -227,7 +229,7 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
                 }
                 // add it to stack
                 operatorStack.push(*it);
-                stopLocation += (*it).getString().length();
+                stopLocation += (*it).string().length();
                 ++it;
                 if (id == minus || id == binaryOp)
                     lookingForValue = true;
@@ -246,7 +248,7 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
                     return false;
                 }
                 ++(functionArgStack.top());
-                stopLocation += (*it).getString().length();
+                stopLocation += (*it).string().length();
                 ++it;
                 while (1)
                 {
@@ -255,10 +257,10 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
                         commands.clear();
                         return false;
                     }
-                    Token token = operatorStack.top();
-                    if (token.getString() == "(")
+                    token token = operatorStack.top();
+                    if (token.string() == "(")
                         break;
-                    commands.push_back(Command(Command::symbol, token.getString(), getOperatorChildren(token.getString())));
+                    commands.push_back(Command(Command::symbol, token.string(), getOperatorChildren(token.string())));
                     operatorStack.pop();
                 }
                 lookingForValue = true;
@@ -278,17 +280,17 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
                         commands.clear();
                         return false;
                     }
-                    Token token = operatorStack.top();
-                    if (token.getString() == "(")
+                    token token = operatorStack.top();
+                    if (token.string() == "(")
                         break;
-                    commands.push_back(Command(Command::symbol, token.getString(), getOperatorChildren(token.getString())));
+                    commands.push_back(Command(Command::symbol, token.string(), getOperatorChildren(token.string())));
                     operatorStack.pop();
                 }
                 operatorStack.pop();
                 if (!operatorStack.empty())
                 {
-                    Token token = operatorStack.top();
-                    if (token.getId() == var)
+                    token token = operatorStack.top();
+                    if (token.id() == var)
                     {
                         if (functionArgStack.empty())
                         {
@@ -297,11 +299,11 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
                         }
                         int children = functionArgStack.top();
                         functionArgStack.pop();
-                        commands.push_back(Command(Command::symbol, token.getString(), children));
+                        commands.push_back(Command(Command::symbol, token.string(), children));
                         operatorStack.pop();
                     }
                 }
-                stopLocation += (*it).getString().length();
+                stopLocation += (*it).string().length();
                 ++it;
                 lookingForValue = false;
             }
@@ -325,10 +327,10 @@ bool Infix::parseTokens(const std::vector<Token>& tokens, std::vector<Command>& 
     //        Pop the operator onto the output queue.
     while (!operatorStack.empty())
     {
-        Token token = operatorStack.top();
+        token token = operatorStack.top();
         operatorStack.pop();
-        int id = token.getId();
-        std::string str = token.getString();
+        int id = token.id();
+        std::string str = token.string();
 
         if (id != minus && id != binaryOp && id != factorial)
         {

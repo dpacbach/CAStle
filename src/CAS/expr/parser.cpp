@@ -3,29 +3,31 @@
 #include "parser.hpp"
 #include "Templates.hpp"
 
+using namespace castle;
+
 namespace DS          {
 namespace CAS         {
 namespace Expressions {
 
-Parser::Parser(std::shared_ptr<Tokens::ScannerBuilder> _sBuilder, std::shared_ptr<Expressions::Builder> _eBuilder,
-               std::shared_ptr<Numbers::NumberFormatter> _nFormatter, std::shared_ptr<Tokens::Tokenizer> _tokenizer)
+Parser::Parser(std::shared_ptr<scanner_builder> _sBuilder, std::shared_ptr<Expressions::Builder> _eBuilder,
+               std::shared_ptr<Numbers::NumberFormatter> _nFormatter, std::shared_ptr<tokenizer> _tokenizer)
 {
     eBuilder     = _eBuilder;
     nFormatter     = _nFormatter;
     sBuilder     = _sBuilder;
-    tokenizer     = _tokenizer;
+    m_tokenizer  = _tokenizer;
 }
 
 ExprConstSP Parser::parse(const std::string& source)
 {
     if (scanners.empty())
         buildScanners(scanners, sBuilder);
-    std::vector<Token> tokens;
+    std::vector<token> tokens;
     stopLocation = source.begin();
-    bool success = tokenizer->tokenizePriority(source, scanners, tokens);
+    bool success = m_tokenizer->tokenize_priority(source, scanners, tokens);
     if (!success)
     {
-        stopLocation = tokenizer->getStopLocation();
+        stopLocation = m_tokenizer->stop_location();
         return ExprConstSP();
     }
     std::vector<Command> commands;

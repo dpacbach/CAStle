@@ -7,11 +7,13 @@
 #include "NumberFormatterStandard.hpp"
 #include "NumberDouble.hpp"
 
-#include "Tokenizer.hpp"
-#include "ScannerBuilder.hpp"
+#include "tokenizer.hpp"
+#include "scanner-builder.hpp"
 
-namespace DS {
-namespace CAS {
+using namespace castle;
+
+namespace DS      {
+namespace CAS     {
 namespace Numbers {
 
 using namespace DS::CAS::Numbers::Proxy;
@@ -260,39 +262,39 @@ void NumberFormatterStandard::buildScanners(void)
     sBuilder->spaces();
     optionalFlags.push_back(true);
     scanners.push_back(sBuilder->pop());
-    sBuilder->floatScientific();
-    sBuilder->floatNumber();
-    sBuilder->orList(2);
+    sBuilder->float_scientific();
+    sBuilder->float_number();
+    sBuilder->or_list(2);
     optionalFlags.push_back(false);
     scanners.push_back(sBuilder->pop());
-    sBuilder->charString("i");
+    sBuilder->char_string("i");
     optionalFlags.push_back(true);
     scanners.push_back(sBuilder->pop());
     sBuilder->spaces();
     optionalFlags.push_back(true);
     scanners.push_back(sBuilder->pop());
 
-    sBuilder->floatNumber();
+    sBuilder->float_number();
     realScientificOptionalFlags.push_back(false);
     realScientificScanners.push_back(sBuilder->pop());
-    sBuilder->charString("e");
-    sBuilder->pushFlag(false);
+    sBuilder->char_string("e");
+    sBuilder->push_flag(false);
     sBuilder->integer();
-    sBuilder->pushFlag(false);
-    sBuilder->optionalList(2);
+    sBuilder->push_flag(false);
+    sBuilder->optional_list(2);
     realScientificOptionalFlags.push_back(true);
     realScientificScanners.push_back(sBuilder->pop());
 
-    sBuilder->charString("-");
+    sBuilder->char_string("-");
     realFloatOptionalFlags.push_back(true);
     realFloatScanners.push_back(sBuilder->pop());
-    sBuilder->posInteger();
+    sBuilder->pos_integer();
     realFloatOptionalFlags.push_back(true);
     realFloatScanners.push_back(sBuilder->pop());
-    sBuilder->charString(".");
+    sBuilder->char_string(".");
     realFloatOptionalFlags.push_back(true);
     realFloatScanners.push_back(sBuilder->pop());
-    sBuilder->posInteger();
+    sBuilder->pos_integer();
     realFloatOptionalFlags.push_back(true);
     realFloatScanners.push_back(sBuilder->pop());
 }
@@ -304,13 +306,13 @@ Number* NumberFormatterStandard::format(const string& _number)
     if (scanners.size() == 0)
         buildScanners();
 
-    DS::Tokens::Tokenizer tokenizer;
-    vector<DS::Token> tokens;
-    if (!tokenizer.tokenizeOrdered(_number, scanners, optionalFlags, tokens, true))
+    tokenizer t;
+    vector<token> tokens;
+    if (!t.tokenize_ordered(_number, scanners, optionalFlags, tokens, true))
         return NULL;
 
-    NumberP result = formatRealScientific(tokens[scientific].getString());
-    if (tokens[img].getString() != "")
+    NumberP result = formatRealScientific(tokens[scientific].string());
+    if (tokens[img].string() != "")
         result.multiplyByImaginaryUnit();
 
     return result.clone();
@@ -322,19 +324,19 @@ Numbers::Proxy::NumberP NumberFormatterStandard::formatRealScientific(const stri
     if (realScientificScanners.size() == 0)
         buildScanners();
 
-    DS::Tokens::Tokenizer tokenizer;
-    vector<DS::Token> tokens;
-    if (!tokenizer.tokenizeOrdered(_number, realScientificScanners, realScientificOptionalFlags, tokens, true))
+    tokenizer t;
+    vector<token> tokens;
+    if (!t.tokenize_ordered(_number, realScientificScanners, realScientificOptionalFlags, tokens, true))
         throw invalid_argument("Tokenizer failed in NumberFormatterStandard::formatRealScientific()");
 
-    string numberString = tokens[number].getString();
+    string numberString = tokens[number].string();
 
     NumberP result = formatRealFloat(numberString);
 
-    if (tokens[exp].getString() != "")
+    if (tokens[exp].string() != "")
     {
         NumberP zero = factory->zero(), one = factory->one(), ten = factory->ten();
-        string exponentString(tokens[exp].getString().begin()+1, tokens[exp].getString().end());
+        string exponentString(tokens[exp].string().begin()+1, tokens[exp].string().end());
         NumberP exponent = formatRealInteger(exponentString);
         bool negateFlag = false;
         if (exponent.isLessReals(zero))
@@ -360,26 +362,26 @@ Numbers::Proxy::NumberP NumberFormatterStandard::formatRealFloat(const string& _
     if (realFloatScanners.size() == 0)
         buildScanners();
 
-    DS::Tokens::Tokenizer tokenizer;
-    vector<DS::Token> tokens;
-    if (!tokenizer.tokenizeOrdered(_number, realFloatScanners, realFloatOptionalFlags, tokens, true))
+    tokenizer t;
+    vector<token> tokens;
+    if (!t.tokenize_ordered(_number, realFloatScanners, realFloatOptionalFlags, tokens, true))
         throw invalid_argument("Tokenizer failed in NumberFormatterStandard::formatRealFloat()");
 
     NumberP wholePart = factory->zero(), fracPart = factory->zero();
-    if (tokens[whole].getString() != "")
-        wholePart = formatRealInteger(tokens[whole].getString());
-    if (tokens[fraction].getString() != "")
+    if (tokens[whole].string() != "")
+        wholePart = formatRealInteger(tokens[whole].string());
+    if (tokens[fraction].string() != "")
     {
-        fracPart = formatRealInteger(tokens[fraction].getString());
+        fracPart = formatRealInteger(tokens[fraction].string());
         NumberP one = factory->one(), ten = factory->ten();
         NumberP powerOfTen = one, oneTenth = one/ten;
-        unsigned int numberOfDigits = tokens[fraction].getString().length();
+        unsigned int numberOfDigits = tokens[fraction].string().length();
         for (unsigned int i = 0; i < numberOfDigits; i++)
             powerOfTen *= oneTenth;
         fracPart.multiply(powerOfTen);
     }
     NumberP result = wholePart + fracPart;
-    if (tokens[neg].getString() != "")
+    if (tokens[neg].string() != "")
         result.negate();
     return result;
 }

@@ -5,26 +5,24 @@
 #include <memory>
 
 #include "NumberFormatter.hpp"
-#include "Scanner.hpp"
+#include "scanner.hpp"
+#include "scanner-builder.hpp"
 
 using namespace std;
 
-namespace DS {
-
-namespace Tokens {
-
-class ScannerBuilder;
-
+namespace castle {
+    class scanner_builder;
 }
 
-namespace CAS {
+namespace DS      {
+namespace CAS     {
 namespace Numbers {
 
 class NumberFormatterStandard : public NumberFormatter
 {
 public:
     NumberFormatterStandard(shared_ptr<NumberFactory> _factory,
-                            shared_ptr<DS::Tokens::ScannerBuilder> _sBuilder, unsigned int _sigFigs = 15)
+                            shared_ptr<castle::scanner_builder> _sBuilder, unsigned int _sigFigs = 15)
                             : NumberFormatter(_factory), sBuilder(_sBuilder), maximumSigFigs(_sigFigs) {}
     virtual ~NumberFormatterStandard() { }
 
@@ -35,7 +33,7 @@ public:
     void setSigFigs(unsigned int _sigFigs) { maximumSigFigs = _sigFigs; }
 
 protected:
-    shared_ptr<DS::Tokens::ScannerBuilder> sBuilder;
+    shared_ptr<castle::scanner_builder> sBuilder;
     unsigned int maximumSigFigs;
 
     void buildScanners(void);
@@ -46,12 +44,12 @@ protected:
     string formatRealDecimal(const Number& _number, unsigned int maxSigDigits);
     string formatRealScientific(const Number& _number, unsigned int maxSigDigits);
 
-    vector<DS::Tokens::Scanner::Ptr> scanners;
+    vector<castle::scanner::ptr> scanners;
     vector<bool> optionalFlags;
 
-    vector<DS::Tokens::Scanner::Ptr> realScientificScanners;
+    vector<castle::scanner::ptr> realScientificScanners;
     vector<bool> realScientificOptionalFlags;
-    vector<DS::Tokens::Scanner::Ptr> realFloatScanners;
+    vector<castle::scanner::ptr> realFloatScanners;
     vector<bool> realFloatOptionalFlags;
 };
 

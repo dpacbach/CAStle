@@ -16,10 +16,10 @@
 #include "Basic.hpp"
 #include "String.hpp"
 #include "CharMap.hpp"
-#include "ScannerBuilder.hpp"
-#include "DefaultParsers.hpp"
-#include "Tokenizer.hpp"
-#include "Token.hpp"
+#include "scanner-builder.hpp"
+#include "parsers.hpp"
+#include "tokenizer.hpp"
+#include "token.hpp"
 #include "NumberFactory.hpp"
 #include "NumberFactoryPrototype.hpp"
 #include "NumberFormatter.hpp"
@@ -33,6 +33,8 @@
 #include "NumEval.hpp"
 
 #include "icalcterm/icalcterm.h"
+
+using namespace castle;
 
 using namespace DS;
 using namespace DS::CAS;
@@ -55,8 +57,8 @@ const int sigFigs = 30;
 typedef DS::Numbers::Float                        FloatType;
 typedef CAS::Numbers::NumberDouble<FloatType>     NumberImp;
 
-std::shared_ptr<Tokens::ScannerBuilder> scannerBuilder_ptr  (new Tokens::ScannerBuilders::Simple);
-std::shared_ptr<Tokens::Tokenizer>      tokenizer_ptr       (new Tokens::Tokenizer);
+std::shared_ptr<scanner_builder>        scannerBuilder_ptr  (new scanner_builder);
+std::shared_ptr<tokenizer>              tokenizer_ptr       (new tokenizer);
 std::shared_ptr<NumberFactory>          nFactory_ptr        (new NumberFactoryPrototype(Proxy::NumberP(new NumberImp())));
 std::shared_ptr<NumberFormatter>        nFormatter_ptr      (new NumberFormatterStandard(nFactory_ptr, scannerBuilder_ptr, sigFigs));
 std::shared_ptr<Builder>                eBuilder_ptr        (new Builders::Standard);

@@ -2,13 +2,13 @@
 
 #include <string>
 #include <vector>
-#include "Tokenizer.hpp"
+#include "tokenizer.hpp"
 #include "Builder.hpp"
 #include "NumberFormatter.hpp"
 
-namespace DS { namespace Tokens {
-    class ScannerBuilder;
-} }
+namespace castle {
+    class scanner_builder;
+}
 
 namespace DS          {
 namespace CAS         {
@@ -32,8 +32,8 @@ protected:
         unsigned int numberOfChildren;
     };
 public:
-    Parser(std::shared_ptr<Tokens::ScannerBuilder>, std::shared_ptr<Expressions::Builder>,
-           std::shared_ptr<Numbers::NumberFormatter>, std::shared_ptr<Tokens::Tokenizer>);
+    Parser(std::shared_ptr<castle::scanner_builder>, std::shared_ptr<Expressions::Builder>,
+           std::shared_ptr<Numbers::NumberFormatter>, std::shared_ptr<castle::tokenizer>);
     virtual ~Parser() {}
 
     ExprConstSP parse(const std::string&);
@@ -42,19 +42,19 @@ public:
     std::string::const_iterator getStopLocation(void) const { return stopLocation; }
 
 protected:
-    virtual void buildScanners(std::vector<Tokens::Scanner::Ptr>&, std::shared_ptr<Tokens::ScannerBuilder>) = 0;
-    virtual bool parseTokens(const std::vector<Token>&, std::vector<Command>&) = 0;
+    virtual void buildScanners(std::vector<castle::scanner::ptr>&, std::shared_ptr<castle::scanner_builder>) = 0;
+    virtual bool parseTokens(const std::vector<castle::token>&, std::vector<Command>&) = 0;
     virtual ExprConstSP buildExpression(const std::vector<Command>&);
 
     std::shared_ptr<Expressions::Builder>     eBuilder;
     std::shared_ptr<Numbers::NumberFormatter> nFormatter;
-    std::shared_ptr<Tokens::ScannerBuilder>   sBuilder;
-    std::shared_ptr<Tokens::Tokenizer>        tokenizer;
+    std::shared_ptr<castle::scanner_builder>  sBuilder;
+    std::shared_ptr<castle::tokenizer>        m_tokenizer;
 
     std::string::const_iterator stopLocation;
 
 private:
-    std::vector<Tokens::Scanner::Ptr> scanners;
+    std::vector<castle::scanner::ptr> scanners;
 };
 
 } /* namespace Expressions */

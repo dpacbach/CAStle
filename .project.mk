@@ -1,15 +1,7 @@
 CXXFLAGS += -std=c++1z
 
-GPLUSPLUS ?= /usr/bin/g++
-
-CC  := $(GPLUSPLUS)
-CXX := $(GPLUSPLUS)
-LD  := $(GPLUSPLUS)
-
-ifeq ($(OS),Linux)
-    # On linux let's do a static linkage
-    LDFLAGS += -static-libgcc -static-libstdc++
-endif
+# Enable if you need to
+#STATIC_LIBSTDCXX=
 
 ###############################################################################
 # Dependency info

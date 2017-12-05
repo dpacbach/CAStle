@@ -1,5 +1,5 @@
 ifndef root
     include $(dir $(lastword $(MAKEFILE_LIST)))../Makefile
 else
-    $(call make_so,CASREDUCTION,castlecasreduction)
+    $(call make_ar,CASREDUCTION,castlecasreduction)
 endif

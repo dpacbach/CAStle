@@ -973,7 +973,9 @@ valid_os = Darwin Linux CYGWIN*
 ifeq (Darwin,$(uname))
     OS := OSX
     CFLAGS += -DOS_OSX
+    ARFLAGS := ucrs
     SO_EXT := dylib
+    AR_EXT := a
     bin_platform = osx
     soname_ld_option_prefix = -Wl,-install_name,@loader_path/
     ld_no_undefined =
@@ -983,7 +985,9 @@ else
 ifeq (Linux,$(uname))
     OS := Linux
     CFLAGS += -DOS_LINUX
+    ARFLAGS := Uucrs
     SO_EXT := so
+    AR_EXT := a
     bin_platform = linux64
     soname_ld_option_prefix = -Wl,-soname,
     ld_no_undefined = -Wl,--no-undefined
@@ -993,7 +997,9 @@ else
 ifneq (,$(filter CYGWIN%,$(uname)))
     OS := Windows
     CFLAGS += -DOS_WIN
+    ARFLAGS := Uucrs
     SO_EXT := dll
+    AR_EXT := a
     bin_platform = win64
     LDFLAGS += -static
     ifdef CC
@@ -1029,6 +1035,13 @@ bin_name := bin-$(bin_platform)$(opt-suffix)
 bin_folder := $(root)$(bin_name)
 # General utilities. Make sure that gmsl is included before  this
 # file
+
+# ===============================================================
+# Lists
+#
+# Simply apply a function to the reverse of a list, and  then  re-
+# verse the result back again.
+on_reverse = $(call reverse,$(call $1,$(call reverse,$2)))
 
 # ===============================================================
 # Tuples
@@ -1130,7 +1143,10 @@ relPath =                                          \
 #   PWD: the system's current directory as seen by make
 #   CWD: the folder that make is currently processing
 # This function will return a relative path from  make's  PWD  to
-# the given path.
+# the  given  path.  Note that whenever we reference the PWD vari-
+# able we need to take the realpath in order to resolve  symlinks
+# for the sake of  consistency,  otherwise  this can cause issues
+# later.
 relPWD = $(call relPath,$1,$(realpath $(PWD)))
 # Get the value of CWD relative to make's PWD. 
 relCWD = $(patsubst %//,%/,$(call trailingSlash,$(_relCWD)))
@@ -1156,7 +1172,10 @@ target_path = $(call noDot,$(call normalizeSlashes,$(dir $@)))
 # Get a path relative to the project root
 rel_root = $(call relPath,$1,$(root))
 # Directory from which make was  invoked, relative to the project
-# root. Will be empty if make is invoked from the root.
+# root. Will be empty if make is invoked from the root. Note that
+# whenever  we  reference the PWD variable we need to take the re-
+# alpath in order to  resolve  symlinks  for  the  sake of consis-
+# tency, otherwise this can cause issues later.
 pwd_rel_root := $(call rel_root,$(realpath $(PWD)))
 # This is a function of  zero  arguments  that, when called, will
 # return the CWD (which changes as the source tree is  traversed)
@@ -1230,6 +1249,7 @@ endif
 
 print_compile = $(call print_rule,$(c_green)compiling$(c_norm) $<)
 print_link    = $(call print_rule,  $(c_cyan)linking$(c_norm) $@)
+print_ar      = $(call print_rule,$(c_cyan)archiving$(c_norm) $@)
 #print_run     = $(call print_rule,  $(c_blue)running$(c_norm) $<)
 print_remove  = $(call print_rule, $(c_red)removing$(c_norm) $*)
 print_copy    = $(call print_rule,  $(c_magenta)copying$(c_norm) $< to $(bin_folder))
@@ -1302,8 +1322,6 @@ endif
 # ===============================================================
 # Locations
 # ===============================================================
-# FIXME: need separate location file for each build configuration
-#
 # This contains a list of all locations encountered in the entire
 # build tree, even ones which may not be built in this invocation
 # of  make,  depending on the target requested and/or the current
@@ -1461,6 +1479,7 @@ define _compile_srcs
 endef
 
 compile_srcs_exe = $(eval $(call _compile_srcs,))
+compile_srcs_ar  = $(eval $(call _compile_srcs,CFLAGS_AR))
 compile_srcs_so  = $(eval $(call _compile_srcs,CFLAGS_LIB))
 
 # ===============================================================
@@ -1502,18 +1521,69 @@ define _link
     # which would not otherwise trigger rebuilding.  We assume
     # that this file ends in a .mk extension and then filter
     # it out in the rule.
+    #
+    # In linker command we put LDFLAGS at the end so that the
+    # addition of a library for linking will come after all
+    # the other modules (which may need them).
     $$(OUT_PATH): $(project_files)
     $$(OUT_PATH): $$(NEW_OBJS) $(call link_binaries,$(LOCATION)) | $(relCWD)$(lib_name)
-	    $$(print_link) $$(LD) $$(LDFLAGS) $$($2) $$(SONAME_$(LOCATION)) $(ld_no_undefined) -Wl,-rpath,'$$$$ORIGIN' $$(call keep_link_files,$$^) $(TP_LINK_EXTRA) $(TP_LINK_$(LOCATION)) -o $$@
+	    $$(print_link) $$(LD) $$($2) $$(SONAME_$(LOCATION)) $(ld_no_undefined) -Wl,-rpath,'$$$$ORIGIN' $$(call keep_link_files,$$^) $(TP_LINK_EXTRA) $(TP_LINK_$(LOCATION)) $$(LDFLAGS) -o $$@
+
+endef
+
+# ===============================================================
+# Creating Archive
+# ===============================================================
+define _ar
+
+    OUT_NAME := $1
+
+    $(LOCATION)_BINARY       := $$(call into_lib,$(relCWD)$$(OUT_NAME))
+    DEFAULT_GOAL_$(LOCATION) := $$($(LOCATION)_BINARY)
+
+    NEW_L_SRCS     := $(wildcard $(relCWD)*.l)
+    NEW_Y_SRCS     := $(wildcard $(relCWD)*.y)
+    NEW_L_SRCS_CPP := $$(NEW_L_SRCS:.l=.l.cpp)
+    NEW_Y_SRCS_CPP := $$(NEW_Y_SRCS:.y=.y.cpp)
+
+    NEW_C_SRCS  := $(wildcard $(relCWD)*.c $(relCWD)*.cpp) $$(NEW_L_SRCS_CPP) $$(NEW_Y_SRCS_CPP)
+    NEW_OBJS    := $$(NEW_C_SRCS:.cpp=.o)
+    NEW_OBJS    := $$(NEW_OBJS:.c=.o)
+    NEW_OBJS    := $$(call map,into_lib,$$(NEW_OBJS))
+
+    BINARIES    := $(BINARIES)    $$($(LOCATION)_BINARY)
+
+    OUT_PATH := $$(call into_lib,$(relCWD)$$(OUT_NAME))
+
+    # Note that in the rule below we are adding the project
+    # file as an explicit dependency so as to cause all files
+    # to be rebuilt if it changes (because usually changes to
+    # this file would change a compiler flag or add a dependency
+    # which would not otherwise trigger rebuilding.  We assume
+    # that this file ends in a .mk extension and then filter
+    # it out in the rule.
+    $$(OUT_PATH): $(project_files)
+    $$(OUT_PATH): $$(NEW_OBJS) $(call link_binaries,$(LOCATION)) | $(relCWD)$(lib_name)
+	    $$(print_ar) $$(AR) $(ARFLAGS) $$@ $$(call keep_link_files,$$^)
 
 endef
 
 link_exe = $(eval $(call _link,$1,))
 link_so  = $(eval $(call _link,$(lib_prefix)$1.$(SO_EXT),LDFLAGS_LIB))
+archive  = $(eval $(call _ar,$(lib_prefix)$1.$(AR_EXT)))
 
 # ===============================================================
 # Highlevel functions
 # ===============================================================
+define _make_ar
+    $$(call set_location,$1)
+    $$(call create_lib)
+    $$(call compile_srcs_ar)
+    $$(call archive,$2)
+endef
+
+make_ar = $(eval $(call _make_ar,$1,$2))
+
 define _make_so
     $$(call set_location,$1)
     $$(call create_lib)
@@ -1536,12 +1606,23 @@ make_exe = $(eval $(call _make_exe,$1,$2))
 first_level_deps = $($(1).deps)
 expand_deps_1    = $(call map,first_level_deps,$1)
 # This will recursively expand a single location into a full list
-# of all dependencies, including  itself  (there may be redunden-
-# cies).
+# of all dependencies, including  itself  (there  may be redunden-
+# cies). Note: it is important (given what follows later) to  put
+# self before the dependencies.
 expand_deps_full = $1 $(call map,expand_deps_full,$(call expand_deps_1,$1))
-# Now just remove redundencies.
-all_deps         = $(call uniq,$(call expand_deps_full,$1))
-all_deps_noself  = $(filter-out $1,$(call uniq,$(call expand_deps_full,$1)))
+# Now just remove redundencies with  the uniq function. Note that
+# we are calling uniq on the  reverse  of the deps list. At first
+# this reverse may seem to be  redundant,  but it is necessary be-
+# cause the full deps list above will always put the dependencies
+# after  self  (which  they need to be in order that dependencies
+# appear in the right order on the linker command line)  but  the
+# uniq method will keep only the first occurence of  an  item  in
+# the list, whereas we actually  want  to  keep  only the last oc-
+# curence  of  it  in order to preserve the property that, on the
+# linker  command  line,  a library comes before all of its depen-
+# dencies.
+all_deps         = $(call on_reverse,uniq,$(call expand_deps_full,$1))
+all_deps_noself  = $(filter-out $1,$(call all_deps,$1))
 
 # ===============================================================
 # Include dependencies
@@ -1588,11 +1669,22 @@ enter_all = $(call map,enter,$1)
 # ===============================================================
 # Standard top-level targets
 build: $$(BINARIES)
+
+# This  is a list of all binaries that we want to copy to the bin
+# folder. Currently, we just  take  all  the top-level targets of
+# each folder (e.g., exe, so) and filter out the archives,  since
+# those don't need to be distributed to run. This  list  is  used
+# both here (for defining the dependencies of  the  copy-bin  tar-
+# get)  and also in another place to create the actual rules that
+# do the copying. At this point  we  don't  know the list of bina-
+# ries, so delay evaluation.
+bins_to_copy = $(filter-out %.$(AR_EXT),$(BINARIES))
+
 # If  run  as  a target this will build and copy all binaries. We
 # use  second expansion here because we don't know what the BINA-
 # RIES are at this point since the src tree hasn't been traversed
 # yet.
-copy-bin: $$(call map,to_bin_folder,$$(BINARIES))
+copy-bin: $$(call map,to_bin_folder,$$(bins_to_copy))
 # Does everything.
 all: copy-bin
 
@@ -1640,9 +1732,11 @@ CFLAGS_RELEASE += $(CXXFLAGS) -Ofast
 $(call set_if_not_specified,CC,gcc)
 $(call set_if_not_specified,CXX,g++)
 $(call set_if_not_specified,LD,g++)
+$(call set_if_not_specified,AR,ar)
 
 ifneq ($(OS),Windows)
     CFLAGS_LIB += -fPIC
+    CFLAGS_AR  += -fPIC
 endif
 
 ifneq ($(origin OPT),undefined)
@@ -1707,6 +1801,10 @@ CWD     := $(OLD_CWD)
 # This file contains config info that can only be  run  after  we
 # have loaded any project-specific make files and/or traverse the
 # source tree. It is the companion to pre-config.mk.
+#
+# Note that if any compile/link flags are set here that they need
+# to have delayed expansion in the rules  (e.g.,  LDFLAGS  is  in-
+# cluded on the linker command line as $$(LDFLAGS).
 
 ifneq ($(origin STATIC_LIBSTDCXX),undefined)
     LDFLAGS += -static-libstdc++
@@ -1729,7 +1827,7 @@ must_be_defined = CFLAGS CXXFLAGS LDFLAGS
 $(call map,assert_defined,$(must_be_defined))
 
 # Make sure all variables are non-empty that need to be
-must_be_nonempty = CC CXX LD bin_folder            \
+must_be_nonempty = CC CXX LD AR bin_folder          \
                    bin_name lib_name sub_locations
 $(call map,assert_nonempty,$(must_be_nonempty))
 
@@ -1767,7 +1865,7 @@ bin_copy_rule = $(eval $(call __bin_copy_rule,$1))
 # Create  a  bin_copy rule for each binary. These rules will copy
 # binary  outputs  (which  do  not include object files) into the
 # top-level binary folder.
-$(call map,bin_copy_rule,$(BINARIES))
+$(call map,bin_copy_rule,$(bins_to_copy))
 
 # When the user runs make  in  a subfolder without specifying any
 # targets  then  this  default  target  will cause all targets to

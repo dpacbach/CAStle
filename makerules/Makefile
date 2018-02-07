@@ -1002,9 +1002,6 @@ ifneq (,$(filter CYGWIN%,$(uname)))
     AR_EXT := a
     bin_platform = win64
     LDFLAGS += -static
-    ifdef CC
-        PATH := $(PATH):$(dir $(CC))
-    endif
     soname_ld_option_prefix = -Wl,-soname,
     ld_no_undefined = -Wl,--no-undefined
     #bison_no_deprecated = -Wno-deprecated
@@ -1022,6 +1019,9 @@ PRECOMP_NAME := precomp.hpp
 opt-suffix :=
 ifneq ($(origin OPT),undefined)
     opt-suffix := .opt
+    CFLAGS += -DNDEBUG
+else
+    CFLAGS += -DDEBUG
 endif
 
 # This is the name that will  be  used for all the binary folders
@@ -1254,6 +1254,7 @@ print_ar      = $(call print_rule,$(c_cyan)archiving$(c_norm) $@)
 print_remove  = $(call print_rule, $(c_red)removing$(c_norm) $*)
 print_copy    = $(call print_rule,  $(c_magenta)copying$(c_norm) $< to $(bin_folder))
 print_copy_   = $(call print_rule,  $(c_magenta)copying$(c_norm) $$< to $(bin_folder))
+print_copy_to = $(call print_rule,  $(c_magenta)copying$(c_norm) $< to $(1))
 print_mkdir   = $(call print_rule, $(c_magenta)creating$(c_norm) $@)
 print_flex    = $(call print_rule,     $(c_yellow)flex$(c_norm) $<)
 print_bison   = $(call print_rule,    $(c_yellow)bison$(c_norm) $<)
@@ -1364,7 +1365,7 @@ location_to_binary = $($1_BINARY)
 # ===============================================================
 define _create_lib
     $(relCWD)$(lib_name):
-	    $$(print_mkdir) mkdir $$@
+	    $$(print_mkdir) mkdir -p $$@
 endef
 
 create_lib = $(eval $(call _create_lib))
@@ -1391,7 +1392,9 @@ define _compile_srcs
     # be compiled to an object  file  with the extension .gch (on
     # top of existing extension).
     NEW_PRECOMP  := $(wildcard $(relCWD)$(PRECOMP_NAME))
-    INC_PRECOMP  := $$(if $$(NEW_PRECOMP),-Winvalid-pch -include $$(call into_lib,$$(NEW_PRECOMP)),)
+    # This variable needs  a  location-specific  name  because it
+    # won't be evaluated until inside a rule.
+    INC_PRECOMP_$(LOCATION) := $$(if $$(NEW_PRECOMP),-Winvalid-pch -include $$(call into_lib,$$(NEW_PRECOMP)),)
     PRECOMP_GCH  := $$(if $$(NEW_PRECOMP),$$(call into_lib,$$(NEW_PRECOMP).gch),)
 
     # It  is possible that the cpp sources may contain duplicates
@@ -1455,7 +1458,7 @@ define _compile_srcs
     # rule.
     $$(NEW_OBJS_C): $(project_files)
     $$(NEW_OBJS_C): $(relCWD)$(lib_name)/%.o: $(relCWD)%.c | $(relCWD)$(lib_name)
-	    $$(print_compile) $$(CC) $(TP_INCLUDES_$(LOCATION)) $(TP_INCLUDES_EXTRA) $(call include_flags,$(LOCATION)) $$($1) $(CXXFLAGS_TO_USE) -c $$< -o $$@
+	    $$(print_compile) $$(CC) $(TP_INCLUDES_$(LOCATION)) $(TP_INCLUDES_EXTRA) $(call include_flags,$(LOCATION)) $$($1) $(CFLAGS) $$($(LOCATION).cflags) -c $$< -o $$@
 
     # Note that we only support PCH for C++, and so we  have  the
     # dependency  on the .gch file and also a -include flag given
@@ -1463,7 +1466,7 @@ define _compile_srcs
     # clude the pch header first.
     $$(NEW_OBJS_CPP): $(project_files) $$(PRECOMP_GCH)
     $$(NEW_OBJS_CPP): $(relCWD)$(lib_name)/%.o: $(relCWD)%.cpp | $(relCWD)$(lib_name)
-	    $$(print_compile) $$(CXX) $(TP_INCLUDES_$(LOCATION)) $(TP_INCLUDES_EXTRA) $(call include_flags,$(LOCATION)) $$(INC_PRECOMP) $$($1) $(CXXFLAGS_TO_USE) -c $$< -o $$@
+	    $$(print_compile) $$(CXX) $(TP_INCLUDES_$(LOCATION)) $(TP_INCLUDES_EXTRA) $(call include_flags,$(LOCATION)) $$(INC_PRECOMP_$(LOCATION)) $$($1) $(CFLAGS) $(CXXFLAGS) $$($(LOCATION).cflags) $$($(LOCATION).cxxflags) -c $$< -o $$@
 
     # If we're doing PCH then create a target that builds it. Im-
     # portant:  this compile rule should be kept identical to the
@@ -1473,7 +1476,7 @@ define _compile_srcs
     ifneq ($$(NEW_PRECOMP),)
     $$(PRECOMP_GCH): $(project_files)
     $$(PRECOMP_GCH): $$(NEW_PRECOMP) | $(relCWD)$(lib_name)
-	    $$(print_compile) $$(CXX) $(TP_INCLUDES_$(LOCATION)) $(TP_INCLUDES_EXTRA) $(call include_flags,$(LOCATION)) $$($1) $(CXXFLAGS_TO_USE) -c $$< -o $$@
+	    $$(print_compile) $$(CXX) $(TP_INCLUDES_$(LOCATION)) $(TP_INCLUDES_EXTRA) $(call include_flags,$(LOCATION)) $$($1) $(CFLAGS) $(CXXFLAGS) $$($(LOCATION).cflags) $$($(LOCATION).cxxflags) -c $$< -o $$@
     endif
 
 endef
@@ -1555,16 +1558,27 @@ define _ar
 
     OUT_PATH := $$(call into_lib,$(relCWD)$$(OUT_NAME))
 
-    # Note that in the rule below we are adding the project
-    # file as an explicit dependency so as to cause all files
-    # to be rebuilt if it changes (because usually changes to
-    # this file would change a compiler flag or add a dependency
-    # which would not otherwise trigger rebuilding.  We assume
-    # that this file ends in a .mk extension and then filter
-    # it out in the rule.
+    # Note  that in the rule below we are adding the project file
+    # as an explicit dependency so as to cause all  files  to  be
+    # rebuilt if it changes (because usually changes to this file
+    # would  change  a  compiler  flag  or add a dependency which
+    # would not otherwise trigger rebuilding. We assume that this
+    # file  ends in a .mk extension and then filter it out in the
+    # rule.
+    #
+    # In  archiving,  unlike  with  linking a dynamic library, we
+    # need  to  first delete the archive because object files cor-
+    # responding to deleted (or  renamed)  cpp files would linger
+    # in the archive and (potentially silently)  cause  conflicts
+    # later during linking. Unfortunately  it  seems  that the ar
+    # utility  does  not  have an option that says "remove all ob-
+    # ject files from the archive that  were not specified on the
+    # commandline." So if we want to  clean  them out, we need to
+    # fork a second process, and  so  then  simply  removing  the
+    # archive seems as good an approach as any.
     $$(OUT_PATH): $(project_files)
-    $$(OUT_PATH): $$(NEW_OBJS) $(call link_binaries,$(LOCATION)) | $(relCWD)$(lib_name)
-	    $$(print_ar) $$(AR) $(ARFLAGS) $$@ $$(call keep_link_files,$$^)
+    $$(OUT_PATH): $$(NEW_OBJS) | $(relCWD)$(lib_name)
+	    $$(print_ar) rm -f $$@ && $$(AR) $(ARFLAGS) $$@ $$(call keep_link_files,$$^)
 
 endef
 
@@ -1690,7 +1704,25 @@ all: copy-bin
 
 .DEFAULT_GOAL = all
 
-.PHONY: all build copy-bin
+# Build either debug or  release  specified  using make target in-
+# stead  of make variable. -s means "quiet" so that make will not
+# print  e.g.  "Entering  directory...". Note that if you run the
+# debug target with OPT set then it  will  be  a  release  target
+# which  defeats  the  purpose,  since  $(MAKE) will inherit that
+# variable.  Also be careful here with race conditions with the
+# .location file mechanism until that is fixed.
+debug:
+	@$(MAKE) -s all
+
+release:
+	@$(MAKE) -s all OPT=
+
+# This target, apart from building  both  debug and release, will
+# enable  building them both in parallel since they are specified
+# as separate targets.
+both: debug release
+
+.PHONY: all build copy-bin both debug release
 
 clean_targets = $(OBJS) $(BINARIES) $(DEPS) $(YL_SRCS) $(GCHS) \
                 $(call map,to_bin_folder,$(BINARIES))
@@ -1714,11 +1746,16 @@ into_lib = $(dir $1)$(lib_name)/$(notdir $1)
 # ===============================================================
 # Default project settings
 # ===============================================================
-CFLAGS         += -MMD -MP -m64 -Wall -Wextra -pedantic
-CXXFLAGS       += $(CFLAGS)
+# In this module we set the base compiler flags that will be used
+# for  compiling  all C/C++ files. If a library needs specific ad-
+# ditions  to  these  flags  then they can specify them using the
+# <location>.cflags  or  <location>.cxxflags in the library's own
+# make file, where <location> is  the  location  name for that li-
+# brary.
+CFLAGS_BASE      := -MMD -MP -m64 -Wall -Wextra -pedantic
 
-CFLAGS_DEBUG   += $(CXXFLAGS) -g -ggdb
-CFLAGS_RELEASE += $(CXXFLAGS) -Ofast
+CFLAGS_DEBUG     := -g -ggdb
+CFLAGS_RELEASE   := -O3
 
 # Here  "not  specified" is defined as the `origin` of a variable
 # being either "undefined" or  "default".  The  ?= operator would
@@ -1740,10 +1777,17 @@ ifneq ($(OS),Windows)
 endif
 
 ifneq ($(origin OPT),undefined)
-    CXXFLAGS_TO_USE = $(CFLAGS_RELEASE)
+    CFLAGS += $(CFLAGS_BASE) $(CFLAGS_RELEASE)
 else
-    CXXFLAGS_TO_USE = $(CFLAGS_DEBUG)
+    CFLAGS += $(CFLAGS_BASE) $(CFLAGS_DEBUG)
 endif
+
+# For C++ compilation we will (on the compile  command  line)  al-
+# ready include the  C  flags,  so  CXXFLAGS  only includes those
+# C++-specific flags that we need over  and  above  the  C  flags.
+# Also, at the moment we  don't distinguish between debug/release
+# (this is assumed to be done only in the C flags).
+CXXFLAGS += # Allow user to add in their own on make cmd line.
 
 LDFLAGS     ?=
 LDFLAGS_LIB := -shared
@@ -1813,6 +1857,12 @@ endif
 ifneq ($(origin STATIC_LIBGCC),undefined)
     LDFLAGS += -static-libgcc
 endif
+
+# If  on  Windows (and using MinGW) we have to add the bin folder
+# into the PATH variable to get it to work properly.
+ifeq ($(OS),Windows)
+    PATH := $(PATH):$(dir $(CC))
+endif
 # This  file  will  do  anything  can  can only be done after the
 # source tree has been traversed.
 
@@ -1845,11 +1895,11 @@ $(call assert_no_dup,$(call map,notdir,$(BINARIES)),$(bin_dup))
 # Things having to do with bin/lib folders
 
 ifneq (undefined,$(origin no_top_bin_folder))
-    bin_folder = .
+    bin_folder = $(root)
 endif
 
 $(bin_folder):
-	$(print_mkdir) mkdir $(bin_folder)
+	$(print_mkdir) mkdir -p $(bin_folder)
 
 to_bin_folder = $(bin_folder)/$(notdir $1)
 
@@ -1897,9 +1947,20 @@ ifdef main_is
     # This is the file name of the  executable.  Assume  that  it
     # will be built as part of the `all` target and that it  will
     # be copied into the bin folder, wherever that is.
-    bin_name := $(notdir $(call location_to_binary,$(main_is)))
+    main_name := $(notdir $(call location_to_binary,$(main_is)))
     run: all
-	    $(at)cd $(bin_folder) && ./$(bin_name)
+	    $(at)cd $(bin_folder) && ./$(main_name)
+    .PHONY: run
+endif
+
+# Same as above for main_is except for the testing executable.
+ifdef test_is
+    # This is the file name of the  executable.  Assume  that  it
+    # will be built as part of the `all` target and that it  will
+    # be copied into the bin folder, wherever that is.
+    test_name := $(notdir $(call location_to_binary,$(test_is)))
+    test: all
+	    $(at)cd $(bin_folder) && ./$(test_name)
     .PHONY: run
 endif
 # This file will display some info about the various settings
